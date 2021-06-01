@@ -1,0 +1,79 @@
+ANSIBLE
+	Redhat
+	Python based
+	Agentless - Simply connects over SSH and runs commands
+	Pushes configuration to devices
+
+cd /etc/ansible	-> ansible.cfg hosts roles
+hosts -> like an inventory
+
+	[linux]
+	<ipaddresses>
+	
+	[linux:vars]	
+	ansible_user=root
+	ansible_password=P@ssword123
+	
+ansible linux -m ping
+
+Playbook -> Organizes all that we do in a command line in a YAML(Data serialization) format
+playbook>plays>tasks
+
+vi sometaskname.yaml
+	
+---
+ - name : sometaskname
+   hosts : linux
+   tasks :
+	- name: ensure nano is there
+	  yum:
+		name: nano
+		state: latest
+		
+ansible-playbook sometaskname.yml
+PLAY [sometaskname] *********************************************************************		
+
+TASK [Gathering Facts] *********************************************************************
+
+TASK [ensure nano is there] *********************************************************************
+
+PLAY RECAP  *******************************************************************
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Ansible works by pushing changes out to all your servers (by default), and requires
+no extra software to be installed on your servers (thus no extra memory footprint,
+and no extra daemon to manage), unlike most other configuration management tools.
+
+pip3 install ansible
+
+Ansible uses an inventory file (basically, a list of servers) to communicate with your
+servers. Like a hosts file (at /etc/hosts) that matches IP addresses to domain names,
+an Ansible inventory file matches servers (IP addresses or domain names) to groups.
+
+/etc/ansible/hosts
+[example]
+www.example.com
+	where example is the group of servers you’re managing and www.example.com is the
+	domain name (or IP address) of a server in that group.
+	
+ansible example -m ping -u [username]		->	-m means what module to use. If you do not pass any module it defaults to the command module
+	where [username] is the user you use to log into the server. If everything worked,
+	you should see a message that shows www.example.com | success >>, then the
+	result of your ping. If it didn’t work, run the command again with -vvvv on the end
+	to see verbose output.	
+	
+ansible example -a "free -m" -u [username]		->	-a means what arguments	
+
+ansible -i inventory multi -a "free -h"
+ansible -i inventory multi -a "date"
+ansible -i inventory db -m setup
+
+
+
+
+
+
+
+
+
+ JUnit 5 aims to adapt java 8 style of coding and several other features as well, that’s why java 8 is required to create and execute tests in JUnit 5 (though it is possible to execute tests written with JUnit 3 or JUnit 4 for backward compatibility).

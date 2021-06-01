@@ -1,0 +1,1143 @@
+Basic Practice:
+
+http://codingbat.com/python
+
+More Mathematical (and Harder) Practice:
+
+https://projecteuler.net/archives
+
+List of Practice Problems:
+
+http://www.codeabbey.com/index/task_list
+
+A SubReddit Devoted to Daily Practice Problems:
+
+https://www.reddit.com/r/dailyprogrammer
+
+A very tricky website with very few hints and touch problems (Not for beginners but still interesting)
+
+Euler Project has ton of math problems
+
+http://www.pythonchallenge.com/
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Flask -> framework for Python to generate HTML code
+
+application.py
+	from flask import Flask, render_template, request	-> request is a special global variable
+		
+	app = Flask(__name__)	-> Hey Flask.. Turn this file application.py into a web application
+	
+	@app.route("/")			-> route that is listening for slash inside of that virtual envelope
+	def index():
+		//return "hello, world"
+		name = request.args.get("name") ->check the incoming request's arguments 
+		//name = request.args.get("name", "world") -> second argument is default value
+		//return render_template("index.html")
+		return render_template("index.html", foo=name) -> To pass data dynamically, use named parameters in python i.e.key=value
+		
+	@app.route("/register", methods=["POST"])
+	def register():
+		name = request.form.get("name")
+		dorm = request.form.get("dorm")
+		if not name or not dorm:
+			return "failure"
+		render_template("success.html")
+++++++++++++++++++++++++++++++++++++++++++++++++
+index.html
+	<html lang="en">
+		<head>
+		</head>
+		<body>
+			hello, {{foo}}
+		</body>
+	</html>	
+++++++++++++++++++++++++++++++++++++++++++++++++	
+	Flask run
+	++++++++++++++++++++++++++++++++++++++++++++++++
+	https://localhost:8080/?name=vijay
+	++++++++++++++++++++++++++++++++++++++++++++++++
+	
+	
+JINJA - Templating Engine. Flask by default supports Jinja
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+PYTHON UDEMY
+++++++++++++
+docs.python.org/3
+Python was created by Guido Van Rossum in 1990
+Python 3 released in 2008
+Python is dynamically typed i.e. No need to specify beforehand what datatype you	 expect
+
+
+Python 2 and 3
+Anaconda Distribution(for installing Python)
+Jupyter Notebooks(development environment)
+Objects and Data Structures
+	- Numbers, Strings, List, Dictionaries, Tuples, Files, Sets, Booleans
+Comparision Operators
+	- Basic Operators, Chained Comparision Operators
+Python Statements
+	- if, elif and else, for loops, while loops, range(), list comprehensions
+Methods and Functions
+	- Methods, Functions, Lambda Expressions, Nested Statements, Scope
+Object Oriented Programming
+	- Objects, Classes, Methods, Inheritance, Special Methods
+Errors and Exception Handling
+	- Errors, Exceptions, Try, Except, Finally
+Modules and Packages
+	- Creating Modules, Installing Modules, Exploring the Python Ecosystem
+Built-in Functions
+	- Map, Reduce, Filter, Zip, Enumerate, All and Any, Complex
+Python Decorators
+Python Generators
+	- Iteration vs Generation, Creating Generators
+++++++++++++++++++++++
+"No install" options
+	jupiter.org/try
+	google collab online notebooks
+	repl.it
+	google search -> python interpreter online
+++++++++++++++++++++++
+https://github.com/Pierian-Data/Complete-Python-3-Bootcamp
+++++++++++++++++++++++
+EXECUTE CODE 
+++++++++++++
+SHIFT + ENTER -> Equivalent of PLAY button
+	
+++++++++++++++++++++++
+Comments 
+++++++++
+# -> Hash Tag
+
+Datatypes
++++++++++
+Integers - int - 100
+Floating point - float - 2.3
+Strings - str - ordered sequence of characters - "hello" 'sammy'	
+Lists - list - ordered sequence of objects - [10,"hello",200.3]
+Dictionaries - dict - unordered key-value pairs - {"mykey":"myvalue"}
+Tuples - tup - Ordered immutable sequence of objects - (10,"hello",200.3)
+Sets - set - Unordered collection of unique objects - {"a","b"}
+Booleans - bool - Logical value indicating true or false
++++++++++++++++++++++++++
+Numbers
++++++++
+1+1
+2-1
+3*2
+4/2
+4%3 - Modulo
+2**3 - Power
++++++++++++++++++++++++++
+Variables
++++++++++
+Rules for variable names
+	- Names cannot start with a number
+	- There can be no spaces in the name. Use _ instead
+	- Can't use any of these symbols :"',<>/?|\()!@#$%^&*~-+
+	- PEP8 best practices names to be lower case
+++++++++++++++++++++++++++
+Dynamic Typing
+++++++++++++++
+Python uses Dynamic Typing i.e you can reassign variables to different data types	
+my_dogs = 2
+my_dogs = [ "Sammy","Frankie" ]
+TYPE FUNCTION 
+	a = "vijay"
+	type(a)	->	str
++++++++++++++++++++++++++
+Strings
++++++++
+Reverse Index - Uses -1 to grab the last letter of the String
+Slicing - Allows you to grab a sub-section of multiple characters. Syntax [start:stop:step]
+len("hello") - 5
+greeting = "hello world" 
+	greeting[0] -> h
+	greeting[6:] -> world
+	greeting[:5] -> hello
+	greeting[4:7] -> o w
+	greeting[::2] -> hlowrd
+	greeting[::-1] -> dlrow olleh
+	greeting * 4 -> hello worldhello worldhello worldhello world
+	2 + 3 -> 5	
+	'2' + '3' -> '23'
+	greeting.upper() -> HELLO WORLD
+	greeting.split() -> ['hello','world']
+	
++++++++++++++++++++++++++
+String Formatting 
+++++++++++++++++++
+.format() method
+	print('Hello {}'.format('WORLD')) -> Hello WORLD
+	print('The {} {} {}'.format('quick','brown','fox')) -> The quick brown fox
+	print('The {2} {1} {0}'.format('hen','fat','big')) -> The big fat hen
+	print('The {b} {f} {h}'.format(h='hen',f='fat',b='big')) -> The big fat hen
+
+f-strings -> formatted string literals	
+	name="emil"
+	print(f"His name is {name}") -> Allows you to write the variable name directly under curly braces
+
++++++++++++++++++++++++++
+Float Formatting 
+++++++++++++++++++
+Float Formatting follows "{value:width.precision f}"	-> width means how long/wide you want your entire string number to be
+result = 100/777
+print("The result is {r}".format(r=result))	-> The result is 0.1287001287001287
+print("The result is {r:1.3f}".format(r=result))	->	The result is 0.129
+print("The result is {r:10.3f}".format(r=result))	->	The result is      0.129
+
++++++++++++++++++++++++++
+Lists 
+++++++++++++++++++
+Ordered sequences that can hold a variety of object types.
+They use [] and commas to separate objects in the list
+Lists support Indexing and Slicing and can be nested
+
+my_list = [1,2,3]
+my_list = [1,'hello',3.35345]
+len(my_list)
+my_list[1]	-> 'hello'
+my_list[1:] ->	['hello',3.35345]
+another_list = ['four','five']
+new_list = my_list + another_list -> [1,'hello',3.35345,'four','five']
+new_list[1] = 2.345
+new_list -> [1,2.345,3.35345,'four','five']
+new_list.append(6) -> [1,2.345,3.35345,'four','five',6]
+new_list.pop() -> Pops an element from end of list -> Returns 6 and new_list -> [1,2.345,3.35345,'four','five']
+new_list.pop(2) -> Pops an element from the index -> Returns 3.35345 and new_list -> [1,2.345,'four','five']
+new_list.sort() -> Sorts in ascending order IN PLACE
+new_list.reverse() -> Sorts in descending order IN PLACE
+sorted(new_list) -> returns the sorted list
+
++++++++++++++++++++++++++
+Dictionaries (Similar to HashMap)
+++++++++++++++++++
+Unordered mappings for storing objects using key-value pairing
+Dictionaries are mappings and do not retain order! If you do want the capabilities of a dictionary but you would 
+like ordering as well, check out the ordereddict 
+
+my_dictionary = {"mykey1":"myvalue1","mykey2":"myvalue2"}
+my_dictionary["mykey1"] -> 'myvalue1'
+dict = {'k1':123,'k2':[0,1,2,3,4],'k3':{'insidekey':300}}
+dict['k3']['insidekey'] -> 300
+Adding/overriding to dictionary -> dict['k4'] = 400
+dict = {'k1':123,'k2':[0,1,2,3,4],'k3':{'insidekey':300},'k4':400}
+dict.keys() -> Returns the dictionary keys -> dict_keys(['k1', 'k2', 'k3', 'k4'])
+dict.values() -> Returns the dictionary values -> dict_values([123, [0, 1, 2, 3, 4], {'insidekey': 300}])
+dict.items() -> Returns the elements as tuples -> dict_items([('k1', 123), ('k2', [0, 1, 2, 3, 4]), ('k3', {'insidekey': 300})])
+
++++++++++++++++++++++++++
+Tuples (Similar to Lists, except for Immutability)
+++++++++++++++++++
+Once an element is inside a Tuple, it cannot be reassigned
+Tuples use Parenthesis (1,2,3)
+tupl = (1,2,3)	-> type(tupl)	-> tuple
+lst = [1,2,3]	-> type(lst)	-> list
+lst[0] = "hi"	->	['hi',2,3]
+tupl[0] = "hi" -> TypeError: 'tuple' object does not support item assignment
+
+
+tupl1 = (1,2,3,4,5,6,7,8,9,1,1,1,1,2,6)
+tupl1.count(1)	-> 5
+tupl1.index(1)	-> 0 (first occurance)
+
++++++++++++++++++++++++++
+Sets
+++++
+Unordered collections of unique elements. i.e there can only be one representative of the same object
+myset = set()
+myset.add(1)
+myset.add(2)
+myset -> {1,2}
+Casting a list to a set to get list of unique values
+mylist = [1,1,1,1,2,2,2,2,3]
+myset = set(mylist) -> {1, 2, 3}
++++++++++++++++++++++++++++++
+Booleans (Captialized T and F)
+++++++++
+True
+False
+
+type(False) -> bool
+1 > 2 		-> False
+
+b = None
+type(b) -> NoneType
+++++++++++++++++++++++++++++++
+Files
+++++++
+%%writefile myfile.txt -> works only with Jupiter notebook
+
+myfile = open('myfile.txt') -> To open a file
+
+myfile = open('C:\\Users\\91979\\Desktop\\PLANNER\\LEARNING\\PYTHON\\myfile.txt') -> To open a file at any location on your PC
+
+str = myfile.read() -> Returns a giant string of everything that is in this text file
+	'Hello this is vijay\ni stay at chennai\ni work at GAVS\n'
+
+Again -> myfile.read() -> ''	because the cursor has moved to the end of the file
+
+myfile.seek(0) -> To return the cursor back to zero
+
+myfile.readlines() -> Returns list of lines -> ['Hello this is vijay\n', 'i stay at chennai\n', 'i work at GAVS\n']
+
+myfile.close() -> To close the file, once you are done working with it
+
+with open('myfile.txt') as my_new_file:		-> No longer worry about closing the file
+    contents = my_new_file.read()
+
+with open('myfile.txt',mode='r') as myfile:
+    contents = myfile.read()
+
+Modes are r(read), w(write), a(append)
+	r - read only
+	w - writeonly. will overwrite files or create new
+	a - append only. will add onto files
+	r+ - reading and writing
+	w+ - writing and reading(Overwrites existing files or creates a new file)	
+
+with open('myfile.txt',mode='a') as myfile:
+    myfile.write("appending content")
+	
+with open('newfile.txt',mode='w') as myfile:
+    myfile.write("overwriting content")	
+	
+++++++++++++++++++++++++++++++++++++++
+Comparision Operators	- Logical(and/or/not)
++++++++++++++++++++++
+2 == 2 -> True
+2 == 1 -> False
+'hello' != 'bye' -> True
+1 < 2 < 3 -> True
+1 < 2 and 2 < 3 -> True	
+not(1 == 1) -> False
++++++++++++++++++++++++++++++++++++++++
+Control Flow(if/elif/else) 
+++++++++++++
+if/elif/else
+Control flow makes use of colons and indentation(whitespace)
+
+if some_condition:
+	# execute some code
+elif some_other_condition:
+	# execute some other code	
+else:
+	# do something else	
+	
+hungry = True
+if hungry:
+    print("I'm Hungry")
+else:
+    print("I'm not Hungry")	
+	
+job = 'software'
+if job == 'auto':
+    print("I work for auto industry")
+elif job == 'software':
+    print("I work for IT industry")
+else:
+    print("I do not work")	
+++++++++++++++++++++++++++++++++++++++++
+For Loop
+++++++++
+my_iterable = [1,2,3]
+for item_name in my_iterable:
+	print(item_name)
+
+namelist = ['vijay','priya', 'meenu','gauti']
+for name in namelist:
+    print(name)	
+
+numlist = [1,2,3,4,5,6,7,8,9,10]
+for num in numlist:
+    if num % 2 == 0:
+        print(f'{num} is even')
+    else:
+        print(f'{num} is odd')	
+		
+for letter in 'hello world':
+	print(letter)
+
+for _ in 'hello world':		-> If you don't intend to use the variable name
+	print('cool')
+
+numtuple = (1,2,3,4,5,6,7,8,9,10)
+for item in numtuple:
+	print(item)
+
+TUPLE UNPACKING
+mytuplelist = [(1,2),(3,4),(5,6),(7,8),(9,10)]
+for (a,b) in mytuplelist:
+    print(a)
+    print(b)	
+for a,b in mytuplelist:
+    print(a)
+    print(b)		
+	
+FOR LOOP IN DICTIONARY
+dic = {'k1':'v1','k2':'v2','k3':'v3'}
+for item in dic:			-> By default, the dictionary iterates over the keys alone
+    print(item)				-> K1 k2 k3
+for item in dic.items():	-> If you want the dictionary to iterate over the key-value pairs
+    print(item)				-> ('k1', 'v1')		('k2', 'v2')	('k3', 'v3')
+for key,value in dic.items():
+    print(value)			->	v1		v2		v3
+
+++++++++++++++++++++++++++++++++++++
+While Loop
+++++++++++
+
+while some_boolean_condition:
+	#do something
+else:
+	#do something else
+	
+x=1
+while x < 5:
+    print(x)
+    x += 1
+else:
+    print(f'{x} is not less than 5')
+++++++++++++++++++++++++++++++++++++
+break, continue, pass
++++++++++++++++++++++
+break - breaks out of current closest enclosing loop
+continue - Goes to the top of the closest enclosing loop
+pass - does nothing at all
+
+x = [1,2,3]
+for item in x:
+    #comment	->	SyntaxError: unexpected EOF while parsing
+	
+x = [1,2,3]
+for item in x:
+    #comment
+	pass
+	
+name = "vijay"
+for letter in name:
+    if letter == 'i':
+        continue
+    if letter == 'a':
+        break        
+    print(letter)	
+
+++++++++++++++++++++++++++	
+RANGE
+++++++
+mylist = [1,2,3]
+for num in range(10):
+	print(num)			-> 0 1 2 3 4 5 6 7 8 9
+for num in range(2,10):
+	print(num)			-> 2 3 4 5 6 7 8 9	
+for num in range(0,11,2):
+	print(num)			-> 0 2 4 6 8 10		
+list(range(0,11,2))  -> Returns the range as a list, as range is a generator and you need to cast into a list	
+
+++++++++++++++++++++++++++
+ENUMERATE (returns a tuple along with implicit index count)
+++++++++++
+word = 'abcde'
+for item in enumerate(word):
+    print(item)				->	(0, 'a')	(1, 'b')	(2, 'c')	(3, 'd')	(4, 'e')
+
+word = 'abcde'
+for index,letter in enumerate(word):
+	print(index)
+	print(letter)
+	print('\n')	
+	
+++++++++++++++++++++++++++++
+ZIP (zips together 2 or more lists like a zipper)
+++++
+mylist1 = [1,2,3]
+mylist2 = ['a','b','c']
+zip(mylist1,mylist2) -> Zip generator doesn't return anything
+list(zip(mylist1,mylist2))	-> [(1, 'a'), (2, 'b'), (3, 'c')]
+
++++++++++++++++++++++++++++++
+IN/MIN/MAX
+++++++++++
+
+'x' in [1,2,3] 			-> False
+'x' in ['x','y','z']	-> True
+'a' in 'a world'		-> True
+'key1' in {'key1':'value1','key2':'value2'}		-> True
+
+dic1 = {'key1':'value1','key2':'value2'}
+'key1' in dic1.keys()					-> True
+'value2' in dic1.values()				-> True
+
+mylist = [12,65,2,96,246]
+min(mylist)
+max(mylist)
+
++++++++++++++++++++++++++++++
+IMPORT FUNCTION FROM LIBRARY
+++++++++++++++++++++++++++++
+from random import shuffle		-> In place function. Randomly shuffles
+mylist = [1,2,3,4,5,6,7,8,9]
+shuffle(mylist)
+mylist		->	[9, 2, 5, 1, 7, 3, 4, 6, 8]
+
+from random import randint
+randint(0,100)				-> 21
+
++++++++++++++++++++++++++++++
+ACCEPT USER INPUT	(as String only. cast as necessary)
++++++++++++++++++
+result = input('enter your name : ')
+print(result)
+type(result) 	-> str
+
+numberstr = input('enter a number : ')
+print(numberstr)
+type(numberstr) 	->	str
+type(int(numberstr)	->	int
+
+++++++++++++++++++++++++++++++++
+LIST COMPREHENSIONS	(Helps to quickly create list in Python)
++++++++++++++++++++
+Easy Way>>>
+mystrlist = []
+mystr = 'hello'
+for letter in mystr:
+    mystrlist.append(letter)
+mystrlist 						->	['h', 'e', 'l', 'l', 'o']
+
+Concise way>>>
+<ELEMENT> for <ELEMENT> in <STR/LIST/ITERABLE>
+
+mystrlist = [letter for letter in mystr]
+mystrlist 						->	['h', 'e', 'l', 'l', 'o']
+
+numlist = [num*num for num in range(0,10)]
+numlist							->	[0, 1, 4, 9, 16, 25, 36, 49, 64, 81]
+
+FOR WITH IF
+numlist = [num for num in range(0,10) if num%2 == 0]
+numlist							->	[0, 2, 4, 6, 8]
+
+FOR WITH IF ELSE (see the change in order)
+numlist = [num if num%2 == 0 else 'ODD' for num in range(0,10) ]
+numlist							->	[0, 'ODD', 2, 'ODD', 4, 'ODD', 6, 'ODD', 8, 'ODD']
+
+NESTED LOOP
+easy way>>
+mylist = []
+for x in [1,2,3]:
+    for y in [1,10,100]:
+        mylist.append(x*y)
+mylist 							-> [1, 10, 100, 2, 20, 200, 3, 30, 300]
+
+concise way>>
+mylist = [x*y for x in [1,2,3] for y in [1,10,100]]
+mylist 							-> [1, 10, 100, 2, 20, 200, 3, 30, 300]
+
+
++++++++++++++++++++++++++++++++++
+METHODS & PYTHON DOCUMENTATION
+++++++++++++++++++++++++++++++
+mylist = [1,2,3]
+mylist.append(4) -> Use TAB for autocomplete
+3 ways of HELP
+mylist.append	-> Use SHIFT+TAB for HELP
+	Signature: mylist.count(value, /)
+	Docstring: Return number of occurrences of value.
+	Type:      builtin_function_or_method
+help(mylist.count)
+	Help on built-in function count:
+	count(value, /) method of builtins.list instance
+    Return number of occurrences of value.
+https://docs.python.org/3/index.html
+
+++++++++++++++++++++++++++++++++
+FUNCTIONS	(Helps to create blocks of code that can be easily executed many times, 
+			 without needing to constantly rewrite the entire block of code)
+using 'def' keyword -> telling python that this is a function
+correct indentation
+proper structure
+positional arguments
+++++++++++++++++++++++++++++++++
+DEF keyword (function)
+++++++++++++++++++++++
+def  name_of_function():
+	'''
+		Docstring explains function.
+	'''
+	print("Hello")	
+	
+name_of_function() -> Hello	    
+
+def say_hello(name):
+    print(f'Hello {name}')
+say_hello('priya') -> this will print 'hello priya'	
+
+def say_hello(name='vijay'):
+    print(f'Hello {name}')
+say_hello() -> this will print the default value 'hello vijay'
+
+def add_function(num1, num2):
+	return num1+num2			-> return allows to save the result to a variable by sending back the result of function
+	
+result = add_function(1,2)
+
+NOTE : If we do not return anything, type(result) = NoneType, otherwise type(result) = int in above example	
++++++++++++++++
+def is_even(num):
+    if num%2 == 0:
+        return True
+    else:
+        return False
+		
+is_even(51) -> False		
++++++++++++++++
+RETURN TRUE IF ANY NUMBER IS EVEN INSIDE A LIST
+
+def is_even(list):
+    for item in list:
+        if item%2 == 0:
+            return True
+		else:
+            pass 
+    return False
+	
+is_even([51,53,54]) -> True	
++++++++++++++++
+RETURN ALL THE EVEN NUMBERS INSIDE A LIST
+
+def get_even(list):
+    even_list = []
+    for item in list:
+        if item%2 == 0:
+            even_list.append(item)
+        else:
+            pass        
+    return even_list
+	
+get_even([51,54,55,56]) -> [54, 56]	
+
+++++++++++++++++++++++++++++++++
+FUNCTIONS AND TUPLE UNPACKING
+++++++++++++++++++++++
+stock_prices = [('TCS',100),('IBM',200),('CTS',300)]
+for item in stock_prices:
+    print(item)
+	
+('TCS', 100)
+('IBM', 200)
+('CTS', 300)
+
+for ticker,price in stock_prices:
+    print(ticker)
+TCS
+IBM
+CTS	
++++++++++
+GET EMPLOYEE OF MONTH
+def get_emp_of_month():
+    work_hours = [('Vijay',100),('Priya',200),('Gautham',300)]
+    max_hours = 0
+    emp_of_month = ''
+    for emp_name,emp_hours in work_hours:
+        if emp_hours > max_hours:
+            emp_of_month = emp_name
+            max_hours = emp_hours
+    return (emp_of_month,max_hours) 
+
+get_emp_of_month() -> ('Gautham', 300)	
+name,hours = get_emp_of_month()
+name,hours,location = get_emp_of_month()	-> Value Error: Not enough values to unpack(expected 3 , got 2)
+
+++++++++++++++++++++++++++++++++
+INTERACTIONS AMONG FUNCTIONS 
+++++++++++++++++++++++++++++
+
+from random import shuffle
+def shuffle_list(mylist):
+    shuffle(mylist)
+    return mylist
+
+def get_guess():
+    user_input = ''
+    while user_input not in ['0','1','2']:
+        user_input = input('enter a number 0,1 or 2? ')
+    return int(user_input)
+
+def check_guess(my_list,user_guess):
+    if my_list[user_guess] == '0':
+        print('match!')
+    else:
+        print('mismatch!')
+        print(my_list)
+
+#INITIALIZE
+my_list = ['','0','']
+#SHUFFLE
+shuffled_list = shuffle_list(my_list)
+print(shuffled_list)
+#GET USER INPUT
+user_input = get_guess()
+#CHECK GUESS
+check_guess(shuffled_list,user_input)
+
+++++++++++++++++++++++++++
+*args and **kwargs (star arguments and keyword arguments)
+++++++++++++++++++
+A way to accept an arbitrary number of arguments and keyword arguments without having to pre-define a bunch of parameters(positional arguments) in your function calls
+the term args is by convention. It can be any other keyword of choice
+
+
+def args_example(*args):
+    return sum(args)
+	
+args_example(1,2,3,4,5,6,7,8,9) -> 45	
+
+def args_example2(*args):
+	for item in args:
+		print item
+++++++++
+**kwargs -> Build a dictionary of key value pairs
+
+def kwargs_example(**kwargs):
+	print(kwargs)				-> {'fruit': 'apple', 'mykey2': 'myvalue2'}
+    if 'fruit' in kwargs:
+        return kwargs['fruit']  
+		
+kwargs_example(fruit="apple",mykey2="myvalue2") -> 'apple'		
++++++++++
+def both_args_example(*args, **kwargs):
+    print(args)
+    print(kwargs)
+    print('I would like to order {} {}'.format(args[1], kwargs['food']))
+
+both_args_example(10,20,30, sport='cycling', food='fish')
+
+(10, 20, 30)
+{'sport': 'cycling', 'food': 'fish'}
+I would like to order 20 fish
+++++++++++++++++++
+LEVEL 1 EXERCISES
++++++++++++++++++
+Takes arbitrary number of arguments as input and returns list that are only even
+def myfunc(*args):
+    even_list = []
+    for item in args:
+        if item % 2 == 0:
+            even_list.append(item)
+    return even_list
++++++++++
+Takes an input string and returns an output where every letter alternates between upper and lower case
+def myfunc(word):
+    output_str = ''
+    for index,letter in enumerate(word):        
+        if index%2 == 0:
+            output_str+=letter.upper()            
+        else:
+            output_str+=letter.lower()
+    return output_str 
+	
+myfunc('arachnophobia') -> 'ArAcHnOpHoBiA'	
++++++++++
+LESSER OF 2 EVENS: Write a  function that returns the lesser of two given numbers if both numbers are even, 
+but returns the greater if one or both numbers are odd
+
+def lesser_of_two_evens(x,y):
+    if x%2 == 0 and y%2 == 0:
+        if x < y:
+            return x
+        else:
+            return y
+    else:
+		if y > x:
+			return y
+		else:
+			return x
+    
+lesser_of_two_evens(2,4)	-> 2
+lesser_of_two_evens(2,5)	-> 5
+
+A better way
+
+	def lesser_of_two_evens(x,y):
+    if x%2 == 0 and y%2 == 0:
+        min(x,y)
+    else:
+		max(x,y)
+
+
++++++++++
+ANIMAL CRACKERS : Write a function that takes a two word string and returns true if both the words begin with the sane letter
+
+def animal_crackers(str):
+    words = str.split(' ')
+    if words[0][0] == words[1][0]:
+        return True
+    else:
+        return False
+
+animal_crackers('hey dude') -> False
+animal_crackers('dolly dude') -> True
++++++++++
+MASTER YODA : Given a sentence, return the sentence with the words reversed
+
+def master_yoda(sentence):
+    reverse_sentence = ''
+    words = sentence.split()
+    reverse_sentence = ' '.join(words[::-1])
+    return reverse_sentence
+
+master_yoda('vijay anand') -> 'anand vijay'	
++++++++++
+ALMOST THERE: Given an integer, return True if n is within 10 of either 100 or 200
+
+def almost_there(num):
+    return abs(100-num) <= 10 or abs(200-num) <= 10
+	
+almost_there(111) -> False
+almost_there(110) -> True	
+
+++++++++++++++++++
+LEVEL 2 EXERCISES
++++++++++++++++++
+Find 33: Given a list of integers, return True if the array contains a 3 next ot 3 somewhere
+
+def find_33(list):
+    found = False
+    for index in range(0,len(list)-1):
+        if list[index] == 3 and list[index] == list[index+1]:
+            found = True
+    return found
+
+find_33([1,3,2,3,4,5]) -> False
+find_33([1,3,2,3,4,5,3,3]) -> True	
+++++++++++++++++++
+Paperdoll : Given a String, return a string where for every character in the original,there are 3 characters
+
+def paper_doll(word):
+    word_thrice = ''
+    for letter in word:
+        word_thrice+=letter*3
+    return word_thrice 
+
+paper_doll('hey') -> 'hhheeeyyy'
+++++++++++++++++++
+Blackjack: Given 3 integers between 1 and 11, if their sum is less than or equal to 21, return their sum. If their sum exceeds 21  
+and there's a 11, reduce total sum by 10. Finally if their sum(even after adjustments) exceeds 21 return bust
+
+def blackjack(x,y,z):
+    sum = x+y+z
+    if sum > 21 and 11 in [x,y,z]:
+        sum-=10
+    if sum > 21:
+        sum='bust'
+    return sum  
+	
+blackjack(5,6,7) -> 18
+blackjack(9,9,9) -> 'bust'
+blackjack(9,9,11) -> 19	
+++++++++++++++++++
+Summer of 69: Return to sum of the numbers in the array except ignore sections of numbers starting with a 6 and extending to the next 9(every 6 will be followed by at least one 9)
+and we return to 0 for no numbers.
+
+def summer_69(array):
+    sum = 0
+    exclude = False
+    for item in array:
+        if item == 6 and exclude == False:
+            exclude = True
+            continue
+        elif item == 9 and exclude == True:
+            exclude = False
+            continue
+        elif exclude == False:
+            sum = sum + item
+    return sum
+	
+summer_69([1,3,5]) -> 9
+summer_69([4,5,6,7,8,9]) -> 9
+summer_69([2,1,6,9,11]) -> 14
+++++++++++++++++++
+Spy Game: write a function that takes on a list of integers and returns true if it contains 007 in order
+
+def spy_game(arr):
+    first_zero = False
+    second_zero = False
+    third_seven = False
+    for item in arr:
+        if first_zero == False and item == 0:
+            first_zero = True
+            continue
+        elif first_zero == True and second_zero == False and item == 0:
+            second_zero = True
+            continue
+        elif first_zero == True and second_zero == True and third_seven == False and item == 7:
+            third_seven = True
+    if first_zero and second_zero and third_seven:
+        return True
+    else:
+        return False
+
+Improved one
+
+def spy_game(arr):
+    order = [0,0,7,'x']
+    for item in arr:
+        if item == order[0]:
+            order.pop(0)
+    return len(order) == 1
+            		
++++++++++++++++++++
+Count primes: write a function that returns the number of prime numbers that exists up to and including a given number and by conventional will treat 0 and 1 as not prime.
+
+def count_primes(num):
+    primes = [2]
+    for x in range(3,num,2):        
+        is_prime = True
+        for y in range(3,x,2):
+            if x%y == 0:                
+                is_prime = False
+        if is_prime == True:
+            #print('{} is prime'.format(x))
+            primes.append(x)
+    print(primes)        
+    return len(primes)
+                
+				
+count_primes(100)
+[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+25				
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+LAMBDA EXPRESSIONS MAP AND FILTER
+++++++++++++++++++++++++++++++++++
+NOTE: When you pass in function as a map, you do not add in open and close parenthesis. Instead you just pass in the function itself as an argument
+Lambda expression is also called as anonymous function
+
+def make_double(num):
+    return num*2
+
+my_list = [1,2,3,4,5,6,7,8,9,10]
+map(make_double,my_list)	->	<map at 0x1f78cc9ceb0> -> Hey you have a map at this location on your computer
+
+for item in map(make_double,my_list):
+    print(item)			->	[2,4,6,8,10,12,14,16,18,20]	
+
+list(map(make_double,my_list))			->	[2,4,6,8,10,12,14,16,18,20]	
+
+def filter_even(num):
+    if num%2 == 0:
+        return True  
+		
+filter(filter_even,my_list)				->	<filter at 0x20e1b3cb160>
+list(filter(filter_even,my_list)) 		->	[2, 4, 6, 8, 10]		
+
+NOTE: To convert a normal function into a lamda expression, we get rid of DEF keyword as well as FUNCTION NAME and replace it instead with LAMBDA
+
+square = lambda num:num**2
+print(list(map(square,[1,2,3,4,5])))	-> [1, 4, 9, 16, 25]
+square(100)	->	10000
+
+Getting rid of square
+print(list(map(lambda num:num**2,[1,2,3,4,5])))	->		[1, 4, 9, 16, 25]
+
+print(list(filter(lambda num:num%2 == 0,[1,2,3,4,5]))) 	->	[2, 4]
+
+names = ['vijay','meenu','gautham']
+list(map(lambda name: name[::-1], names))	->	['yajiv', 'uneem', 'mahtuag']
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NESTED STATEMENTS AND SCOPE
++++++++++++++++++++++++++++
+
+Scope allows Python to have a set of rules to decide which variables you're referencing in your code and these rules are a LEGB rule format.
+
+L: Local - Names assigned in any way within a function(def or lambda) and not declared global in that function.
+E: Enclosing function locals	-	Names in the local scope of any and all enclosing functions(def or lambda), from inner to outer. i.e. fnction within functions
+G: Global(module)	-	Names assigned at the top level of a module file, or declared global in a def within the file
+B: Built-in(Python)	-	Names preassigned in the built in names module: open, range, syntaxError etc (that has special syntax highlighting rules to them)
+
+Local
+lambda num:num**2	-> num is local to this lambda expression
+
+var = "global variable"
+def method():
+    var = "enclosing fuction locals"
+    def nested_method():
+        var = "local variable"
+        print("CALL -> "+var)
+    print("CALL -> "+var)    
+    nested_method()
+
+print("CALL -> "+var)
+method()
++++++
+CALL -> global variable
+CALL -> enclosing fuction locals
+CALL -> local variable
+
+some_var = 'old'
+def func():
+    global some_var		-> loads the global variable	(AVOID IT)
+    some_var = 'new'	-> local reassignment on a global variable
+    return some_var
++++++
+print(some_var) -> old
+func()	->	new
+print(some_var)	->	new	
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EXERCISES
++++++++++
+Write a function that computes the volume of a sphere given its radius.
+	
+	def volume_sphere(radius):
+		return (4/3*22/7*radius**3)
+	
+	volume_sphere(2) ->	33.523809523809526
+	
+write a function that checks whether a number is in a given range, inclusive of high and low.
+	def in_range(num,low,high):
+		return num>=low and num<=high
+	
+	improved
+	def in_range(num,low,high):
+		return num in range(low,high+1)
+	
+	in_range(5,6,10)	->	True
+	
+write a python function that accepts a string and calculates the number of uppercase letters in lowercase letters.
+	def count_case(sentence):
+		upper_count = 0
+		lower_count = 0
+		for letter in sentence:
+			if letter.isupper():
+				upper_count+=1
+			elif letter.islower():
+				lower_count+=1
+		print(f'LOWER = {lower_count}')
+		print(f'UPPER = {upper_count}')
+	
+	count_case('The world is Fun')	->	LOWER = 11	UPPER = 2
+	
+write a python function that takes in a list and returns a new list with unique elements of the first list.
+	def get_unique(my_list):
+		unique_list = []
+		for item in my_list:
+			if item not in unique_list:
+				unique_list.append(item)
+		return unique_list
+	
+	Improved..
+	def get_unique(my_list):
+		return list(set(my_list))
+	
+	get_unique([1,1,2,3,4,6,2,3,4,5,7,9])	->	[1, 2, 3, 4, 6, 5, 7, 9]
+	
+write a python function to multiply all the numbers in the list.
+	def multiply(my_list):
+		result = 1
+		for item in my_list:
+			result*=item
+		return result 
+	
+	multiply([5,6,10])	->	300
+
+write a python function that checks whether a word or phrase is a palindrome or not.
+	def palindrome(str):
+		if str == str[::-1]:
+			return True
+		else:
+			return False
+		
+	palindrome('malayalam') -> True	
+
+write a python function to check whether a string is a panagram or not. A panagram is a word or sentence containing every letter of the alphabet at least once.
+	string.ascii_lowercase -> It is a string of entire alphabests in lowercase
+	
+	import string
+	def panagram(sentence):
+		sentence = sentence.lower()
+		unique_letters = []
+		for letter in sentence:
+			if letter not in unique_letters and letter in string.ascii_lowercase:
+				unique_letters.append(letter)
+		print(len(unique_letters))        
+		return len(unique_letters) == 26
+	
+	improved..
+	def panagram(sentence):
+		sentence = sentence.lower()
+		sentence = sentence.replace(' ','')
+		output = list(set(sentence))
+		print(output)
+		print(len(output))
+		return len(output) == 26
+
+	panagram('the quick brown fox jumps over the lazy dog')		->	True
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+FIRST MILESTONE(TIC TAC TOE)
+++++++++++++++++++++++++++++
+board = ['','X','O','O','O','X','X','O','O','O']
+def display_board(input):
+    print('|'+input[7]+'|'+input[8]+'|'+input[9])
+    print('|'+input[4]+'|'+input[5]+'|'+input[6])
+    print('|'+input[1]+'|'+input[2]+'|'+input[3])
+
+str_index = ''
+while not(str_index.isdigit() and int(str_index) in range(1,9)):
+    str_index = input("enter the index between 1-9? ")
+    if not(str_index.isdigit()):
+        print('Sorry. That input is not a digit')
+    elif not(int(str_index) in range(1,9)):
+        print('Sorry. That input is not in acceptable range')    
+int_index = int(str_index)
+user_choice = input("enter your choice: O/X ? ")
+board[int_index] = user_choice
+display_board(board)
+
+
+is_continue = False
+while not(is_continue):
+    str_continue = input("Do you want to continue Y/N ?")
+    if not(str_continue == 'Y' or str_continue == 'N'):
+        print('Sorry. That input is not valid')
+    elif str_continue == 'Y':
+        is_continue = True
+    elif str_continue == 'N':
+        is_continue = False  
+		
+		
+Simple interactive program
+1)Display a list
+2)Have a user choose an index position and an input value
+3)Replace value at index position with user's chosen input value		
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+OBJECT ORIENTED PROGRAMMING
++++++++++++++++++++++++++++++
+
+class NameOfClass():	-> Name of class in Camelcase
+
+	def __init__(self,param1,param2):	-> Allows you to create instance of the actual object
+		self.param1=param1
+		self.param2=param2
+		
+	def some_method(self):				-> Using self keyword connect this method to the class
+		#perform some action
+		print(self.param)
+		
+class Sample():
+	pass
+
+my_sample = Sample()
+type(my_sample)	->	__main__.Sample
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Pip INSTALL AND PyPI
+++++++++++++++++++++
+
+PyPI - repository for open-source third party Python packages
+

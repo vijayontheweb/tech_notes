@@ -1,0 +1,16 @@
+Scala REPL
+SBT
+Variables and Values
+Types
+Function Definitions
+If expressions
+Try..Catch..Finally
+Simple loops
+++++++++++++++++++++++++++++
+scala> 1+2
+val res0: Int = 3		-> res0 is memory result. Strong static type
+
+SBT -> Build tool for Scala
+REPL -> Read Evaluate Print Loop
+val -> final variable definition. it cannot be reassigned with a different value
+var -> mutable variable definition. it can be reassigned with another value of the same type

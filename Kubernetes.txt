@@ -1,0 +1,2816 @@
+https://kodekloud.com/p/game-of-pods 
+
+/etc/systemd/system/kubelet.service.d -> 10-kubeadm.conf
+	-> KUBELET_CONFIG_ARGS = /var/lib/kubelet/config.yaml
+
+
+This is for a person who will take care of the management of cluster, its fine tuning, and implementation of any 
+future components, and installation automation automation. The skill set required is below – (This person should 
+be able to do what you people are doing exactly + the installer creation that Sivakumar is doing)
+
+He should be having experience in Kubernetes cluster, Docker and how to install components in that.Should be Good 
+hands on Ansible scripting. Knowledge on Azure Dev Ops or Azure AKS will be a plus.
+Please don’t spend not more than 30 min for each candidates.
+You should be able to decide in the first 10 min if it is ok to ahead with the candidate. 
+Next 20 min firm up the candidature for next level. If not fit you can finish the interview even in first 5 min. 
+That is ok.
+
+Commands
+++++++++
+	kubectl explain pods --recursive | grep envFrom -A3 -> Look up the different options on Pod Definition
+
+
+	kubectl get nodes
+	kubectl get pods
+	kubectl get pods -n kube-system
+	kubectl describe pod myapp-pod
+	kubectl get daemonset -n kube-system
+	kubectl run nginx --image nginx		-> This creates a deployment and not just a POD
+	kubectl create -f pod-definition.yml	->	
+	kubectl delete deployment nginx
+	
+	
+	kubectl get pods
+	kubectl get pods -o wide
+	kubectl get pods --show-labels
+	kubectl get pods -l env=dev --no-headers | wc -l
+	kubectl get all -l env=dev --no-headers | wc -l
+	kubectl get pods --selector "env=prod,bu=finance,tier=frontend"
+	kubectl get all --selector env=prod	
+	kubectl get replicaset
+	
+	kubectl run nginx --image=nginx --generator=run-pod/v1
+	kubectl run redis --image=redis123 --generator=run-pod/v1
+	kubectl run blue --image=nginx --replicas=6
+	
+	kubectl describe pod <pod name>
+	kubectl describe replicaset <replica set name>
+	kubectl delete pod webapp
+	
+	
+	kubectl get replicasets
+	kubectl describe replicaset new-replica-set
+	kubectl apply -f /root/replicaset-definition-2.yaml
+	kubectl delete replicaset replicaset-1
+	kubectl edit replicaset <replicaset-name>
+	kubectl replace -f <replicaset-definition-file-name>
+	kubectl scale --replicas=3 replicaset <replicaset-name>
+	kubectl scale --replicas=3 -f <replicaset-definition-file-name>
+	
+	kubectl get deployments
+	kubectl get services
+	
+	kubectl create -f pod-definition.yml
+	kubectl create -f pod-definition.yml --namespace=dev
+	
+    kubectl describe node centos1 | grep Taint    -> By default, Master node doesn't host any Pods and that is made possible from Taint
+	kubectl get events
+	kubectl logs <podname> --namespace=<namespace name>
+	
+	TAINTS & TOLERATIONS
+	Does any Taint exist on Node01? -> kubectl describe node Node01 | grep -i Taint
+	Create a Taint on Node01 -> kubectl taint node Node01 spray=mortein:NoSchedule
+	kubectl run bee --image=nginx --restart=never --dry-run -o yaml > bee.yaml
+	kubectl explain pod --recursive | less
+	kubectl explain pod --recursive | grep -A5 tolerations
+	pod-definition>spec>tolerations
+		-effect : NoSchedule
+		 key : spray
+         operator: Equal
+		 value: mortein	
+	Does any taint exist on Master Node -> kubectl describe taint master | grep -i taint
+	Remove the taint on Master(using MINUS) -> kubectl taint node master node-role.kubernetes.io/master:NoSchedule-
+	
+	NODE AFFINITY
+	Show labels on Node01 -> kubectl get nodes node01 --show-labels
+	Apply a label to a Node -> kubectl label nodes node01 color=blue
+	
+	DAEMONSETS
+	How many DaemonSets are created in the cluster in all namespaces -> kubectl get daemonsets(ds) --all-namespaces
+	Difference between Deployment and DaemonSet? In DaemonSet, there won't be any replicas and strategy
+	Difference between ReplicaSet and DaemonSet? In DaemonSet, there won't be any replicas(because the replica count is always 1 for DaemonSet)
+	
+	CONFIGMAPS 
+	kubectl get configmaps(cm)
+	kubectl describe configmap db-config
+	
+	SECRETS 
+	kubectl get secrets
+	kubectl describe secrets <secretname>
+	kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+	
+	HOW TO EDIT A POD AND REDEPLOY
+	kubectl get pod orange -o yaml > orange.yaml
+	kubectl delete pod orange
+	
+	PV/PVC
+	To View Pod Logs -> kubectl exec webapp --cat /log/app.log
+	kubectl get persistentvolume --recursive | less
+
+Purpose of Kubernetes -> Host your application in the form of containers in an automated fashion so that you can easily deploy many instances 
+of your application as required and easily enable communication between different services within your application
+
+NOTE ABOUT PODS: PODS HAVE A ONE-ONE RELATIONSHIP WITH THE CONTAINERS. A SINGLE POD CAN HAVE MULTIPLE CONTAINERS EXCEPT THAT YOU DO NOT ADD 
+MULTIPLE CONTAINERS OF THE SAME KIND TO AN EXISTING POD TO SCALE UP. INSTEAD YOU CREATE NEW PODS TO SCALE UP. DELETE AN EXISTING POD TO SCALE 
+DOWN. CONTAINERS WITHIN A POD SHARE THE SAME STORAGE, NETWORK, NAMESPACE AND FATE
+
+Master node has a set of "Control Plane" components
+	ETCD - Highly available key value store. Stores information about the cluster. advertise-client-urls -> Runs on port 2379 by default. 
+		Stores information regarding Nodes, Pods, Config, Secrets, Accounts, Roles, Bindings, Others. Use etcd.service for high availability
+		ETCDCTL is the CLI tool used to interact with ETCD
+		
+		
+	Kube Scheduler - Schedules applications or containers or pods on nodes. Decides which pod goes on which node. Doesn't actually place the 
+		pods on the nodes. Its actually done by kubelet.
+	Controller Manager
+	Node Controller
+	Replication Controller
+	Kube API Server - Orchestrating all operations within the cluster
+	
+Worker Node
+	Kubelet - Agent that runs on each node in the cluster. Listens for instruction from kube-api server and manages containers
+	Kube-Proxy - helps in enabling communication between services within a cluster
+
+kubeadm 1)deploys etcd server as a pod in kube-system namespace 2)deploys kubeapi server
+
+kubeapi server workflow -> When kubeapi server receives a pod request, it creates a pod object without assigning it to any node and 
+updates the information in the etcd server and then updates back the user that the pod is created. The "scheduler" as part of continuously
+monitoring the api server realizes that a new pod has been created with no node assigned. The scheduler identifies the right node to place
+the new pod on and communicates back to the API server. The API server updates the information in the etcd server and passes the information
+to the kubelet in the worker node. The kubelet then creates the pod on the node and instructs the container runtime engine(docker) to deploy
+the application image. Once done, the kubelet updates the information back to the API server, and the API server updates the information in
+etcd cluster. view the kube api server options in 
+kubeadm -> /etc/kubernetes/manifests/kube-apiserver.yaml
+non-kubeadm -> /etc/systemd/system/kube-apiserver.service
+
+Kube-Controller-Manager -> Kube-Controller-Manager.service
+	1)Watch Status 2)Remediate Situation
+	Various controllers are Deployment Controller, Namespace Controller, Endpoint Controller, Job Controller, PV-Protection Controller, 
+	Service Account Controller, Node Controller, PV-Binding Controller, Replication Controller, CronJob, StatefulSet, ReplicaSet
+	In detail..
+	attchdetach, bootstrapsigner, clusterrole-aggregation, cronjob, csrapproving, csrcleaner, csrsigning, daemonset, deployment, disruption,
+	endpoint, garbagecollector, horizontalpodautoscaling, job, namespace, nodeipam, nodelifecycle, persistentvolume-binder, persistentvolume-expander,
+	podgc, pv-protection, pvc-protection, replicaset, replicationcontroller, resourcequota, root-ca-cert-publisher, route, service, serviceaccount,
+	serviceaccount-token, statefulset, tokencleaner, ttl, ttl-after-finished
+
+	
+kubeadm -> /etc/kubernetes/manifests/kube-controller-manager.yaml
+non-kubeadm -> /etc/systemd/system/kube-controller-manager.service
+
+kube-scheduler -> kube-scheduler.service
+	Tries to assign the best node for the pod in 2 phases
+	1)Filter nodes 2)Rank remaining nodes calculates the amount of resources that would be free after placing the pod on the node.
+	kubeadm -> /etc/kubernetes/manifests/kube-scheduler.yaml
+
+Kubelet -> load or unload containers as per instructions from the scheduler of the master node. The Kubelet in the worker node registers 
+	the node with the kubernetes cluster. When it receives instruction to load a container or a pod on the node, it requests the container 
+	runtime engine such as Docker to pull the container image and run an instance. The kubelet also send back report on the status of nodes
+	and pods at regular intervals to the kube-api server.
+	Note: Unlike controller-manager and scheduler, the kubeadm doesn't deploy kubelet. You need to install it manually.
+
+kube-proxy -> kube-proxy.service
+Within a Kubernetes cluster, every pod can reach every other pod. This is acheived by deploying a pod networking solution to
+the cluster. A pod network is an internal virtual network that spans across all the nodes in the cluster to which all the pods connect to.
+A crude way is by using the IP of the Pod, one application can connect to another application. But since the IP of the Pod keeps changing, 
+A better way is to use a Service IP which is a virtual one that doesn't exist. The service cannot join the pod network since it doesn't have
+any container or interfaces or actively listening process. Its a virutal component that only lives in the kubernetes memory. 
+Kube-proxy is a process that runs on each node in the Kubernetes cluster. It will look for new services and when a new service is created, it
+will create appropriate rules to forward traffic of each services to the backend pods.Every node in the cluster will have IP table rules
+that knows how to route the service IP to the Pod IP which hosts the application.
+
+kubectl run nginx --image nginx -> It deploys a docker container by creating a pod. It creates a pod automatically and deploys an instance of nginx docker image.
+		The image is pulled from the dockerhub repository
+
+YAML -> Kubernetes uses YAML files as input for the creation of objects such as Pods, Deployment, Service, Replica etc
+	pod-definition.yml -> root level properties
+		apiVersion: -> version of Kubernetes api to create the object. For example, v1(Pod/Service), apps/v1(ReplicaSet/Deployment) 
+		kind: -> refers to the type of object that we are trying to create. For example, Pod,Service,ReplicaSet,Deployment 
+		metadata: -> Is a Dictionary. Data about the object such as name, labels etc
+			name: myapp-pod
+			labels:
+				app: myapp
+				type: front-end
+		spec: -> Is a Dictionary. So add a property under it called Containers(list or array)
+			containers
+				- name: nginx-container		-> dash indicates first item in the list
+				  image: nginx				-> Name of the image from the docker repository
+				
+	
+	kubectl create -f pod-definition.yml
+	kubectl get pods
+	kubectl describe pod myapp-pod
+	
+apiVersion: v1
+kind: Pod
+metadata:
+    name: redis			
+spec:
+    containers:
+        - name: redis-container
+          image: redis123
+				
+Deployment 
+++++++++++
+	Multiple pods are deployed using replication controllers or replica sets. The Deployment object provides capability to upgrade the 
+	underlying instances seamlessly using rolling updates, undo changes, pause and resume changes. We can create a deployment using the
+	deployment.definition.yml(exactly similar to the replica set definition file)
+
+Controllers are the processes that Monitors Kubernetes objects and respond accordingly
+
+
+Replication Controller
+++++++++++++++++++++++
+	Provides High availability. The Role of a Replication Controller/Replia Set is to monitor the pods and if any of them were to fail, 
+	deploy new ones. Ensures specified number of pods are running at all times even if its just 1 or 100. It spans across multiple nodes
+	in the cluster. It helps balance the nodes across multiple pods and scale our application when the demand increases. Replication controller
+	is older technology that is replaced by ReplicaSet.
+
+	replicationcontroller-definition.yml
+		apiVersion: v1
+		kind: ReplicationController
+		metadata:
+			name: myapp-rc
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			template: -> Inside template, Copy contents of Pod definition.yml into Template section(except for apiversion and kind)
+				metadata:
+					name: myapp-pod
+					labels:
+						app: myapp
+						type: front-end
+				spec:
+					containers
+						- name: nginx-container
+						  image: nginx
+			replicas : 3
+			
+"selector" is one of the major differences between replication controller and replica set. It helps the replicaset to identify what pods
+fall under it. Because ReplicaSet can also manage pods that were not created as part of replica set at creation
+
+replicaset-definition.yml
+		apiVersion: apps/v1
+		kind: ReplicaSet
+		metadata:
+			name: myapp-rs
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			template: -> Inside template, Copy contents of Pod definition.yml into Template section(except for apiversion and kind)
+				metadata:
+					name: myapp-pod
+					labels:
+						app: myapp
+						type: front-end
+				spec:
+					containers
+						- name: nginx-container
+						  image: nginx
+			replicas : 3
+			selector :
+				matchLabels:					
+					type: front-end			
+
+Labels and Filters -> We could use these labels as filters for replica sets. Under the selector section, we used to match label filters
+and provide the same label that we used while creating the pods.
+
+kubectl create -f replicaset-definition.yml
+kubectl replace -f replicaset-definition.yml
+kubectl scale --replicas=6 -f replicaset-definition.yml
+
+Deployments (wrapper around replicasets. Have similar base structure of replicasets)
++++++++++++
+Provides us the capability to upgrade the underlying instances seamlessly using 
+ROLLING UPDATES, UNDO CHANGES, PAUSE/RESUME CHANGES as required
+
+deployment-definition.yml
+		apiVersion: apps/v1
+		kind: Deployment
+		metadata:
+			name: myapp-rs
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			template: -> Inside template, Copy contents of Pod definition.yml into Template section(except for apiversion and kind)
+				metadata:
+					name: myapp-pod
+					labels:
+						app: myapp
+						type: front-end
+				spec:
+					containers
+						- name: nginx-container
+						  image: nginx
+			replicas : 3
+			selector :
+				matchLabels:					
+					type: front-end			
+
+kubectl create -f deployment-definition.yml
+
+kubectl create deployment httpd-frontend --image=httpd:2.4-alpine
+kubectl scale deployment --replicas=3 httpd-frontend
+
+
+Create an NGINX Pod
+	kubectl run --generator=run-pod/v1 nginx --image=nginx
+
+Generate POD Manifest YAML file (-o yaml). Don't create it(--dry-run)
+	kubectl run --generator=run-pod/v1 nginx --image=nginx --dry-run -o yaml
+
+Create a deployment
+	kubectl create deployment --image=nginx nginx
+
+Generate Deployment YAML file (-o yaml). Don't create it(--dry-run)
+	kubectl create deployment --image=nginx nginx --dry-run -o yaml
+
+Generate Deployment YAML file (-o yaml). Don't create it(--dry-run) with 4 Replicas (--replicas=4)
+	kubectl create deployment --image=nginx nginx --dry-run -o yaml > nginx-deployment.yaml
+
+Save it to a file, make necessary changes to the file (for example, adding more replicas) and then create the deployment.
+
+
+Namespace
++++++++++
+kubectl get ns
+kubectl get ns --no-headers | wc -l  -> To get the count of namespaces
+kubectl run redis --image=redis --dry-run=client -n finance -o yaml > pod.yaml 
+
+Default - Namespace that is automaticaly created by Kubernetes when the cluster is first set up
+kube-system - Namespace within which Kubernetes creates a set of pods and services for internal purpose i.e those required by networking solution, DNS service etc
+kube-public - Namespace within which the resources that should be made available to all users
+
+Each of these namespaces can 
+	have their own set of policies that defines who can do what
+	assign quota for resources for each namespace
+
+servicename.namespace.svc.cluster.local
+For example, db-service.dev.svc.cluster.local
+	db-service - Service Name
+	dev - namespace
+	svc - sub-domain for the service
+	cluster.local - default domain name 
+
+mysql.connect("db-service")
+mysql.connect("<servicename>.<namespace>.svc.cluster.local")
+
+When a service is created, a DNS entry is added automatically in this format. "cluster.local" is the default domain name of the kubernetes
+cluster. "svc" is the subdomain for the service.
+
+For example, kubectl list pods -> list the pods ONLY in the default namespace
+kubectl list pods --namespace=kube-system -> list the pods in the kube-system namespace
+
+For example, applying namespace for the given pod-definition.yml
+		apiVersion: v1
+		kind: Pod
+		metadata:
+			name: myapp-pod
+			namespace : dev		-> Either you can define it in YAML or you can add extra entry in command line
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			containers
+			- name: nginx-container
+			  image: nginx
+			  
+
+kubectl create -f pod-definition.yml
+kubectl create -f pod-definition.yml --namespace=dev
+
+For example, creating a namespace can be either through a YAML file or commandline
+namespace-dev.yml
+
+		apiVersion: v1
+		kind: Namespace
+		metadata:
+			name: dev
+
+kubectl create -f namespace-dev.yml
+
+(or) kubectl create namespace dev
+
+Switching from default namespace to another namespace
+	kubectl config set-context $(kubectl config current-context) --namespace=dev	-> To permanently set the context to dev namespace
+
+View pods from all namespaces
+	kubectl get pods --all-namespaces
+
+ResourceQuota for Namespaces -> To limit resources in a namespace
+Compute-quota.yml
+apiVersion : v1
+kind : ResourceQuota
+metadata:
+	name : compute-quota
+	namespace : dev
+spec:
+	hard:
+		pods: "10"
+		requests.cpu: "4"
+		requests.memory: 5Gi
+		limits.cpu: "10"
+		limits.memory: 10Gi
+
+kubectl create -f Compute-quota.yml
+
+++++++++++++++++++++++++++
+Services
+++++++++++++++++++++++++++
+A Service is simply like a virtual server inside the node. Inside the cluster, it has his own IP address(called Cluster IP of the Service).
+
+Enables communication between various components(groups of pods) within and outside of the application. 
+Helps connect application together with other applications or users or to an external data source.
+Enables loose coupling between microservices in our application
+
+kubectl run redis --imageredis:alpine --labels=tier=db
+kubectl expose pod redis --name redis-service --port 6379 --target-port 6379
+kubectl describe svc redis-service
+
+Laptop on the same network will have an IP address i.e. 192.168.1.10		-> curl http://192.168.1.2:30008
+Kubernetes node has an IP address i.e. 192.168.1.2
+The internal pod network within the node will have range 10.244.0.0 and Pod has IP address 10.244.0.2
+
+I want to access the webserver from my laptop, without having to SSH into the node and simply by accessing the IP of Kubernetes node
+
+We need something in the middle to help us map requests from our laptop through the node to the pod running the web container
+
+Kubernetes Service is an object similar to pods/replicasets/deployment. Service Types -> NodePort/Cluster IP/Load Balancer
+
+"NodePort" Service(30000 - 32767) -> Use case for Services is to listen to a port on the node and forward that request on that port to a port on the Pod 
+running the web application. In case of Node Port, there are 3 ports involved. Node's  port, Service's <> Port and Pod's <TARGET> port.
+Node Port valid range is from 30000 - 32767. In other words, a NodePort makes an internal port accessible through a port on the node
+
+3 Ports involved. 1)Port on the Node(Access the web server externally) 2)Port on the Service(simply port) 3)Port on the Pod(target Port 
+where the service forwards the request to)
+
+
+ClusterIP -> The service creates a virtual IP inside the cluster to enable communication between different services(set of frontend servers
+to a set of backend servers)
+
+Load Balancer -> Provisions a load balancer for our application to distribute load across different servers
+
+service-definition.yml
+		apiVersion: v1
+		kind: Service
+		metadata:
+			name: myapp-service
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			type: NodePort	-> It can be ClusterIP, NodePort or LoadBalancer
+			ports:
+			- targetPort: 80 <OPTIONAL. By default, assumed to be same as Port>
+			  port: 80	<MANDATORY>
+			  nodePort: 30008	<OPTIONAL. By default, a free port in the valid range 30k-32767 is allocated>
+			selector:	-> We will use Labels/Selectors to link a service to a one/group of pods
+				app: myapp
+				type: frontend
+
+Another way to generate YAML File
+	kubectl expose deployment simple-webapp-deployment --name=webapp-service --target-port=8080 --type=NodePort --port=8080 --node-port=30080 --dry-run=client -o yaml > svc.yaml		
+				
+Inorder to "LINK POD TO SERVICE" -> Pod was created using a "Label". We need to refer to the Label in the Service-definition file using "Selector".
+Service acts as a built-in loadbalancer using a random Algorithm to distribute load across the pods
+			  
+If the Pods for a given service are distributed across multiple nodes, then Kubernetes automatically assigns the same port number to all the NodePorts
+containing the Pods(by creating a service that spans across all the nodes in a cluster). When pods are added or removed, the service is automatically 
+updated making it highly flexible/adaptable
+
+Cluster IP
+A Kubernetes Service that helps to group the pods together and provides a single interface to access the pods in a group. The requests are forwarded
+to one of the pods in the service randomly. Each layer can scale without impacting communication. Each service gets an IP/name within the cluster. 
+Service can be accessed by other pods using Cluster IP/Service Name
+This enables us to easily and effectively deploy a microservices based application on a kubernetes cluster
+
+service-definition.yml
+		apiVersion: v1
+		kind: Service
+		metadata:
+			name: myapp-service
+			labels:
+				app: myapp
+				type: back-end
+		spec:
+			type: ClusterIP	-> It can be ClusterIP(default), NodePort or LoadBalancer
+			ports:
+			- targetPort: 80 <OPTIONAL. By default, assumed to be same as Port>
+			  port: 80	<MANDATORY>			  
+			selector:	-> We will use Labels/Selectors to link a service to a one/group of pods
+				app: myapp
+				type: back-end
+
+kubectl create -f service-definition.yml
+kubectl get services
+
+LoadBalancer
+Kubernetes has support for integrating with the native load balancers of certain cloud providers like AWS or Azure and configuring that for us
+Set the service type to LoadBalancer instead of NodePort
+
+service-definition.yml
+		apiVersion: v1
+		kind: Service
+		metadata:
+			name: myapp-service
+			labels:
+				app: myapp
+				type: front-end
+		spec:
+			type: LoadBalancer	-> It can be ClusterIP, NodePort or LoadBalancer
+			ports:
+			- targetPort: 80 <OPTIONAL. By default, assumed to be same as Port>
+			  port: 80	<MANDATORY>
+			  nodePort: 30008	<OPTIONAL. By default, a free port in the valid range 30k-32767 is allocated>
+			selector:	-> We will use Labels/Selectors to link a service to a one/group of pods
+				app: myapp
+				type: frontend
+
+++++++++++++++++++++++++++
+IMPERATIVE COMMANDS:
+++++++++++++++++++++++++++
+
+Create Objects
+	kubectl run nginx --image=nginx
+	kubectl create deployment nginx --image=nginx
+	kubectl expose deployment nginx --port=80
+
+	kubectl create -f nginx.yaml
+Update Objects	
+	kubectl edit deployment nginx
+	kubectl scale deployment nginx --replicas=5
+	kubectl set image deployment nginx nginx=nginx:1.18
+
+--dry-run -> By default as soon as the command is run, the resource will be created.
+--dry-run=client option. This will not create the resource, instead, tell you whether the resource can be created and if your command is right.
+
+-o yaml: This will output the resource definition in YAML format on screen.
+
+kubectl run --generator=run-pod/v1 nginx --image=nginx 	-> Create an NGINX Pod
+kubectl run --generator=run-pod/v1 nginx --image=nginx --dry-run -o yaml	-> Generate POD Manifest YAML file (-o yaml).
+kubectl create deployment --image=nginx nginx	-> Create a deployment
+kubectl create deployment --image=nginx nginx --replicas=4 --dry-run -o yaml -> Generate Deployment YAML file (-o yaml)
+kubectl expose pod nginx --port=80 --name nginx-service --dry-run -o yaml -> Create a Service named nginx of type NodePort to expose pod nginx's port 80 on port 30080 on the nodes. (This will automatically use the pod's labels as selectors
+kubectl create service nodeport nginx --tcp=80:80 --node-port=30080 --dry-run -o yaml -> 
+
+kubectl expose pod nginx --port=6379 --name=redis-service	-> This creates a service
+kubectl create deployment webapp --image=kodekloud/webapp-color --replicas=4
+
+DECLARATIVE COMMANDS:
++++++++++++++++++++++
+kubectl apply -f nginx.yaml -> Intelligent enough to create an object if it doesn't already exist
+kubectl apply -f /path/to	-> If there are multiple YAML files, you may specify a directory instead of a single file
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Scheduling
++++++++++++
++++++++++++
+Labels & Selectors
+Resource Limits
+Manual Scheduling
+Daemon Sets
+Multiple Schedulers
+Scheduler Events
+
+
+Manual Scheduling
++++++++++++++++++++
+NodeName is not generally set in Pod Definition. 
+The Scheduler goes through all the pods and looks for those that do not have this property set. Those are the candidates for scheduling
+It then identifies the right node for the pod by running the scheduling algorithm
+Once identified, it then schedules the pod on the node by setting the "nodeName" property to the name of the node by creating a BINDING object
+In case, there are no schedulers, we can ALSO manually assign the nodes to the pods. The pod then gets assigned to the specified node. 
+We can only specify the node name to the pod at creation time.
+The Pods continue to be in Pending state if there are no scheduler to monitor and schedule nodes
+
+Another way to assign a node to an existing pod is to create a binding object and send a post request to the Pods' Binding API thus mimicking
+what the actual scheduler does
+
+Pod-bind-definition.yaml
+	apiVersion: v1
+	kind: Binding
+	metadata:
+		name: nginx
+	target:
+		apiVersion: v1
+		kind: Node
+		name: node02
+
+Labels & Selectors -> Standard method to group things together
+++++++++++++++++++
+
+Labels are properties attached to each item. Selectors help to filter these items
+Define Labels in a key-value format in following way		->		Pod-definition>Metadata>Labels> {Key value pairs}
+Access the Labels using Selectors in command line by	->	kubectl get pods --selector <key>=<value>
+
+For example, in order to connect a replicaset to a pod, we configure the selector field under the replicaset specification
+to match the labels defined on the pod. This ensures that the right pods are discovered by the replica set. If the labels
+match the replicaset is created successfully
+
+Annotations -> Used to record other details just for information purpose
++++++++++++
+
+Taints(set on nodes) & Tolerations(set on pods)	-> Tolerations has to be enclosed in double quotes
++++++++++++++++++++++++++++++++++++++++++++++++
+Used to set restrictions on what pods can be scheduled on a node. 
+By DEFAULT, NONE of the pods can tolerate any taint that is applied on a node
+Only Pods that are tolerant to a specific taint can be scheduled on that respective node
+Taints & Toleration -> It tells the node to only accept pods with a certain toleration. On the other hand, it DOES NOT tell a 
+pod to go to any particular node. This is acheived by making use of  -> "Node Affinity".
+
+ADDING TAINT TO NODE
+kubectl taint nodes <node-name> <key=value>:<taint-effect>
+taint-effect describes what will happen to pods that do not tolerate this taint
+taint-effect -> NoSchedule | PreferNoSchedule | NoExecute
+	NoSchedule : Pods will not be scheduled to the Node
+	PreferNoSchedule : System will try to avoid placing the pod on the Node(thats not guaranteed)
+	NoExecute : New pods will not be scheduled on the Node. Existing pods if any will be evicted(Killed) if they do not tolerate the taint.
+For example, kubectl taint nodes node01 app=blue:NoSchedule
+Another example to remove taint on master, kubectl taint nodes master node-role.kubernetes.io/master:NoSchedule-
+
+ADDING TOLERATION TO PODS
+Pod-Definition.yml > Spec
+tolerations:
+	-key: "app"
+	 operator: "Equal"
+	 value: "blue"
+	 effect: "NoSchedule"
+
+kubectl describe node kubemaster | grep Taint -> To know what Taint is applied on the Master node
+
+Node Selector
++++++++++++++
+Setting limitation on the Pods so that they only run on particular nodes. 
+First Label the node prior to creating a pod.. How to Label a node -> kubectl label nodes <node-name> <key=value>
+	For example, kubectl label node node01 size=large
+Then apply LabelSelector in pod definition Yaml file
+	PodDefinition.yml > Spec > 
+		nodeSelector:
+			size:large
+
+Node Affinity
++++++++++++++
+Primary Purpose is to ensure that Pods are hosted on particular Nodes
+Node Affinity provides us advanced capabilities to limit pod placement on specific nodes
+	
+Under PodDefinition.yml > Spec > 
+	affinity:
+		nodeAffinity:
+			requiredDuringSchedulingIgnoredDuringExecution:
+				nodeSelectorTerms:
+					-matchExpressions:
+						-key:size
+						 operator: Not In
+						 values:
+							- Small
+							- Medium
+
+NodeAffinityTypes -> Defines the behavior of the scheduler w.r.t Node affinity and the stages in the life cycle of the Pod
+
+Available:
+	requiredDuringSchedulingIgnoredDuringExecution
+	preferredDuringSchedulingIgnoredDuringExecution
+Planned:
+	requiredDuringSchedulingRequiredDuringExecution
+
+During Scheduling - State where a pod does not exist and is created for the first time
+	Required - Scheduler will mandate that the pod be placed on a Node with a given affinity rules. If scheduler cannot find matching node, the Pod will not be scheduled
+	preferred- If scheduler cannot find matching node, Scheduler will simply ignore any node affinity rules and places the pod on any available node.	
+
+During Execution - State where a pod has been running, and a change is made in the environment that affects node affinity suca as a change in the label or a node.
+	Ignored - Pods will continue to run and any changes in node affinity will not impact them once they are scheduled
+	
+			DuringScheduling	DuringExecution
+Type 1		Required			Ignored
+Type 2		Preferred			Ignored
+Type 3		Required			Required
+	
+An Example
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+ name: red
+spec:
+ replicas : 3
+ selector :
+  matchLabels:					
+   app: myapp	
+ template:
+  metadata:
+   labels:
+    app: myapp
+  spec:
+   containers:
+    - name: nginx-container
+      image: nginx
+   affinity:
+    nodeAffinity:
+     requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node-role.kubernetes.io/master
+          operator: Exists
+
+		  
+Resource Requests	(Requests and Limits are set for each container within the Pod)
++++++++++++++++++
+The scheduler takes into consideration, the amount of resources required by pod and those available in nodes
+If there is no sufficient resources available on any of these nodes, kubernetes holds back scheduling the pod, and the pod will be in PENDING state
+
+Default resource requirement for a container -> 0.5 vCPU and 256 Mi	[MIN RESOURCE REQUEST FOR A CONTAINER]
+Default LIMITS for resource requirement for a container -> 1 vCPU and 512 Mi
+
+	where 1 unit of CPU = 1 AWS vCPU = 1 GCP Core = 1 Azure Core = 1 Hyperthread
+		  
+Under PodDefinition.yml > spec > containers
+	resources:
+		requests:
+			memory: "1Gi"
+			cpu: 1 -> 1000m(milli)
+		limits:
+            memory: "2Gi"
+			cpu: 2		
+
+Kubernetes throttles the CPU so that it doesn't go beyond the specified limit. A container cannot use more CPU resources than its limit
+However a container can use more memory resources than its limit. However if it repeats constantly, the Pod will be TERMINATED
+
+When a pod is created the containers are assigned a default CPU request of .5 and memory of 256Mi". For the POD to pick up those defaults you must have first set those as default values for request and limit by creating a LimitRange in that namespace.
+	apiVersion: v1
+	kind: LimitRange
+	metadata:
+	  name: mem-limit-range
+	spec:
+	  limits:
+	  - default:
+		  memory: 512Mi
+		defaultRequest:
+		  memory: 256Mi
+		type: Container			
+			
+kubectl edit pod <pod name>
+kubectl create -f /tmp/kubectl-edit-ccvrq.yaml
+kubectl get pod webapp -o yaml > my-new-pod.yaml
+kubectl delete pod webapp
+kubectl create -f my-new-pod.yaml
+kubectl edit deployment my-deployment
+
+DaemonSets (Exactly same as ReplicaSet except for Kind)
+++++++++++
+Similar to ReplicationSets, helps you to deploy multiple instances of pods. However, It runs and ensures one copy of your pod on each node 
+in your cluster. Whenever a new node is added to the cluster, a replica of that pod is added to the node, and viceversa. Use case is
+Monitoring Solution or Log Viewer
+For example, a kube-proxy is a good use case of daemonset.
+			
+kubectl get daemonsets
+kubectl get daemonsets --all-namespaces
+kubectl describe daemonsets <daemonsetname>
+kubectl create -f daemonset-definition.yaml
+
+Usecase : Deploy Monitoring Agents, Logging Agents on Nodes.
+	Kube-proxy can be deployed as DaemonSet in the cluster
+
+DaemonSets uses Default Scheduler and Node affinity rules. -> from v1.12
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+ name: elasticsearch
+ namespace : kube-system
+spec:
+ template:
+  metadata:
+   labels:
+    type: back-end
+  spec:
+   containers:
+    - name: elasticsearch
+      image: k8s.gcr.io/fluentd-elasticsearch:1.20
+ selector :
+  matchLabels:					
+   type: back-end
+   
+Static POD
++++++++++++
+Without intervention from any Master or API Server, Kubectl can manage independently. It can create Pods. Configure Kubectl to read Pod-definition file from a directory.
+It can also ensure that the Pod stays alive. 
+Option 1
+	The Directory path is passed as an option directly in the kubelet.service file i.e --pod-manifest-path=<directorypath>
+Option 2
+	Kubelet.service -> --config=kubeconfig.yaml
+	kubeconfig.yaml -> staticPodPath: <directorypath>	
+
+Once the pods are created, you can only use "docker ps" to view the pod containers (and NOT the kubectl command since we don't have the kube-api server)
+Usecase -> Deploy control plane components as static pods
+
+Example -> Creating a static pod on command line 
+	kubectl run --restart=Never --image=busybox static-busybox --dry-run -o yaml --command -- sleep 1000 > 
+																								/etc/kubernetes/manifests/static-busybox.yaml
+																								
+Difference between STATIC POD and DAEMONSETS
+	SP(Created by Kubelet) DS(Created by DaemonsetController through Kube-API server)
+	SP(Used to deploy control plane components as static pods) DS(Deploy monitoring agents, logging agents on nodes)
+	Both SP and DS(Ignored by Kube-Scheduler. It has no effect on these pods)
+
+Multiple Scheduler
+++++++++++++++++++
+kube-scheduler.service
+	--scheduler-name=default-scheduler
+	
+my-custom-scheduler.service	
+	--scheduler-name=my-custom-scheduler																								
+
+Use the file at /etc/kubernetes/manifests/kube-scheduler.yaml to create your own scheduler. 
+
+Under Spec>Containers>Command
+	- -- scheduler-name : <custom-scheduler-name>
+	- -- lock-object-name : <custom-scheduler-name>
+
+Then -> kubectl create -f /etc/kubernetes/manifests/custom-scheduler.yaml	
+
+Monitoring
+++++++++++
+Node level metrics - Number of nodes in the cluster, how many of them are healthy, Performance metrics such as CPU, Memory, Network and Disk utilization
+Pod Level metrics - Number of Pods, performance metrics of each pod such as CPU and Memory consumption on them
+
+Monitor these metrics, store them and provide analytics around this data
+
+Heapster>Metrics Server, Prometheus, Elastic Stack, Data Dog, Dyna Trace
+cAdvisor(subcomponent of kubelet) retrieves performance metrics from pod and exposing them through Kubelet API and make them available for Metrics Server
+
+Metrics Server - In Memory and no historical performance data
+
+METRICS SERVER
+minikube addons enable metrics-server
+git clone https://github.com/kubernetes-incubator/metrics-server
+kubectl create -f /deploy/1.8+/ 
+kubectl top node
+kubectl top pod
+
+kubectl create -f <pod-definition.yaml>
+kubectl logs -f <pod-name>  -> In case of only one container in a pod
+kubectl logs -f <pod-name> <container-name>  -> In case of multiple containers in a pod
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Application Lifecycle Management
+++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++
+Rolling Updates and Rollbacks in Deployment
++++++++++++++++++++++++++++++++++++++++++++
+When you first create a Deployment, it triggers a rollout. A new Rollout creates a new Deployment Revision. When container is upgraded, 
+it increments the deployment revision after new rollout.
+
+kubectl rollout status deployment/<deployment-name>		-> To know the status of your deployment
+kubectl rollout history deployment/<deployment-name>		-> To know the revisions and history of our deployment
+kubectl rollout undo deployment/<deployment-name>		-> Undo a deployment	
+
+Deployment strategy
++++++++++++++++++++
+2 Types. 
+One is "Recreate" Strategy where all the pods are destroyed before recreating the pods.  -> Application goes down for a while
+Next is "Rolling Update" (default) strategy where we take down the older version and bring up the newer version
+	one by one. -> Application never goes down and upgrade is seamless.
+	
+	kubectl set image deployment/myapp-deployment nginx=nginx:1.9.1
+	kubectl get replicasets	
+	
+	CREATE
+		kubectl create -f deployment-definition.xml
+	GET
+		kubectl get deployments
+	UPDATE
+		kubectl edit deployment.apps <deploymentname>
+		kubectl apply -f  deployment-definition.xml
+		kubectl set image deployment/myapp-deployment nginx=nginx:1.9.1	-> To update the image of your application
+	STATUS
+		kubectl rollout status deployment/<deployment-name>		-> To know the status of your deployment
+		kubectl rollout history deployment/<deployment-name>		-> To know the revisions and history of our deployment
+	ROLLBACK	
+		kubectl rollout undo deployment/<deployment-name>		-> Undo a deployment	
+
+
+ROLLING UPDATE
+
+When a new deployment is created(i.e. to deploy 5 replicas), it first creates a replicaset automatically, which in turn creates the number of Pods 
+required to meet the number of replicas. When you upgrade your applicaion, the kubernetes deployment creates a new replicaset under the hood and
+starts deploying the containers there, while at the same time, taking down the pods in the old replica set following a rolling update strategy.
+This is evident when you try to list the replicasets using the kubectl get replicasets command. Here we see the old replicasets with 0 pods and 
+new replicasets with 5 pods
+
+ROLLBACK
+Kubernetes deployment allows you to roll back to a previous revision to undo a change
+	kubectl rollout undo deployment/myapp-development
+The deployment will then destroy the pods in the new replica set and bring the older ones up in the old replica set and you application is back 
+in its older format
+
+IMPORTANT
+kubectl run nginx --image=nginx -> This not only creates a pod, but also a deployment
+
+
+Application Commands (Docker vs Kubernetes)				****** VERY IMPORTANT ******
+++++++++++++++++++++
+++++++++++++++++++++	-> Command Section has to be enclosed in double quotes
+docker run ubuntu
+docker ps
+docker ps -a
+	
+Dockerfile	
+	FROM Ubuntu
+	ENTRYPOINT ["sleep"]	-> DOCKER ENTRYPOINT INSTRUCTION(Command run at startup)					X
+	CMD ["5"]				-> COMMAND INSTRUCTION(Default paraeter passed to the command)				Y
+
+docker run --entrypoint sleep2.0 ubuntu-sleeper 10 	-> In order to override the default ENTRYPOINT and CMD
+	
+Pod-definition.yaml
+	apiVersion: v1
+	kind: Pod
+	metadata:
+		name: ubuntu-sleeper-pod			
+	spec:
+		containers:
+			- name: ubuntu-sleeper-container
+			  image: ubuntu-sleeper
+			  command:["sleep2.0"]		->	The Command field overrides the DOCKER ENTRYPOINT INSTRUCTION		X
+			  args:["10"]				-> The Args field overrides the DOCKER COMMAND INSTRUCTION				Y
+	
+
+apiVersion: v1
+	kind: Pod
+	metadata:
+		name: ubuntu-sleeper-pod			
+	spec:
+		containers:
+			- name: ubuntu-sleeper-container
+			  image: ubuntu-sleeper
+			  command:
+				- "sleep"
+				- "1200"
+
+	
+Environment Variables in Kubernetes
++++++++++++++++++++++++++++++++++++
+docker run -e APP_COLOR = pink simple-webapp-color
+
+Under Pod-definition.yml > spec > containers > env		-> Direct way of specifying the environment variable using the plain key value pair format
+	- name : <env name>
+	  value : <env value>
+
+ENV value types ->  Plain Key Value/Config Maps/Secrets
+		env :
+			- name : APP_COLOR
+			  value : pink
+
+		env :
+			- name : APP_COLOR							-> Take the env data out of pod definition file and manage it centrally using Config Maps
+			  valueFrom :
+				configMapKeyRef :
+			  
+		env :
+			- name : APP_COLOR
+			  valueFrom :
+				secretKeyRef :
+
+
+Config Maps
++++++++++++
++++++++++++
+Take the env out of pod definition file and manage it in Config Maps. Config Maps are used to pass Configuration data in the form of key value
+pairs in Kubernetes.
+2 Steps -> 1)Create Config Maps 2)Inject config maps into Pods so that the key value pairs are available as environment variable for the
+application hosted inside the container in the pod
+
+Config Maps can be created either imperatively or declaratively. 
+Imperative way directly specify the key value pairs in the command line.
+
+Imperative Way
+++++++++++++++
+	kubectl create configmap
+		<config-name> --from-literal=<key>=<value>
+For example,
+	kubectl create configmap \
+		app-config --from-literal=APP_COLOR=blue
+				   --from-literal=APP_MODE=prod
+
+
+	kubectl create configmap
+		<config-name> --from-file=<Path To File>
+				   
+	kubectl create configmap \
+		app-config --from-file=app_config.properties
+
+app_config.properties
+	APP_COLOR: blue
+	APP_MODE: prod
+
+Declarative Way
++++++++++++++++
+	Config-Map.yaml
+
+	apiVersion: v1
+	kind: ConfigMap
+	metaData:
+		name: app-config
+	data:
+		APP_COLOR: blue
+		APP_MODE: prod
+
+kubectl create -f Config-Map.yaml
+kubectl get configmaps
+kubectl describe configmaps <config-map-name>
+
+Injecting a Config Map definition to a Pod Definition. 
+"envFrom" property is a list, so we can pass as many environment variables as required.
+Each item in the list corresponds to a configMap item. Specify the name of the configMap we created to inject a specific configMap.
+
+
+As Env File
+Under Pod-Definition.yaml > spec > containers
+		envFrom:
+			- configMapRef:
+				name: app-config
+
+As Single Env Entry
+Under Pod-Definition.yaml > spec > containers
+		envFrom:
+			- configMapRef:
+				name: app-config
+				key: APP_COLOR
+
+Inject the whole data as files in a Volume
+volumes:
+	-name: app-config-volume
+	 configMap:
+		name: app-config
+
+
+If they ask you to edit a pod definition which requires deleting and recreating a pod, use the following
+	kubectl get pod <podname> -o yaml > pod.yaml
+After that delete the existing pod
+	kubectl delete pod <podname>
+And then create the new pod
+	kubectl create -f pod.yaml
+
+
+Secrets -> https://kubernetes.io/docs/concepts/configuration/secret
++++++++
+Used to store sensitive information like passwords or keys. They are similar to ConfigMaps except they are stored in encoded or hashed format
+Steps 1)Create Secret 2)Inject into Pod
+2 ways of creating Secret
+Imperative
+	kubectl create secret generic \
+		<secret-name> --from-literal=<key>=<value>
+		
+	For Example,
+	kubectl create secret generic \
+		app-secret --from-literal=DB_Host=mysql	
+
+	kubectl create secret generic \
+		<secret-name> --from-file=<Path To File>
+				   
+	kubectl create secret generic \
+		app-secret --from-file=app_secret.properties
+	
+Declarative	
+	kubectl create -f secret-data.yaml
+	
+secret-data.yaml
+	apiVersion : v1
+	kind : Secret
+	metadata : 
+		name : app-secret
+	data : 
+		DB_Host : mysql
+		DB_User : root
+		DB_Password : paswrd
+	
+You must specify secret data in an encoded form
+	echo -n '<Your Text Here>' | base64 -> To get the encoded form of a plain text	
+
+kubectl get secrets
+kubectl describe secrets
+kubectl get secret <secret-name> -o yaml	
+	
+	echo -n '<Your Text Here>' | base64 --decode
+	
+Secrets in Pod Definition
+		Pod-definition.yaml > spec > containers
+		
+		envFrom:
+			- secretRef : 
+				name : app-secret
+				
+Single Env
+		env:
+			-name : DB_Password
+			 valueFrom:
+				secretKeyRef:
+					name: app-secret
+					key: DB_Password
+
+Volumes
+		volumes:
+			-name : app-secret-volume
+			 secret:
+				secretName : app-secret
+
+If you were to mount a secret as a volume to the Pod, Each attribute in the secret is created as a file, the value of the secret as itsd content
+Inside the container
+		ls /opt/app-secret-volume
+			DB_Host		DB_Password		DB_User		
+		cat  /opt/app-secret-volume/DB_Password
+			Password		
+
+Remember that secrets encode data in base64 format. Anyone with the base64 encoded secret can easily decode it. As such the secrets can be considered as not very safe.
+	https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+Also the way kubernetes handles secrets. Such as:
+A secret is only sent to a node if a pod on that node requires it.
+Kubelet stores the secret into a tmpfs so that the secret is not written to disk storage.
+Once the Pod that depends on the secret is deleted, kubelet will delete its local copy of the secret data as well.	
+
+There are other better ways of handling sensitive data like passwords in Kubernetes, such as using tools like Helm Secrets, HashiCorp Vault.
+
+kubectl create secret generic db-secret --from-literal=DB_Host=sql01 --from-literal=DB_User=root --from-literal=DB_Password=password123
+
+
+kubectl get secret db-secret -o yaml > secret2.yaml
++++++++++++++++++++++++++++
+apiVersion: v1
+data:
+  DB_Host: c3FsMDE=
+  DB_Password: cGFzc3dvcmQxMjM=
+  DB_User: cm9vdA==
+kind: Secret
+metadata:
+  creationTimestamp: "2020-03-03T15:31:30Z"
+  name: db-secret
+  namespace: default
+  resourceVersion: "3602"
+  selfLink: /api/v1/namespaces/default/secrets/db-secret
+  uid: 7c2ccd2b-0ba0-4272-a4c6-c7cf636b11d0
+type: Opaque
++++++++++++++++++++++++++++
+apiVersion: v1
+kind: Secret
+metadata:
+ name: db-secret
+data:
+ DB_Host: sql01
+ DB_User: root
+ DB_Password: password123
++++++++++++++++++++++++++++
+apiVersion: v1
+kind: Secret
+metadata:
+ name: db-secret
+data:
+ DB_Host: c3FsMDE=
+ DB_User: cm9vdA==
+ DB_Password: cGFzc3dvcmQxMjM=
+
+
+Multi-container Pods 
++++++++++++++++++++
+Share the same Network, Storage and Lifecycle
+Multi-container Patterns - Side car, Adapater, Ambassador	-> These are part of CKAD certification
+
+Pod-definition.yaml>Spec>Containers
+	- name: simple-webapp
+	  image: simple-webapp
+	  Ports:
+		- ContainerPort: 8080
+	- name: log-agent
+	  image: log-agent
+	
+
+InitContainers
+++++++++++++++
+When a POD is first created the initContainer is run, and the process in the initContainer must run to a completion before the real container 
+hosting the application starts. You can configure multiple such initContainers as well, like how we did for multi-pod containers. In that case 
+each init container is run one at a time in sequential order. If any of the initContainers fail to complete, Kubernetes restarts the Pod 
+repeatedly until the Init Container succeeds.
+
+Pod-definition.yaml>Spec
+ initContainers:
+  - name: init-myservice
+    image: busybox
+    command: ['sh', '-c', 'git clone <some-repository-that-will-be-used-by-application> ; done;']
+  - name: init-mydb
+    image: busybox:1.28
+    command: ['sh', '-c', 'until nslookup mydb; do echo waiting for mydb; sleep 2; done;']	
+
+Self Healing Application
+++++++++++++++++++++++++
+Kubernetes supports self-healing applications through ReplicaSets and Replication Controllers. 
+The replication controller helps in ensuring that a POD is re-created automatically when the application within the POD crashes. 
+It helps in ensuring enough replicas of the application are running at all times.
+
+Kubernetes provides additional support to check the health of applications running within PODs and take necessary actions 
+through Liveness and Readiness Probes. 	-> These are part of CKAD certification
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Cluster Maintenance
+++++++++++++++++++++
+++++++++++++++++++++
+Cluster Upgrade Process
+Operating System Upgrades
+Backup and Restore Methodlogies
+
+When a node went down and came back online immediately, then the kubectl process starts and the pods come back online. 
+However if the node was down for more than 5 minutes, then the pods are terminated from that node by the Master node and Kubernetes considers them as dead
+If the PODs were part of replicaset, then they are recreated on other nodes.
+The time it waits for a POD to come back online is known as the POD EVICTION TIMEOUT and is set on the controller manager with a default value of 5 minutes
+	kube-controller-manager --pod-eviction-timeout=5m0s
+
+DRAIN
+You can purposefully drain the node of all workloads so that the workload moves to other nodes in the cluster. When you drain the node, the pods
+are gracefully terminated from the nodes they are on and recreated on another. The node is also cordoned and also marked as unschedulable. 
+kubectl drain node01 --ignore-daemonsets 
+
+UNCORDON
+When the node comes back online, you need to uncordon so that the pods can be scheduled again
+kubectl uncordon node-1
+
+CORDON
+The below command doesn't drain the pods. It simply makes the new pods unschedulable.
+kubectl cordon node-1
+	
+References
+++++++++++
+https://kubernetes.io/docs/concepts/overview/kubernetes-api/
+https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
+https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md
+
+Cluster Upgrade Process -> Upgrade kubeadm tool (if not already), then the master components, and finally the kubelet.
++++++++++++++++++++++++
+NOTE : It is mandatory for kube-apiserver to have a version greater than or equal to version of controller-manager, kube-scheduler, kubelet, 
+kube-proxy
+Master node version should be higher or equal to worker node version
+
+kubeadm upgrade plan -> This will say after you upgrade the control plane components, you must manually upgrade the kubelet version. Finally
+	it will give command to upgrade the cluster.
+
+	Upgrading the master node
+			apt-get upgrade  -y kubeadm=1.17.0-00	-> Upgrading the kubeadm tool itself
+			kubeadm upgrade apply v1.17.0 -> Then upgrade the cluster from the upgrade plan output. 
+		Next step is to upgrade the kubelets on all the ncdes. First among them is to upgrade Kubelets on Master node if you have them installed.
+			apt-get upgrade  -y kubelet=1.17.0-00	-> Upgrading the kubelet
+		Once the package is upgraded, restart the kubelet server
+			systemctl restart kubelet
+	Now the master node would have been upgraded. Next we need to upgrade the worker node. First we need to drain the worker node
+		apt-get upgrade  -y kubeadm=1.12.0-00
+		apt-get upgrade  -y kubelet=1.12.0-00
+		kubeadm upgrade node config --kubelet-version v1.12.0
+		systemctl restart kubelet
+
+
+	Exercise : Upgrade the master components to exact version v1.17.0	
+		Run the command apt install kubeadm=1.17.0-00 
+		and then kubeadm upgrade apply v1.17.0 
+		and then apt install kubelet=1.17.0-00 to upgrade the kubelet on the master node
+
+	Exercise : Upgrade the worker node to the exact version v1.17.0
+		Run the commands: apt install kubeadm=1.17.0-00 
+		and then apt install kubelet=1.17.0-00 
+		and then kubeadm upgrade node config --kubelet-version $(kubelet --version | cut -d ' ' -f 2)
+		
+Backup - Resource Configs
++++++++++++++++++++++++++
+https://github.com/mmumshad/kubernetes-the-hard-way/blob/master/practice-questions-answers/cluster-maintenance/backup-etcd/etcd-backup-and-restore.md
+https://kubernetes.io/docs/tasks/administer-cluster/configure-upgrade-etcd/#backing-up-an-etcd-cluster
+https://github.com/etcd-io/etcd/blob/master/Documentation/op-guide/recovery.md
+https://www.youtube.com/watch?v=qRPNuT080Hk
+
+Backup Candidates - Resource Configuration,ETCD Cluster, Persistent Volumes
+
+Query the kubeapi server
+	kubectl get all --all-namespaces -o yaml > all-deploy-services.yaml
+
+ETCD service Data Directory can be configured to be backup. 
+	
+To check the members of the cluster	
+	ETCDCTL_API=3 etcdctl member list --endpoints=https://[127.0.0.1]:2379 --cacert=/etc/kubernetes/pki/etcd/ca.crt --cert=/etc/kubernetes/pki/etcd/server.crt 	--key=/etc/kubernetes/pki/etcd/server.key
+	
+ETCD built in Snapshot tool	
+	ETCDCTL_API=3 etcdctl snapshot save snapshot.db
+	
+Advanced .. Saving a snapshot
+	ETCDCTL_API=3 etcdctl 
+	--endpoints=https://[127.0.0.1]:2379 
+	--cacert=/etc/kubernetes/pki/etcd/ca.crt 
+	--cert=/etc/kubernetes/pki/etcd/server.crt 
+	--key=/etc/kubernetes/pki/etcd/server.key 
+	snapshot save /tmp/snapshot-pre-boot.db. 
+
+
+
+	ETCDCTL_API=3 etcdctl snapshot status snapshot.db	-> To view the status of backup
+
+	To restore from the backup
+	->	service kube-apiserver stop
+	
+	->	snapshot restore snapshot.db \
+		--data-dir /var/lib/etcd-from-backup \
+		--initial-cluster master-1=https://192.168.5.11:2380,master-2 master-2=https://192.168.5.12:2380,master-2 \
+		--initial-cluster-token etcd-cluster-1 \
+		--initial-advertise-peer-urls https://${INTERNAL_IP}:2380
+		
+	->	systemctl daemon-reload
+	->	service etcd restart
+	->	service kube-apiserver start
+
+ETCD Cluster - Stores all cluster related information
+
+ETCDCTL
+++++++++
+etcdctl is a command line client for etcd.
+To make use of etcdctl for tasks such as back up and restore, make sure that you set the ETCDCTL_API to 3.
+You can do this by exporting the variable ETCDCTL_API prior to using the etcdctl client. 
+This can be done as follows:		export ETCDCTL_API=3
+
+For example, if you want to take a snapshot of etcd, use:
+	etcdctl snapshot save -h 
+and keep a note of the mandatory global options.
+
+Since our ETCD database is TLS-Enabled, the following options are mandatory:
+
+		--cacert                                                verify certificates of TLS-enabled secure servers using this CA bundle
+		--cert                                                    identify secure client using this TLS certificate file
+		--endpoints=[127.0.0.1:2379]          This is the default as ETCD is running on master node and exposed on localhost 2379.
+		--key                                                      identify secure client using this TLS key file
+
+Similarly use the help option for snapshot restore to see all available options for restoring the backup.
+	etcdctl snapshot restore -h
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SECURITY 
++++++++++
++++++++++
+
+
+
+Security Primitives
+++++++++++++++++++
+All Access to Hosts must be secure. How?
+	Root Access Disabled
+	Password based authentication disabled
+	ONLY SSH based key authentication enabled
+	
+Authentication Mechanisms
+		Files - Usernames and Passwords
+		Files - Usernames and Tokens
+		Certificates
+		External Authentication Providers - LDAP
+		Service Accounts(Machines)
+Authorization
+		RBAC(Role Based Access Control)
+		ABAC(Attribute Based)
+		Node Authorization
+		Webhook Mode
+
+All communication in the cluster between various components are secured using "TLS ENCRYPTION"
+By default all pods can reach all other pods. We can restrict access between them using "NETWORK POLICIES"
+
+Authentication
+++++++++++++++++
+Humans - Users (Admin, Developer)
+Robots - Service Account		
+		
+	Kubernetes doesn't manage user account natively. It relies external  source like File Credential, Certificates
+Third party based Authentication such as LDAP.		
+	However it can manage service account
+	
+	kubectl create serviceaccount sa1
+	kubectl list serviceaccount
+	
+All user access is managed by kube-apiserver.service. It authenticates request before processing it. It authenticates based on
+		- Static Password File(CSV - Password,User Name, User Id)
+			--basic-auth-file=user-details.csv
+		- Static Token File
+			--token-auth-file=user-details.csv
+		- Certificates
+		- Identity Services(LDAP, Kerberos)
+		
+/etc/kubernetes/manifests/kube-apiserver.yaml
+
+
+
+Setup basic authentication on kubernetes
+	Follow the below instructions to configure basic authentication in a kubeadm setup.
+
+	1.Create a file with user details locally at /tmp/users/user-details.csv
+
+	# User File Contents
+	password123,user1,u0001
+	password123,user2,u0002
+	password123,user3,u0003
+	password123,user4,u0004
+	password123,user5,u0005
+
+	2.Edit the kube-apiserver static pod configured by kubeadm to pass in the user details. The file is located at /etc/kubernetes/manifests/kube-apiserver.yaml
+
+	apiVersion: v1
+	kind: Pod
+	metadata:
+	  name: kube-apiserver
+	  namespace: kube-system
+	spec:
+	  containers:
+	  - command:
+		- kube-apiserver
+		  <content-hidden>
+		image: k8s.gcr.io/kube-apiserver-amd64:v1.11.3
+		name: kube-apiserver
+		volumeMounts:
+		- mountPath: /tmp/users
+		  name: usr-details
+		  readOnly: true
+	  volumes:
+	  - hostPath:
+		  path: /tmp/users
+		  type: DirectoryOrCreate
+		name: usr-details
+
+
+	Modify the kube-apiserver startup options to include the basic-auth file
+
+
+
+	apiVersion: v1
+	kind: Pod
+	metadata:
+	  creationTimestamp: null
+	  name: kube-apiserver
+	  namespace: kube-system
+	spec:
+	  containers:
+	  - command:
+		- kube-apiserver
+		- --authorization-mode=Node,RBAC
+		  <content-hidden>
+		- --basic-auth-file=/tmp/users/user-details.csv
+	Create the necessary roles and role bindings for these users:
+
+	---
+	kind: Role
+	apiVersion: rbac.authorization.k8s.io/v1
+	metadata:
+	  namespace: default
+	  name: pod-reader
+	rules:
+	- apiGroups: [""] # "" indicates the core API group
+	  resources: ["pods"]
+	  verbs: ["get", "watch", "list"]
+	 
+	---
+	# This role binding allows "jane" to read pods in the "default" namespace.
+	kind: RoleBinding
+	apiVersion: rbac.authorization.k8s.io/v1
+	metadata:
+	  name: read-pods
+	  namespace: default
+	subjects:
+	- kind: User
+	  name: user1 # Name is case sensitive
+	  apiGroup: rbac.authorization.k8s.io
+	roleRef:
+	  kind: Role #this must be Role or ClusterRole
+	  name: pod-reader # this must match the name of the Role or ClusterRole you wish to bind to
+	  apiGroup: rbac.authorization.k8s.io
+
+	Once created, you may authenticate into the kube-api server using the users credentials
+
+	curl -v -k https://localhost:6443/api/v1/pods -u "user1:password123"		
+		
+
+
+TLS CERTIFICATES	(VERY IMPORTANT)
+++++++++++++++++
+A Certificate is used to guarantee trust between two parties during a transaction
+For example, when the user tries to access a web server, the TLS certificate ensures that the communication between 
+the user and the server is encrypted and the server is who it says it is.
+
+SYMMETRIC ENCRYPTION	
+- You must encrypt the data being transferred using ENCRYPTION KEY
+- Data being transferred is encrypted using a KEY which is basically a set of random numbers and alphabets
+- A copy of the KEY is sent to the server so that the server can decrypt and read the message
+- Since the key is also sent over the same network, the attacker can sniff that as well and decrypt that data with it.
+- This is known as Symmetric Encryption
+- DRAWBACK: Though it is a secure way of encryption but since it uses the same key to encrypt and decrypt the data and since 
+			the key has to be exchanged between the sender and the receiver there is a risk of a hacker gaining access 
+			to the key and decrypting the data and that's where ASSYMMETRIC ENCRYPTION comes in.
+
+ASYMMETRIC ENCRYPTION
+-Instead of using a single key to encrypt and decrypt data asymmetric encryption uses a pair of keys i.e. private and public keys.
+-A KEY that is only with me i.e PRIVATE KEY and a LOCK that anyone can access i.e. PUBLIC LOCK
+-PRIVATE KEY - A key that must always be secure with you and not be shared with anyone else. It's private.
+-PUBLIC LOCK(key) - A lock that is public and may be shared with others but they can only lock something with it no matter what is 
+	locked using the public lock it can only be unlocked by your private key
+-IDEA here is to ENCRYPT the data with PUBLIC LOCK(key) that is shared with others and DECRYPT with PRIVATE KEY that is only with you.
+	Using Asymmetric Encryption, we can securely transmit the symmetric key from the user to the server.Once the symmetric key is safely 
+	made available to the server, the server and client can safely continue communication
+-STEPS FOR SIMPLE SSH
+	-With "ssh-keygen", User generates a private and public key i.e. id_rsa and id_rsa.pub
+	-You then secure your server by locking down all access to it, except through a door that is locked using your PUBLIC lock.
+		-HOW? It's usually done by adding your public key entry into the server's file -> "cat ~/.ssh/authorized_keys"
+	-The lock is public and anyone can attempt to break through. But as long as no one gets their hands on your private key which is 
+	 safe with you on your laptop no one can gain access to the server.
+	-When you try to SSH, you specify the location of your private key in your SSH command
+		-HOW? "ssh -i id_rsa user1@server1"
+-STEPS FOR WEB APPLICATION
+	-we use the openssl command to generate a private and public key pair. 
+		- openssl genrsa -out my-bank.key 1024					-> This generates private key my-bank.key
+		- openssl rsa -in my-bank.key -pubout > mybank.pem 		-> This generates public key mybank.pem
+	-When the user first accesses the web server using https, he gets the public key from the server.(Since the hacker is sniffing all traffic 
+	 that is assumed he too gets a copy of the public key)
+	-The user(In fact the user's browser) then encrypts the symmetric key using the public key provided by the server.
+	-The symmetric key is now secure and the user then sends this to the server.(The hacker also gets a copy)
+	-The server uses the private key to decrypt the message and retrieve the symmetric key from it.
+	-[However the hacker does not have the private key to decrypt and retrieve the symmetric key from the message it received the hacker only has 
+	  the public key with which he can only lock or encrypt a message and not decrypt the message]
+	-Hence the symmetric key is now safely available only to the user and the server
+	
+
+SERVER CERTIFICATES
+-Perfect the hacker now looks for new ways to hack into our account and so he realizes that the only way he can get your credential is by getting you to 
+ type it into a form he presents.So he creates a Web site that looks exactly like your bank's web site.The design is the same.The graphics are the same.
+ The Web site is a replica of the actual bank's Web site.
+-He hosts the website on his own server.He wants you to think it's secure too.So he generates his own set of public and private key pairs and configure 
+ them on his web server.
+-And finally he somehow manages to tweak your environment or your network to route your requests going to your bank's web site to his servers.
+-When you open up your browser and type the website address in you see a very familiar page the same login page of your bank that you're used to seeing.
+-So you go ahead and type in the username and password. You made sure you typed in HTTPS in the URL to make sure that communication is secure encrypted 
+ your browser receives the public key using which you send encrypted symmetric key and then you send your credentials encrypted with the symmetric key and 
+ the receiver decrypt the credentials with the same symmetric key you've been communicating securely in an encrypted manner but with the hackers server. 
+-As soon as you send in your credentials, you see a dashboard that doesn’t look very much like your bank's dashboard.
+-What if, you could look at the public key that you received from the server, and see if it is a legitimate key from the real bank server.
+-When the server sends the PUBLIC KEY, it does not send the key alone. It sends a CERTIFICATE that has the public key in it.
+-If you take a closer look at the certificate you will see that it is like an actual certificate, but in a digital format. It has information about who the 
+ certificate is issued to, the public key of that server, the location of that server etc. 
+-Here is an output of an actual certificate
+	Certificate
+		Data
+			Serial Number: 23523523523535325
+		SignatureAlgorithm:	sha256WithRSAEncryption
+			Issuer: CN=kubernetes
+			Validity
+				Not After: <TIMESTAMP>
+			Subject: CN=my-bank.com
+	x509v3  Subject Alternative Name:
+				DNS:mybank.com, DNS:i-bank.com,
+				DNS:we-bank.com
+			Subject Public Key Info:
+				00:b9:b0:55...
+
+-Every certificate has a name on it the person or subject to whom the certificate is issued to. That is very important as that is the field that helps you validate 
+ their identity. If this is for a web server this must match what the user types in the you are on his browser. If the bank is known by any other names and if they 
+ like their users to access their application with the other names as well then all those names should be specified in the certificate under the subject alternative 
+ name section.
+-But you see anyone can generate a certificate like this. You could generate one for yourself saying you're Google and that's what the hacker did in this case.
+ He generated a certificate saying he is your bank's web site. So how do you look at a certificate and verify if it is legit. That is where the most important part 
+ of the certificate comes into play who's signed and issued the certificate. If you generate the certificate then you will have to sign it by yourself. That is known 
+ as a self signed certificate. Anyone looking at the certificate you generated will immediately know that it is not a safe certificate because you have signed
+-If you looked at the certificate you received from the hacker closely you would have noticed that it was a fake certificate that was signed by the hacker himself.
+-As a matter of fact your browser does that for you. All of the web browsers are built in with a Certificate validation mechanism, wherein the browser checks the 
+ certificate received from the server and validates it to make sure it is legitimate. If it identifies it to be a fake certificate then it actually warns you.
+-So then how do you create a legitimate certificate for your web servers that the web browsers will trust. How do you get your certificates signed by someone with 
+ authority. That’s where "CERTIFICATE AUTHORITIES" or CAs comes in. They are well known organizations that can sign and validate your certificates for you. Some of 
+ the popular ones are Symantec, Digicert, Comodo, GlobalSign etc.
+-The way this works is you generate a CERTIFICATE SIGNING REQUEST(CSR) using the public key you generated earlier and the domain name of your Web site. You can do this 
+ again using the open SSL command.
+	-> openssl req -new -key my-bank.key -out my-bank.csr -subj "/C=US/ST=CA/O=MyOrg,Inc./CN=m-bank.com"	-> Output will be my-bank.csr for my-bank.key
+-This generates a my-bank.csr file which is the certificate signing request that should be sent to the CA for signing.It looks like this
+	BEGIN CERTIFICATE REQUEST
+	klsdlkgsdfgjklsjklsdgklsdklgklsdg
+	asfasffasfklasklfjfskljfasjklfklasjfklasfasf
+	klasfklsljksafjklasfjklsafkljfaskjlfkl
+	END CERTIFICATE REQUEST
+-The certificate authorities verify your details and once it checks out, they sign the certificate and send it back to you.You now have a certificate signed by a CA 
+ that the process trust 
+-If a hacker tried to get his certificate signed the same way, he would fail during the validation phase and his certificate would be rejected by the CA. So the Web site 
+ that the hacker is hosting won't have a valid certificate.
+-The CAs use different techniques to make sure that you are the actual owner of that domain. You now have a certificate signed by CA that the browsers trust.
+-But how do the browsers know that the CA itself was legitimate. For example what if the certificate was signed by a fake CA. In this case our certificate was signed by 
+ Symantec. How would the browser know Symantec is a valid CA and that the certificate was infact signed by Symantec and not by someone who says they are semantec. The CA is themselves have a set of public and private key pairs. The CA's use their private keys to sign the certificates. The public keys of all the CAs are built in to the browsers. 
+ The browser uses the public key of the CA to validate that the certificate was actually signed by the CA themselves.
+-You can actually see them in the settings of your web browser, under certificates. They are under trusted CAs tab.
+-Now these are public CAs that help us ensure the public websites we visit, like our banks, email etc are legitimate. However they don't help you validate sites hosted privately 
+ say within your organization. For example, for accessing your payroll or internal email applications. For that you can host your own private CAs.
+-PRIVATE CA: Most of these companies listed here have a private offering of their services. A CA server that you can deploy internally within your company. You can then have 
+ the public key of your internal CA server installed on all your employees browsers and establish secure connectivity within your organization
+SUMMARY
+	-We have seen why you may want to encrypt messages being sent over a network to encrypt messages.
+	-We use asymmetric encryption with a pair of public and private keys and admin uses a pair of keys to secure SSH connectivity to the servers. 
+	 The server uses a pair of keys to secure HTTPS traffic.
+    -For this the server first sends a certificate signing request to a CA. The CA uses its private key to sign the CSR. Remember all browsers have a copy of the CAs public key.
+	-The signed certificate is then sent back to the server. The server configure the web application with the signed certificate. Whenever a user accesses the web application 
+	 the server first sends the certificate with its public key. The user or rather the user's browser reads the certificate and uses the CA's public key to validate and 
+	 retrieve the Servers Public key. It then generates a symmetric key that it wishes to use going forward for all communication. The symmetric key is encrypted using the 
+	 server's public key and sent back to the server. The server uses its private key to decrypt the message and retrieve the symmetric key. The symmetric key is used for
+	 communication going forward
+	Thre$H01d
+	so 
+	-The administrator generates a key pair for securing SSH.
+	-The web server generates a key pair for securing the web site with HTTPS
+	-The Certificate Authority generates its own set of key pair to sign certificates.
+	-The end user though only generates a single symmetric key. Once he establishes trust with the Web site he uses his username and password to authenticate the Web server 
+
+CLIENT CERTIFICATE
+-With the servers key pairs,the client was able to validate that the server is who they say they are. But the server does not for sure know if the client is who they say they are.
+ It could be a hacker impersonating a user by somehow gaining access to his credentials. Not over the network for sure, as we have secured it already with TLS. May be some other
+ means. 
+-So what can the server do to validate that the client is who they say they are for this as part of the initial trust building exercise.
+-The server can request a certificate from the client and so the client must generate a pair of keys and a signed certificate from a valid CA
+-The client then sends the certificate to the server for it to verify that the client is who they say they are.
+-Now you must be thinking you have never generated a client's certificate to access a Web site.Well that's because TLS client certificates are not generally implemented on 
+ web servers even if they are it's all implemented under the hood. So a normal user don't have to generate and manage certificates manually
+ 
+PUBLIC KEY INFRASTRUCTURE(PKI)
+This whole infrastructure including the CA the servers the people and the process of generating distributing and maintaining digital certificates is known as 
+public key infrastructure or PKI. 
+
+CLARIFICATION
+I've been using the analogy of a key and law for private and public keys.
+If I give you the impression that only the lock or the public key can encrypt data then please forgive me as it's not true.
+These are in fact two related or paired keys.
+You can encrypt data with any one of them and only decrypt data with the other.
+You cannot encrypt data with one and decrypt with the same.
+So you must be careful what you encrypt your data with.
+If encrypted data with your private key then remember anyone with your public key which could really be anyone out there will be able to decrypt and read your message.
+
+NAMING CONVENTION
+Usually certificates with Public key are named crt or pem extension. 
+So that’s server.crt, server.pem for server certificates or client.crt or client.pem for client certificates. 
+And private keys are usually with extension .key, or –key.pem. For example server.key or server-key.pem. 
+So just remember private keys have the word ‘key’ in them usually either as an extension or in the name of the certificate 
+and one that doesn't have the word key in them is usually a public key or certificate.
+
+	-Public Key Certificates are named as .CRT or .PEM	-> Public Keys DO NOT have the word KEY in them as either extension or name of certificate
+	-Private Key Certificates are named as .KEY or -KEY.PEM	-> Private Keys DOES have the word KEY in them as either extension or name of certificate
+
+
+TLS IN KUBERNETES 
++++++++++++++++++
+3 TYPES OF CERTIFICATES ->
+	ROOT CERTIFICATES (that of CA)
+	SERVER CERTIFICATES
+	CLIENT CERTIFICATES
+
+SERVER CERTIFICATES
+	KUBE-API SERVER -> apiserver.crt & apiserver.key
+	ETCD SERVER -> etcdserver.crt & etcdserver.key
+	KUBELET SERVER -> kubelet.crt & kubelet.key
+
+CLIENT CERTIFICATES
+	ADMIN			-> admin.key & admin.crt
+	KUBE-SCHEDULER	-> scheduler.key and scheduler.crt 
+	KUBE-CONTROLLER	-> controller-manager.key & controller-manager.crt
+	
+CCertificate Authority -> 	ca.crt & ca.key
+
+Generate Certificates -> EasyRSA, OpenSSL<Our Choice>, CFSSL
+
+
+CERTIFICATE AUTHORITY	
+	Generate Keys -> openssl genrsa -out ca.key 2048	-> ca.key
+	Certificate Signing Request -> openssl req -new -key ca.key -subj "/CN=KUBERNETES-CA" -out ca.csr		-> ca.csr
+	Sign Certificates -> openssl x509 -req -in ca.csr -signkey ca.key -out ca.crt
+
+
+ADMIN USER 
+	Generate Keys -> openssl genrsa -out admin.key 2048	-> admin.key
+	Certificate Signing Request -> openssl req -new -key admin.key -subj "/CN=kube-admin/O=system:masters" -out admin.csr		-> admin.csr
+	Sign Certificates -> openssl x509 -req -in admin.csr -CA ca.crt -CAkey ca.key -out admin.crt	-> 			admin.crt
+
+Resource: Download Kubernetes Certificate Health Check Spreadsheet
+	https://github.com/mmumshad/kubernetes-the-hard-way/tree/master/tools
+	
+
+KubeConfig File
+++++++++++++++++
+ -> Clusters, Contexts, Users
+	
+	kubectl config view
+	kubectl config view --kubeconfig=my-custom-config
+	kubectl config use-context prod-user@production		-> Update the current Context
+
+
+API Groups
+++++++++++
+/metrics
+/healthz
+/version
+/api	-> Core Group such as Namespaces, Pods, Replication controllers, Events, Endpointa, Nodes, Bindings, PV, PVC, ConfigMaps, Secrets, Services
+/apis	-> /apps[deployment,replicaset,statefulset] /extensions /networking.k8s.io[networkpolicies] /storage.k8s.io /authetication.k8s.io
+			/certificates.k8s.io[certificatesigningrequests]				
+/logs
+
+Resources -> Namespaces, Pods, Replication controllers, Events, Endpointa, Nodes, Bindings, PV, PVC, ConfigMaps, Secrets, Services
+verbs -> list, get, create, delete, update, watch
+
+RBAC
+++++
+kubectl get roles
+kubectl get rolebindings
+
+Check Access
+++++++++++++
+kubectl auth can-i create deployments
+kubectl auth can-i delete nodes
+
+kubectl auth can-i create deployments --as dev-user
+kubectl auth can-i delete nodes --as dev-user
+
+Cluster Role and Role Bindings
+++++++++++++++++++++++++++++++ 
+Namespace Scope Resources -> Pods, Replication controllers, Events, Endpointa, Bindings, PVC, ConfigMaps, Secrets, Services
+Cluster Scope Resources -> Nodes, PV, ClusterRoles, ClusterRoleBindings, CertificateSigningRequests, Namespaces
+
+To know a list of Namespaced and Non-namespaced resources
+	kubectl api-resources --namespaced=true
+	kubectl api-resources --namespaced=false
+	
+Image Security 
+++++++++++++++
+image: docker.io/nginx/nginx	
+	   gcr.io/kubernetes-e2e-test-images/dnsutils	
+
+In Docker we used to log in to private registry like this	
+	docker login private-registry.io
+	docker run private-registry.io/apps/internal-app
+
+However in Kubernetes
+
+	kubectl create secret docker-registry regcred \
+		--docker-server=private-registry.io		\
+		--docker-username=registry-user			\
+		--docker-password=registry-password		\
+		--docker-email=regaistry-user@org.com
+
+
+	nginx-pod.yaml
+		apiVersion: v1
+		kind: Pod
+		metadata:
+			name: nginx-pod
+		spec:
+			containers:
+			- name: nginx
+			  image: private-registry.io/app/internal-app
+			imagePullSecrets:
+			-name: regcred	
+
+Security Context
+++++++++++++++++
+Container Security
+	docker run --user=1001 ubuntu sleep 3600
+	docker run --cap-add MAC_ADMIN ubuntu
+
+	POD LEVEL
+		apiVersion: v1
+		kind: Pod
+		metadata:
+			name: web-pod
+		spec:
+			securityContext:
+				runAsUser:1000
+			containers:
+			- name: ubuntu
+			  image: ubuntu
+			  command: ["sleep","3600"]	
+
+	CONTAINER LEVEL
+		apiVersion: v1
+		kind: Pod
+		metadata:
+			name: web-pod
+		spec:			
+			containers:
+			- name: ubuntu
+			  image: ubuntu
+			  command: ["sleep","3600"]	
+			  securityContext:
+				runAsUser:1000
+			    capabilties:
+					add: ["MAC_ADMIN"]	
+
+NETWORK POLICY 
++++++++++++++++
+Another object in the K8s Namespace. You link a N/w ploicy to one or more Pods. 
+
+2 Types of Traffic - Ingress(incoming traffic to a server) and Egress(Outgoing traffic to another server)
+Kubernetes by default is configured with "All Allow" traffic
+
+For example, Allow Ingress[A] Traffic from API Pod [B] on Port 3306 [C]
+
+	apiVersion: v1
+	kind: NetworkPolicy
+	metadata:
+		name: db-policy
+	spec:		
+		podSelector:
+			matchLabels:
+				role: db
+		policyTypes:
+		-Ingress	->	[A]
+		ingress:
+		-from:
+			-podSelector:
+				matchLabels:
+					name:api-pod	-> [B]
+			ports:
+			-protocol: TCP
+			 port: 3306				-> [C]
+
+Solutions that support N/W policy -> Kube-router, Calico, Romana, Weave-net
+Solutions that DO NOT support N/W policy -> Flannel
+
+kubectl get netpol/networkpolicy
+kubectl get pods -l name=payroll	-> Find all pods matchnig a specified label
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+STORAGE
+++++++++
+Persistent Volumes
+Persistent Volume Claims
+Configure Applications with Persistent Storage
+Access mode for Volumes
+Kubernetes Storage Object
+
+Docker Storage -> Storage Drivers(Enable Layered Architecture) & Volume Drivers(Handles Volumes. Default is local)
+Docker File System	
+	/var/lib/docker -> aufs, containers, image, volumes
+
+	docker volume create data_volume	
+		/var/lib/docker > volumes > data_volume	
+	docker run -v data_volume:/var/lib/mysql mysql
+	
+	docker run -v data_volume:/var/lib/mysql mysql -> Volume Mount(Docker will automatically create /var/lib/docker > volumes > data_volume)	
+	docker run -v /data/mysql:/var/lib/mysql mysql -> Bind Mount
+	Latest Syntax -> 
+		docker run \
+			--mount type=bind, source=/data/mysql, target=/var/lib/mysql mysql 
+	
+Volume Drivers - Local, Azure File Storage, Convoy,Digital Ocean Block Storage, Flocker, gce-docker, GlusterFS, Netapp, RexRay, PortWorx, VMWare vSphere storage
+
+When you run a docker container you can choose to use a specific volume driver such as the Rex Ray CBS to provision volume from Amazon CBS
+	docker run -it \
+		--name mysql
+		--volume-driver rexray/ebs
+		--mount src=ebs-vol, target=/var/lib/mysql
+		mysql
+
+container runtime interface(CRI) -> is a standard that defines how an orchestration solution like Kubernetes would communicate with container run times like Docker, rocket, cri-o.
+container networking interface(CNI) -> To extend support for different networking solutions(weaveworks, flannel, cilium), the container networking interface was introduced.
+container storage interface(CSI) -> developed to support multiple storage solutions(Portworx, Amazon EBS, Dell EMC, GlusterFS) with CSI. You can now write your own drivers for your own storage to work with.
+
+Remote Procedure Calls -> CreateVolume, DeleteVolume, ControllerPublishVolume
+
+Volumes & Mounts
+++++++++++++++++
+	apiVersion: v1
+	kind: Pod
+	metadata:
+		name: random-number-generator
+	spec:
+		containers:
+		- image: alpine
+		  name: alpine
+		  command: ["/bin/sh","-c"]
+		  args: ["shuf -i 0-100 -n 1 >> /opt/number.out;"]
+		  volumemounts:
+		  -mountPath: /opt
+		   name: data-volume
+		
+		volumes:
+		-name: data-volume
+		 hostPath:
+			path:	/data
+			type: Directory
+			
+Hostpath for volume is not recommended in a multinode cluster since data in each node is not the same.
+Solution is to configure some kind of external replicated cluster storage solution
+Kubernetes supports storage solutions like NFS, GlusterFS, Flocker, FibreChannel, CephFS, ScaleIO or public cloud solutions like AWS,
+EBS, Azure Disk or File or Google’s Persistent Disk.
+
+For example, to configure an AWS Elastic Block Store volume as the storage or the volume, we replace hostPath field of the volume with 
+awsElasticBlockStore field along with the volumeID and filesystem type. The Volume storage will now be on AWS EBS.
+
+		volumes:
+		-name: data-volume
+		 awsElasticBlockStore:	
+			volumeID: <volume-id>
+			fsType: ext4
+
+PERSISTENT VOLUME
+A persistent volume is a cluster wide pool of storage volumes configured by an administrator to be used by users deploying applications on the Cluster.
+The users can now select storage from this pool using persistent volume claims let us now create a persistent
+
+	apiVersion: v1
+	kind: PersistentVolume
+	metadata:
+		name: pv-vol1
+	spec:
+		accessModes:		-> defines how a volume should be mounted on the hosts whether in a read only mode or read write mode etc. ReadOnlyMany/ReadWriteOnce/ReadWriteMany
+			-ReadWriteOnce
+		capacity:
+			storage: 1Gi	-> specify the amount of storage to be reserved for this persistent volume which is set to 1 GB here.
+		hostPath:
+			path: /tmp/data -> host path option that uses storage from the nodes local directory.Remember this option is not to be used in a production environment.
+
+	kubectl create -f pv-definition.yml
+	kubectl get persistentvolume
+	
+	Replace the Hostpath with one of the storage solutions
+	
+	awsElasticBlockStore:
+		volumeID:	<volume-id>
+		fsType:	ext4
+
+
+PERSISTENT VOLUME CLAIM 
+Persistent Volumes and Persistent Volume Claims are two separate objects in the Kubernetes namespace.
+
+-An Administrator creates a set of Persistent Volumes and a user creates Persistent Volume Claims to use to storage.
+-Once the Persistent Volume Claims are created, Kubernetes binds the Persistent Volumes to Claims based on the request 
+	and properties set on the volume. Every Persistent Volume Claims is bound to single Persistent volume.
+-During the binding process, Kubernetes tries to find a persistent volume that has sufficient capacity as requested by the 
+	claim and any other request properties such as access modes, volume modes, storage class etc. 
+-However if there are multiple possible matches for a single claim and you would like to specifically use a particular volume 
+	you could still use labels and selectors to bind to the right volumes.
+-There is a one to one relationship between claims and volumes so no other claims can utilize the remaining capacity in the volume.
+-If there are no volumes available the persistent volume claim will remain in a pending state until newer volumes are made 
+	available to the cluster once newer volumes are available.The claim would automatically be bound to the newly available volume. 
+
+
+	apiVersion: v1
+	kind: PersistentVolumeClaim
+	metadata:
+		name: myclaim
+	spec:
+		accessModes:
+			-ReadWriteOnce
+		resource:
+			requests:
+				storage: 500Mi
+
+	kubectl create -f pvc-definition.yml
+	kubectl get persistentvolumeClaim
+
+-When the claim is created, kubernetes looks at the volume created previously. The access Modes match. The capacity requested is 500 Megabytes 
+	but the volume is configured with 1 GB of storage. Since there are no other volumes available. The persistent volume claim is bound to 
+	persistent volume when we run to get volumes command again. We see the claim is bound to the persistent volume we created. 
+
+	kubectl delete persistentvolumeClaim myclaim
+	
+-what happens to the underlying persistent volume when the claim is deleted. You can choose what is to happen to the volume by default.
+
+	PersistentVolumeReclaimPolicy: Retain/Delete
+	
+[Retain] - It is set to retain meaning the persistent volume will remain until it is manually deleted by the administrator. It is not available 
+	for reuse by any other claims.
+[Delete] - or it can be deleted automatically. This way as soon as the claim is deleted the volume will be deleted as well thus freeing up 
+	storage on the end storage device or a third option is to recycle.
+[Recycle] - or a third option is to recycle. In this case the data in the data volume will be scrubbed before making it available to other claims	
+
+Using PVCs in PODs
+Once you create a PVC use it in a POD definition file by specifying the PVC Claim name under persistentVolumeClaim section in the volumes section like this:
+
+	apiVersion: v1
+	kind: Pod
+	metadata:
+	  name: mypod
+	spec:
+	  containers:
+		- name: myfrontend
+		  image: nginx
+		  volumeMounts:
+		  - mountPath: "/var/www/html"
+			name: mypd
+	  volumes:
+		- name: mypd
+		  persistentVolumeClaim:
+			claimName: myclaim
+
+
+The same is true for ReplicaSets or Deployments. Add this to the pod template section of a Deployment on ReplicaSet.
+Reference URL: https://kubernetes.io/docs/concepts/storage/persistent-volumes/#claims-as-volumes
+
+STORAGE CLASS
+++++++++++++++
+Static Provisioning Volumes
+
+	gcloud beta compute disks create \
+		--size 1GB
+		--region us-east1	
+		pd-disk
+	
+	pv-definition.xml
+	
+	apiVersion: v1
+	kind: PersistentVolume
+	metadata:
+		name: pv-vol1
+	spec:
+		accessModes:
+			-ReadWriteOnce
+		capacity:
+			storage: 1Gi
+		gcePersistentDisk:
+			pdName: pd-disk
+			fsType: ext4	
+
+Dynamic Provisioning Volume (Storage Class)
+
+-It would have been nice if the volume gets provisioned automatically when the application requires it, and that's where storage clauses come in.
+-With storage classes, you can define a provisional such as Google storage that can automatically provision storage on Google Cloud and attach 
+	that to parts when a claim is made. That's called dynamic provisioning of volumes.
+-Other VolumePlugins are AWSElasticBlockStore, AzureFile, AzureDisk, GCEPersistentDisk etc
+	StorageClass-Definition.yaml	-> We no longer need PV definition
+	
+	apiVersion:	storage.k8s.io/v1
+	kind: StorageClass
+	metadata:
+		name: google-storage
+	provisioner:	kubernetes.io/gce-pd
+
+
+	PVC-Definition.yaml ->	Include StorageclassName under spec:		
+		storageClassName: google-storage
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NETWORKING 
+++++++++++
+++++++++++
+Switching & Routing
+	-Switching
+	-Routing
+	-Default Gateway
+DNS	
+	-DNS Configurations on LINUX
+	-Core DNS introduction
+Tools
+CNI
+Network Namespaces in LINUX
+Networking in Docker
+Network Configuration on Cluster Nodes
+POD networking concepts
+CNI in Kubernetes
+Service Networking
+Cluster DNS
+Network Load Balancer
+Ingress
+
+ip link
+ip addr
+ip addr add 192.168.1.0/24 dev eth0
+ip route
+ip route add 192.168.1.0/24 via 192.168.2.1
+cat /proc/sys/net/ipv4/ip_forward
+
+
+SWITCHING(For one system to reach another system within a network through a switch)		(VERY IMPORTANT)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+	LAPTOP A - 192.168.1.10 with interface eth0
+	LAPTOP B - 192.168.1.11 with interface eth0
+	SWITCH - 192.168.1.0
+
+-We have two computers A & B – laptops, desktops, VMs on the cloud, wherever. How does system A reach B? We connect them through a switch, and the switch 
+	creates a network connecting the two systems. To connect them to a switch, we need an interface(eth0) on each host. Physical or virtual depending on the 
+	host. 
+-To see the interfaces for the host. We use the "ip link" command.
+	ip link -> we look at the interface named eth0 that we will be using to connect to the switch.
+	
+-Let's assume the switch is in a network with the address -> 192.168.1.0
+	We then assign the systems with IP addresses on the same network.
+	
+		ip addr add 192.168.1.10/24 dev eth0
+		ip addr add 192.168.1.11/24 dev eth0
+	
+-Once the links are up, and the IP addresses are assigned, the computers can now communicate with each other through the switch
+	The switch can only enable communication within a network, which means it can receive packets from a host on the network and 
+	deliver it to other systems within the same network.
+
+-BUT How does a system in one network reach a system in another Network.
+
+
+	SWITCH NETWORK - 192.168.1.0
+	LAPTOP A - 192.168.1.10 with interface eth0
+	LAPTOP B - 192.168.1.11 with interface eth0
+	
+	ROUTER	-> NETWORK1(192.168.1.1) & NETWORK2(192.168.2.1)
+
+	SWITCH NETWORK - 192.168.2.0
+	LAPTOP C - 192.168.2.10 with interface eth0
+	LAPTOP D - 192.168.2.11 with interface eth0
+	
+
+	For example, how does System B with the IP 192.168.1.11 reach system C with the IP 192.168.2.10 on the other network.
+
+ROUTING(CONNECTING 2 OR MORE NETWORKS)			(VERY IMPORTANT)
+++++++++++++++++++++++++++++++++++++++
+ROUTER
+-That’s where a Router comes in. A Router helps connect two networks together. It is an intelligent device
+-Think of it as another server with many NETWORK PORTS. 
+-Since it connects to the two separate networks,it gets two IPs assigned. One on each network. 
+	In the first network we assign it an IP address 192.168.1.1 and in the second we assign it an IP 192.168.2.1.
+	Now we have a router connected to the two networks that can enable communication between them.
+	Now, when system B tries to send a packet to system C, how does it know where the router is on the network to send the packet through 
+	The router is just another device on the network. There could be many other such devices. 
+GATEWAY	
+-That’s where we configure the systems with a gateway or a route.
+-If the network was a room, the gateway is a door to the outside world to the other networks or to the Internet.
+-The systems need to know where that door is to go through that 
+-To see the existing ROUTING CONFIGURATIONS on a system run the "route" command. It displays the KERNEL's ROUTING TABLE 
+	and within that, INITIALLY there will be NO routing configurations.
+	
+	route
+	<kernel IP routing table is empty>
+	
+-So in this condition your system B will not be able to reach system C and it can only reach other systems within the same network in the range 192.168.1.0. 
+-To configure a gateway on system B to reach the systems on (switch)network 192.168.2.0, run the "ip route add" command, and specify that you can reach the
+192.168.2.0 (switch)network through the router's door or gateway at 192.168.1.11. 
+	
+	ip route add 192.168.2.0/24 via 192.168.1.1
+
+-Running the route command again shows that we have a route added to reach the 192.168.2.0 series (switch)network through the router.
+	
+	route
+	<kernel IP routing table is not empty>
+	Destination(192.168.2.0) Gateway(192.168.1.1)
+
+-Note: Remember this has to be configured on all the systems. For example, if the system C is to send a packet to system B, then you need to add a route on system C’s
+	routing table to access network 192.168.1.0 through the router configured with the IP address 192.168.2.1. 
+-Now suppose these systems need access to the Internet. Say they need access to Google at 172.217.194.0 network on the internet. So you connect the router to the internet.
+	and then add a new route in your routing table to route all traffic to the network 172.217.194 through your router. There are so many different sites on different 
+	networks on the Internet. 
+DEFAULT GATEWAY	
+-Instead of adding a routing table entry for these same routers IP address for each of those networks you can simply say for any network that you don't know a route to use this router as the DEFAULT GATEWAY. This way any request to any network outside of your existing network goes to this particular router.
+
+	ip route add default via 192.168.2.1
+	
+	route
+	<kernel IP routing table is not empty>
+	Destination(Default) Gateway(0.0.0.0)
+
+-So in a simple setup like this, all you need is a single routing table entry with a default gateway set to the routers IP address.
+-NOTE: Instead of the word default you could also say 0.0.0.0. It means any IP destination. Both of these lines mean the same thing. 
+	A 0.0.0.0 entry in the Gateway field indicates that you don't need a gateway. For example in this case for system C to access any 
+	devices in the 192.168.2.0 network, it doesn't need a gateway because it is in its own network. 
+-But say you have multiple routers in your network, one for the Internet another for the internal private network then you will need 
+	to have two separate entries for each network. One entry for the internal private network and another entry with the default gateway 
+	for all other networks including public networks. So if you are having issues reaching internet from your systems, this routing table 
+	and the default gateway configuration is a good place to start.
+-Let us know look at how we can set up a linux host as a ROUTER. Let's start with a simple setup. I have 3 hosts A, B and C. 
+
+	LAPTOP A(192.168.1.5-eth0)
+	
+	SWITCH NW 1(192.168.1.0)
+	
+	LAPTOP B(192.168.1.6-eth0 AND 192.168.2.6-eth1)
+	
+	SWITCH NW 2(192.168.2.0)
+	
+	LAPTOP C(192.168.2.5-eth0)
+
+	A & B are connected to a network 192.168.1
+	B & C to another on 192.168.2. 
+	So host B is connected to both the networks using two interfaces eth0 and eth1
+	A has IP 192.168.1.5, C has 192.168.2.5 and B has an IP on both the networks 192.168.1.6 and 192.168.2.6.
+	How do we get A to talk to C? Basically, if I try to ping 192.168.2.5 from A, it would say Network is Unreachable. And by now we know why that is.
+	Host A has no idea how to reach a network at 192.168.2. We need to tell host A that the door or gateway to network 2 is through host B. And we do 
+	that by adding a routing table entry. We add a route to access network 192.168.2 via the gateway 192.168.1.6. 
+	
+	ip route add 192.168.2.0/24 via 192.168.1.6
+	
+-If the packets where to get through to Host C, Host C will have to send back responses to Host A. When Host C tries to reach Host A at 192.168.1 network, 
+it would face the same issue. So we need to let know Host C know that it can reach Host A through Host B which is acting as a router. So we add a similar 
+entry into Host C’s routing table. This time we say to reach network 192.168.1.0, talk to Host B at 192.168.2.6. 
+	
+	ip route add 192.168.1.0/24 via 192.168.2.6
+
+-When we try to ping now, we no longer get the Network Unreachable error message, That means our routing entries are right, but we still don't get any response back. 
+-IMPORTANT: By default in Linux, packets are not forwarded from one interface to the next. For example packets received on eth0 on host, B are not forwarded to elsewhere 
+	through eth1. This is this way for security reasons. For example, if you had eth0 connected to your private network and eth1 to a public network, we don't want anyone 
+	from the public network to easily send messages to the private network unless you explicitly allow that. But in this case since we know that both are private networks 
+	and it is safe to enable communication between them, we can allow host B to forward packets from one network to the other. 
+	
+-Whether a host can forward packets between interfaces is governed by a setting in this system at file /proc/sys/net/ipv4/ip_forward 
+	
+	cat /proc/sys/net/ipv4/ip_forward
+	0
+
+-By default, the value in this file is set to 0 meaning no forward. Set this to 1 and you should see the pings go through. Now remember simply setting this value does not 
+persist the changes across reboots for that you must modify the same value in the /etc/sysctl.conf file.
+
+	/etc/sysctl.conf
+		net.ipv4.ip_forward=1
+
+-So let's take away some key commands 
+	ip link									->	used to list and modify interfaces on the host
+	ip addr			 						->	used to see the ip addresses assigned to those interfaces 
+	ip addr add 192.168.1.10/24 dev eth0	->	used to set IP addresses on the interfaces.
+
+
+NOTE: Now remember changed made using these commands are only valid till a restart. If you want to persist these changes you must set them in the 
+/etc/network/interfaces file. 
+
+	"ip route" or simply the "route" command	->	used to view the routing table. 
+	ip route add 192.168.1.0/24 via 192.168.2.6	->	used to add entries into the routing table.
+	cat /proc/sys/net/ipv4/ip_forward			->	used to check if IP forwarding is enabled on a host, if you're working with a host configured as a router
+	1
+
+DNS		(VERY IMPORTANT)
++++++
+Name Resolution
+ping db	/	ssh db	/	curl http://www.goole.com -> All will check on hosts file first to find out the IP address of the host
+	cat >> /etc/hosts
+	
+DNS Server -> move all these entries into a single server who will manage it centrally that we call our DNS server.
+	and then we point all hosts to look up that server if they need to resolve the hostname to an IP address instead
+	of their own ETC HOSTS files.
+
+cat /etc/resolv.conf -> Every host has a DNS resolution configuration file
+	nameserver 	192.168.1.100
+	nameserver	8.8.8.8		->	a common, well known public name server available on the Internet hosted by Google that knows about all the websites on the Internet.
+
+You can have multiple name servers like this configured on your host, but then you have to configure that on all your hosts in your network.
+You already have a name server within your network configured on all the hosts. So in that case, you can configure the server itself to forward 
+any unknown host names to the public name server on the Internet.
+
+Once this is configured on all of your host, every time a host comes up across a hostname that it does not know about, it looks it up from the DNS over.
+
+ /etc/nsswitch.conf
+	hosts:  files dns	-> This instructs your computer to look up hostnames and IP addresses first in the /etc/hosts file, and to contact the DNS server if a given host does not occur in the local hosts file. 
+	
+	
+Domain Name -> www.facebook.com -> it is how IPs translate to names that we can remember on the public internet, just like how we did for our hosts.
+	Root -> dot is the root, that's where everything starts
+	Top Level Domains ->	The last portion of the domain name, the dot coms, the dot net start edu, dot org, etc. are the top level domains that represent the 
+		intent of the website dot com for commercial or general purpose, dot net for network, dot edu for educational organizations and dot org for non-profit organizations.
+	Domain Name -> Google is the domain name assigned to Google
+	Sub Domain ->	www is a subdomain, the subdomains helping further grouping things together.
+					Under Google, for example, Google's map service is available at maps.google.com. So Maps is a subdomain of Google
+
+
+WORKFLOW -> When you try to reach any of these domain names, say, apps.google.com from within your organization, your request first hits your organization's 
+			internal DNS server. It doesn't know who apps or Google is. It forwards your request to the Internet. On the Internet, the IP address of the server 
+			serving apps.google.com, maybe resolved with the help of multiple DNS servers, a root server looks at your request and points you to a server serving 
+			dot com. The dot com server looks at your request and forwards you to Google and Google's apps server provides you the IP of the server serving the app's 
+			applications. In order to speed up all future results, your organization's DNS server may choose to cache this IP for a period of time, typically a 
+			few seconds up to few minutes. That way it doesn't have to go through the whole process again each time.
+
+
+cat /etc/resolve.conf	-> when you try to ping web, you will see it actually tries web.mycompany.com
+	search mycompany.com
+
+RECORD TYPES 	-> How are the records stored in the DNS server?
+	A	-> Storing IPs to host names
+	AAAA	-> Storing ipv6 to host names
+	CNAME	->	Mapping one name to another name is called C Name Records. For example food.web-server eat.web-server
+
+NSLOOKUP -> to query a hostname from a DNS server.
+		NOTE: In this lookup does not consider the entries in the local etc hosts file. So if you add an entry into the local etc hosts file for your web application 
+		and if you try to do an NSLOOKUP for that web application, it is not going to find it. The entry for your Web application has to be present in your DNS server 
+		and its lookup only queries the DNS server.
+
+DIG -> another useful tool to test the enemy's name resolution, it returns more details in a similar form as is stored on the server
+
+
+COREDNS
++++++++
+how to configure a host as a DNS server.
+
+We are given a server dedicated as the DNS server, and a set of Ips to configure as entries in the server. There are many DNS server solutions out there 
+CoreDNS is one among them
+
+Run the executable to start a DNS server. It by default listens on port 53, which is the default port for a DNS server.
+Now we haven’t specified the IP to hostname mappings. For that you need to provide some configurations. There are multiple ways to do that. We will look at one. 
+First we put all of the entries into the DNS servers /etc/hosts file.
+And then we configure CoreDNS to use that file. CoreDNS loads it’s configuration from a file named Corefile. Here is a simple configuration that instructs CoreDNS 
+to fetch the IP to hostname mappings from the file /etc/hosts. When the DNS server is run, it now picks the Ips and names from the /etc/hosts file on the server.
+
+Read more about CoreDNS here:
+https://github.com/kubernetes/dns/blob/master/docs/specification.md
+https://coredns.io/plugins/kubernetes/
+
+
+NAMESPACES	(VERY IMPORTANT)
+++++++++++
+-Network Namespaces are used by containers like Docker to implement Network Isolation. containers are separated from the underlying host using namespaces.
+-When you create a container you want to make sure that it is isolated that it does not see any other processes on the host or any other containers.
+-So we create a special Isolation(Room) for it on our host using an namespace as far as the container is concerned. It only sees the processes run by it and thinks that 
+	it is on its own host. The underline host however has visibility into all of the processes including those running inside the containers.
+-This can be seen when you list the processes from within the container. 
+	-You see a single process with process id = 1 inside container
+	-When you list the same processes as a root user from the underlying host. You see all the other processes along with the process running inside the container. 
+		This time with a different process id. 
+	-It is the same process running with different process ids inside and outside the container.
+	-That's how names spaces work. 
+	
+ps aux (on the container)
+ps aux(on the host)
+
+-When it comes to networking, our host has its own INTERFACES that connect to the local area network. Our host has its own ROUTING and ARP TABLES with information 
+	about rest of the network. We want to seal all of those details from the container. 
+-When a container is created, we create a network namespace for it. That way, it has no visibility to any network related information on the host.
+-A container has its own namespace. Within a namespace, a container has its own Virtual Network Interface(eth0), routing table and ARP table
+
+To create a network namespace "red" on LINUX host
+	ip netns add red
+	
+To list all the network namespaces
+	ip netns
+
+To list network interace on my host
+	ip link
+	
+To list the network interace within the red namespace
+	ip -n red link
+    ip netns exec red ip link	
+
+Similarly for ARP table
+	arp
+	ip netns exec red arp
+
+Similarly for Routing table
+	route
+	ip netns exec red route
+
+CONNECTING NAMESPACES
+	
+- Just like how we would connect 2 physical machines together using a cable to an Ethernet(Eth0) interface on each machine, you can connect 2 name spaces together using
+	a virtual ethernet pair or a virtual cable. i.e VIRTUAL CABLE with 2 INTERFACES on either ends
+
+- To create the VIRTUAL CABLE run the "ip link add" command with a type set to "veth" and specify the two ends "veth-red" and "veth-blue".
+
+	ip link add veth-red type veth peer name veth-blue
+
+- The next step is to ATTACH each INTERFACE to the appropriate NAMESPACE using the "ip link set"
+
+	ip link set veth-red netns red
+	ip link set veth-blue netns blue
+
+- Then assign IP ADDDRESS to each of these NAMESPACE using "ip addr add" command
+	ip -n red addr add 192.168.15.1 dev  veth-red
+	ip -n blue addr add 192.168.15.2 dev  veth-blue
+	
+- We then bring the INTERFACE UP using the "ip link set up" command
+	ip -n red link set veth-red up
+	ip -n blue link set veth-blue up
+
+- Now the namespaces are up and can now reach each other. Try a ping from the Red namespace to reach the IP of the blue.	
+	ip netns exec red ping 192.168.15.2
+	
+- Also if you look at the ARP table of RED namespace, you'll see that it has identified its blue neighbor at 192.168.15.2 with a MAC address.
+	Similarly if you look at the ARP table of BLUE namespace, you'll see that it has identified its red neighbor at 192.168.15.1 with a MAC address.
+	
+- If we compare this will be ARP table of the host you'll see that the host our table has no idea about this new namespace as we have created and no 
+	idea about the interfaces we created in those namespaces.	
+	
+- SCENARIO: But how do you enable multiple namespaces to communicate with each other? 
+  ANSWER:	Just like in the physical world, you create a VIRTUAL NETWORK INSIDE YOUR HOST.
+	To create a network you need a switch, so to create a virtual network you need a VIRTUAL SWITCH.
+	So you create a virtual switch within our host and connect the namespaces to it. 
+	But how do you create a virtual switch within our host? 
+	There are multiple solutions available such as the native solution called as LINUX BRIDGE and the OPEN VSWITCH etc..  
+
+- We will use the Linux bridge option to create an internal bridge network. We add a new interface to the host using the "ip link add" command with 
+	the type set to "bridge". We will name it v-net-0. As far as our host is concerned, it is just another interface just like the eth0 interface, 
+	it appears in the output of the "ip link" command along with the other interfaces
+	
+		ip link add v-net-0 type bridge
+		ip link
+
+- It is currently down so you need to turn it up. Use the "ip link set up" command to bring it up.	
+
+		ip link set dev v-net-0 up
+
+- NOTE : Now for the NAMESPACES, this INTERFACE is like a SWITCH that it can connect to. So think of it as an INTERFACE for the HOST and a SWITCH for the NAMESPACE.
+
+- So the next step is to connect the NAMESPACE to this new VIRTUAL NETWORK SWITCH. Earlier we created the CABLE or the VETH pair with the VETH-RED interface on one end 
+	and VETH-BLUE interface on the other because we wanted to connect the two namespaces directly. Now we will be connecting all named spaces to the bridge network.
+
+- So we need new cables for that purpose. The earlier cable doesn't make sense anymore so we will get rid of it using the "ip link delete" command to delete the cable 
+	when you delete the link with one end the other end gets deleted automatically, since they are a pair 
+
+		ip -n red link del veth-red
+
+- Let us now create new cables to connect the namespace to the bridge. Run the "ip link add" command and create a pair with "veth-red" on one end like before but this time
+	the other end will be named "veth-red-br" as it connects to the bridge network. This naming convention will help us easily identify the interfaces that associate to 
+	the direct namespace. Similarly create a cable to connect the blue namespace to the bridge network.
+		
+		ip link add veth-red type veth peer name veth-red-br
+		
+		ip link add veth-blue type veth peer name veth-blue-br
+
+- Now that we have the cables ready it's time to get them connected to the namespace. To attach one end of this of the interface to the red namespace run the
+	"ip link set netns" command.
+		ip link set veth-red netns red
+
+- To access the other end to the bridge network run the "ip link set master" command on the "veth-red-br" end and specify the "master" for it as "v-net-0" network.
+		ip link set veth-red-br master v-net-0
+
+- Follow the same procedure to attach the blue cable to the blue namespace and the bidge network.
+		ip link set veth-blue netns blue
+		ip link set veth-blue-br master v-net-0
+
+- Let us now set IP addresses for these links and turn them up. We will use the same IP addresses that we used before on one end to 192.168.15.1 
+	and one end to 192.168.15.2 and finally turn the devices up.
+	
+		ip -n red addr add 192.168.15.1 dev veth-red
+		ip -n blue addr add 192.168.15.2 dev veth-blue
+		
+		ip -n red link set veth-red up
+		ip -n blue link set veth-blue up
+
+- The containers can now reach each other over the network. So we follow the same procedure to connect the remaining other name spaces to the same network.
+	We now have all four namespaces connected to our internal bridge network and they can all communicate with each other.
+
+- They have all IP addresses 
+	192.168.15.1
+	192.168.15.2
+	192.168.15.3
+	192.168.15.4
+
+  And remember we assigned our host the IP 
+	192.168.1.2
+	
+   Virtual Network - 192.168.15.0		
+
+- From my host, what if I tried to reach one of these interfaces in these namespaces. Will it work now. NO!
+	My host is on one network and the namespaces are on another.
+
+- But what if I really want to establish connectivity between my host and these namespaces. Remember we said that the Bridge switch is actually a network interface 
+	for the host. So we do have an interface(v-net-0) on the 192.168.15.0 network on our host.
+
+- Since this is just another interface, all we need to do is assign an IP address to it so we can reach the namespace through it run the "ip addr" command.
+ to set the IP 192.168.15.5 to this interface.
+	
+	ip addr add 192.168.15.5/24 dev v-net-0
+
+- We can now ping the red namespace from our local host. 
+	
+	ping 192.168.15.1
+
+- Now remember this entire network is still private and restricted within the host. From within the namespace, you can't reach the outside world nor can anyone 
+	from the outside world reach the services or applications hosted inside. The only door to the outside world is the ethernet port(eth0) on the host.
+
+- So how do we configure this Bridge to reach the LAN network through the Ethernet port. Say there is another host attached to our LAN network with the address 
+192.168.1.3. Our LAN network is at 192.168.1.0. How can you reach this host from within my name spaces? What happens if I try to ping this host from my  
+namespace. The blue namespace sees that I'm trying to reach a network at 192.168.1 which is different from my current network of 192.168.15. 
+
+- So it looks at its routing table to see how to find that network. The routing table has no information about other network. So it comes back saying that the network 
+is unreachable.
+	ip netns exec blue ping 192.68.1.3
+		-> Connect : Network is unreachable
+	ip netns exec blue route
+	
+- So we need to add an entry into the routing table to provide a gateway or door to the outside world. So how do we find that gateway? 
+A door or a gateway as we discussed before is a system on the local network that connects to the other network. So what is a system that has one interface on the network 
+local to the blue namespace which is the one only to 160 or 50 network and is also connected to the outside LAN network.
+
+Here's a logical view.
+
+It's the local hosts that have all these namespace along so you can ping the name spaces.
+
+Remember our local host has an interface to attach the private network so you can ping the name spaces
+
+so our local host is the gateway that connects the two networks together.
+
+We can now add a row entry in the blue namespace to say road or traffic to the one only to 168 one network
+
+to the Gateway add one only to 168 15 not 5.
+
+Now remember our host has two IP addresses one on the birth network at 192 160 or 15 or five and another
+
+on the external network and one only to 168.
+
+One or two can you use any in the route.
+
+No because the blue namespace can only reach the gateway in its local network at one end to 160 at 15
+
+at five.
+
+The default gateway should be reachable from your namespace when you add it to your route when you tried
+
+to paying now you no longer get the network unreachable message.
+
+What you still don't get any response back from the pin.
+
+What might be the problem.
+
+We talked about a similar situation in one of our earlier lectures where from our home network we tried
+
+to reset the external Internet through our router our whole network has our internal private IP addresses
+
+that the destination network don't know about so they cannot reach back for this.
+
+We need Nat enabled on our host acting as a gateway here so that it can send the messages to the land
+
+in its own name with its own address.
+
+So how do we add that functionality to our host.
+
+You should do that using IP tables.
+
+Add a new rule in the Nat IP table in the post routing chain to masquerade or replace the from address
+
+on all packets coming from the source network.
+
+One entry to the 168 are 15 0 0 with its own IP address.
+
+That way anyone receiving these packets outside the network will think that they are coming from the
+
+host and not from within the namespace.
+
+When we try to ping now we see that we are able to reach the outside world.
+
+Finally say the land is connected to the Internet.
+
+We want the name spaces to reach the Internet.
+
+So we tried to ping a server on the Internet at a tornado later it from the blue namespace.
+
+We receive a familiar message that the network is unreachable but now we know why that we look at the
+
+writing table and see that we have roads to the network 180 to 168 one but not to anything else.
+
+Since these name spaces can reach any network our host can reach.
+
+We can simply say that to reach any external network talk to our host.
+
+So we add a default gateway specifying our host.
+
+We should now be able to reach the outside world from within these names basis.
+
+Now what about connectivity from the outside world to inside the name spaces.
+
+Say for example the blue namespace hosted a Web application on port 80.
+
+As of now the name spaces are on an internal private network and no one from the outside world knows
+
+about that.
+
+We can only access these from the host itself.
+
+If you try to ping the private IP of the namespace from another host on another network you will see
+
+that it's not reachable obviously because that host doesn't know about this private network.
+
+In order to make that communication possible you have two options.
+
+The two options that we saw in the previous lecture on that.
+
+The first is to give away the identity of the private network to the second host.
+
+So we basically add an IP wrote entry to the second host telling the host that the network 190 to 168
+
+or 15 can be reached through the host at 190 to 168 one or two but we don't want to do that.
+
+The other option is to add a port forwarding rule using IP tables to see any traffic coming to port
+
+80 on the local host is to be forwarded to port 80 on the IP assigned to the blue namespace.
+
+
+
+
+
+
+	
+[upgrade/config] Making sure the configuration is correct:
+[upgrade/config] Reading configuration from the cluster...
+[upgrade/config] FYI: You can look at this config file with 'kubectl -n kube-system get cm kubeadm-config -oyaml'
+[preflight] Running pre-flight checks.
+[upgrade] Making sure the cluster is healthy:
+[upgrade] Fetching available versions to upgrade to
+[upgrade/versions] Cluster version: v1.16.0
+[upgrade/versions] kubeadm version: v1.17.0
+[upgrade/versions] Latest stable version: v1.17.4
+[upgrade/versions] Latest version in the v1.16 series: v1.16.8
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     2 x v1.16.0   v1.16.8
+
+Upgrade to the latest version in the v1.16 series:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.16.0   v1.16.8
+Controller Manager   v1.16.0   v1.16.8
+Scheduler            v1.16.0   v1.16.8
+Kube Proxy           v1.16.0   v1.16.8
+CoreDNS              1.6.2     1.6.5
+Etcd                 3.3.15    3.3.17-0
+
+You can now apply the upgrade by executing the following command:
+
+        kubeadm upgrade apply v1.16.8
+
+_____________________________________________________________________
+
+Components that must be upgraded manually after you have upgraded the control plane with 'kubeadm upgrade apply':
+COMPONENT   CURRENT       AVAILABLE
+Kubelet     2 x v1.16.0   v1.17.4
+
+Upgrade to the latest stable version:
+
+COMPONENT            CURRENT   AVAILABLE
+API Server           v1.16.0   v1.17.4
+Controller Manager   v1.16.0   v1.17.4
+Scheduler            v1.16.0   v1.17.4
+Kube Proxy           v1.16.0   v1.17.4
+CoreDNS              1.6.2     1.6.5
+Etcd                 3.3.15    3.4.3-0
+
+You can now apply the upgrade by executing the following command:
+
+        kubeadm upgrade apply v1.17.4
+
+Note: Before you can perform this upgrade, you have to update kubeadm to v1.17.4.
+
+_____________________________________________________________________
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+	
+Rolling Updates -> Upgrading Docker instances one after another
+How to install Kubeadm?
+
+First install Docker
+
+	sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+	sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+	sudo yum install docker-ce docker-ce-cli containerd.io
+
+
+
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm
+
+Control-plane node(s)
++++++++++++++++++++++
+TCP	Inbound	6443*		Kubernetes API server		Used By(All)
+TCP	Inbound	2379-2380	etcd server client API		Used By(kube-apiserver, etcd)
+TCP	Inbound	10250		Kubelet API					Used By(Self, Control plane
+TCP	Inbound	10251		kube-scheduler				Used By(Self)
+TCP	Inbound	10252		kube-controller-manager		Used By(Self)
+
+Worker node(s)
+++++++++++++++
+TCP	Inbound	10250		Kubelet API					Used By(Self, Control plane)
+TCP	Inbound	30000-32767	NodePort Services**			Used By(All)
+
+
+https://kubernetes.io/docs/tasks/tools/install-kubectl/
+
+In order for kubectl to find and access a Kubernetes cluster, it needs a kubeconfig file, which is created automatically when you create a cluster using kube-up.sh or successfully deploy a Minikube cluster. By default, kubectl configuration is located at ~/.kube/config
+
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
+
+Kubernetes is an orchestration engine and open-source platform for managing containerized application workload and services that facilitates
+both declarative configuration and automation
+
+Installing Kubernetes - Multiple ways
+1)kubeadm - baremetal installation
+2)Minikube - virtualized environment for Kubernetes (only single node, not multinode for production)
+3)Kops - Kubernetes on AWS
+4)Kubernetes on Google Cloud Platform
+
+Kubernetes Architecture
+	User Interface - Dashboard is a web-based Kubernetes user interface. Use it to deploy containerized application in a kubernetes cluster,
+		troubleshoot a containerized application, manage a cluster along with its resources.
+	CLI(kubectl) - Command Line tool for Kubernetes and used to interact with the master node. Kubectl has a configuration file called 
+		Kubeconfig. This file has the server and authentication information to access the API server. Example, kubectl get pods
+	Kubernetes Master - Main Node responsible for managing the entire kubernetes cluster. It handles the orchestration of worker nodes.
+		It handles API Server(for communicstion), Scheduler, Controller Manager, etcd(distributed key value database to store all cluster data)
+	Worker Node - Pod(with one or more docker containers), kubelet, kube-proxy. Where application actually runs. Worker nodes are controlled
+		by master nodes using kubelet process. Worker Nodes are exposed to internet via Kube-proxy(performs network routing)
+
+Deployment.yaml -> Blueprint for pods to be created. A deployment will create a pod by its "spec" from the "template". Can scale up "replica"
+of pods.
+
+Service.yaml -> Responsible for making our pods discoverable inside the network or exposing them to the internet. A service identifies pods
+by its label selector. Types of services are load balancer, node port, cluster IP.
+		
+
+Excellent -> https://www.youtube.com/watch?v=NUt9VVG_gac (Deep dive into Kubernetes networking)
+
+PODS
+++++
+Pods - Small groups of tightly coupled containers deployed to a single node within a pod. Every pod has unique IP. Containers in a Pod share
+ the same IP address, host name, namespace and volume and other resources. Share the same lifecycle. Pods abstract network and storage away 
+ from underlying containers. This lets you move containers around the cluster more easily.
+Use cases for multi-container pods, sidecars, proxies/adapters,
+
+Why use Pods? Containers have their own namespaces and cgroups. There is a lot of overhead in communication across containers. Pods tie 
+together one or more containers. In Kubernetes, the smallest construct that you deploy is a pod. Containers within a pod share the same
+namespace.They see the same volume(w.r.t Storage) and IP address(w.r.t Networking)
+
+Advantage -> With Kubernetes, every pod gets a unique IP which other Pods across the network sees the same IP
+
+Single Pod Networking -> A special "Pause" container manages the networking within a Pod. Pause will start the container and goes in an infinite loop so that if any of the container dies, networking and namespace remains intact. All the containers within a Pod share the same
+"internal" eth0 virtual interface. These containers will be mapped to the outside world using an "external" eth0 interface using a "bridge" cbr0 interface
+
+Pods can communicate across nodes using various approaches such as L2(broadcast), L3(Static/BGP routing), Overlay(encapsulate pod's traffic into underlay traffic - VXLAN), Cloud()
+
+Using CNI(Container Networking Interface), it allows any vendor's networking technology to integrate with Kubernetes
+
+SERVICES
+++++++++
+Group of endpoints(usually Pods) grouped by selector(common label) and which is exposed using a virtual IP address. Pods are ephemeral(some
+may die and some are spawned). How to communicate using something permanent. That is what services are for. Every Pod has a label and when 
+you define a service, you say that all pods which have this label belong to the service. For example, "selector app : productPage".
+"port" is the service port i'm reaching to the service as a virtual IP address. "targetPort" is the port number of the Pod.
+
+Kubernetes uses KubeDNS which is an implementation of SkyDNS. How it works? "API Server" monitors which are the services running in the 
+cluster. It will watch the services and it will updates to the common etcd cluser. SkyDNS will read out of that and it will maintain the 
+mapping of complete service name to IP address i.e. Service-IPaddress Mapping
+
+Nodeport, Network Load Balancer and Ingress Controller are service types for external world to reach services inside the cluster
+Type "ClusterIP" is used for internal communication within the cluster
+
+NodePort - Service is exposed using a reserved port in all nodes of the cluster. Default(32000-32767). Node IP is used for external communication
+
+LoadBalancer - Typically implemented as network load balancer. Each service needs to have own external IP. Used for L3 services
+
+Ingress Controller - Typically implemented as Http LoadBalancer. Many services can share same external IP. Uses path based demux. Used for
+L7 services. Examples are NGINX, Itsio.
+
+Network Control Policy
++++++++++++++++++++++++
+
+
+Containerization -> Consistent, Repeatable, Reliable Deployments
+Kubernetes  -> Deploys and Monitors containerized workloads
+
+Kubernetes APIs are declarative rather than imperative. i.e. we define the desired state. And System works to drive towards that state
+How? We create an API object that is persisted on Kube API server until deletion. And System ensures that all components will work in 
+parallel to drive towards that state
+
+Container Orchestration Engine - Automation of deploying, scaling and managing containerized applications hosted on group of servers. Example 
+Examples -> Kubernetes, Docker Swarm, Apache Mesos
+
+Cloud Specific Container Services - Google Kubernetes Engine(GKE), EC2 Container Service, Azure Container Service
+
+Cluster Management, Scheduling, Service Discovery & Monitoring, Secrets Management
+
+One Master Node and multiple worker compute nodes
+Worker Node - VMs
+Pod 
+
+Kubeadm
+kubectl
+Google Kubernetes Engine
+Minikube
+Pods 
+	Configuration - ConfigMaps, Secrets
+	Controllers - Replication Controller, ReplicaSet, Deployments, DaemonSet, Jobs
+	Services - NodePort, LoadBalancer, ClusterIP
+	Storage - Volumes, emptyDir, HostPath, GCE Persistent Disk, PV & PVC, Static Volume Provisioning, Dynamic Volume Provisioning
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+TROUBLESHOOTING	
++++++++++++++++
+https://kubernetes.io/docs/tasks/debug-application-cluster/debug-application
+
+curl http://web-service-ip:node-port
+
+kubectl describe service web-service
+	-> Compare the selectors configured on the service to the ones on the pod. Make sure they match.
+		Selector: name=webapp-mysql		<->		Pod.yaml>metadata>labels>name:webapp-mysql 
+		
+Check Pod
+	kubectl get pod
+	kubectl describe pod web
+	kubecl logs web
+	kubecl logs web -f  --previous	-> To view the failed logs of a previous pod
+	
+kubectl get ep -> Check Endpoints
+
+Control Plane
+	service kube-apiserver status
+	service kube-controller-manager status
+	service kube-scheduler status
+	service kubelet status
+	service kube-proxy status
+
+kubectl cluster-info
+systemctl daemon-reload
+systemctl restart kubelet
+++++++++++++++++++
+Bring them under same namespace	

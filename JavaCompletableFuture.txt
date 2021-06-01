@@ -1,0 +1,108 @@
+Runtime.getRuntime().availableProcessors(); -> Returns number of cores i.e. 8
+ForkJoinPool pool = ForkJoinPool.commonPool(); //Use java.util.concurrent  -> Returns one minus i.e parallelism = 7
+Work Stealing
+Configuring number of threads JVM wide
+	-DJava.util.concurrent.ForkJoinPool.common.parallelism=100
+
+ForkJoinPool pool = new ForkJoinPool(1000);
+pool.submit(() -> {
+					//Do some operation here
+	});
+	
+pool.shutdown();
+pool.awaitTermination(30, TimeUnit.SECONDS);
+
+Javascript callback hell
+JavaScript's answer is Promises -> 
+	3 states RESOLVE/REJECT/PENDING	
+	Promise has 2 channels DATA and ERROR
+	
+Java's CompletableFuture are Javascript's promises
+
+import java.util.concurrent.completableFuture
+CompletableFuture.runAsync(() -> System.out.println("do work")); 			-> This took a runnable
+CompletableFuture.supplyAsync(() -> {
+										System.out.println("doing work"); 
+										return 2;
+									} ); 									-> This took a supplier	
+System.out.println(									
+	CompletableFuture.supplyAsync(Sample::generate).get()	);
+
+System.out.println(									
+	CompletableFuture.supplyAsync(Sample::generate).getNow()	);
+
+
+class Sample{
+
+	public static int generate() {
+		System.out.println("doing work"); 
+		Thread.sleep();
+		return 2;	
+	}
+
+	public static void printIt(int value){
+		System.out.println(value);
+	}
+
+	public static int processError(Throwable throwable){
+		System.out.println(throwable);
+		return 0; -> Recover from an exception
+	}
+
+	public static void processError(Throwable throwable){
+		System.out.println(throwable);
+		throw new RuntimeException(); -> Doesn't recover from an exception
+	}
+
+	
+
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(Sample::generate);
+Sleep.sleep(1000);
+future.thenAccept(Sample::printIt);
+++++++++++++
+ForkJoinPool cpuBoundPool = new ForkJoinPool(10);
+ForkJoinPool ioBoundPool = new ForkJoinPool(1000);
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(Sample::generate, cpuBoundPool);
+future.thenAccept(Sample::printIt, ioBoundPool);
+++++++++++++++++
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(Sample::generate, cpuBoundPool)
+				.thenAccept(data -> printIt(data), ioBoundPool);
+++++++++++++++++
+thenAccept IS LIKE forEach
+thenApply IS LIKE Map
+thenCompose is LIKE flatMap	
+++++++++++++++++
+CompletableFuture<Integer> future = CompletableFuture<>();
+future.thenApply(data -> data * 2)
+	  .orTimeout(2, TimeUnit.SECONDS) 	
+	  .thenAccept(data -> printIt(data))
+	  .exceptionally(Sample::processError);
+Sleep.sleep(2000);
+future.complete(7);
+future.completeOnTimeout(7, 2, TimeUnit.SECONDS);
+++++++++++++++++
+COMPLETABLEFUTURE vs Stream
+	CompletableFuture(only one set of data)  vs Stream( zero or multiple streams of data)
+
+PROMISE vs OBSERVABLE	  
+	Promise(zero or one piece of data) vs Observable(zero or many pieces of data)
++++++++++++++++++++++++
+COMBINE
+public static int getStockPrice(String ticker, int noOfShares){
+	int price = 1000;
+	if(ticker.equals("GOOG")
+		price = 500
+	return 	noOfShares * price;
+}
+
+CompletableFuture<Integer> goog = CompletableFuture,supplyAsync(() -> getStockprice("GOOG", 1));
+	goog.thenAccept(value -> System.out.println(value))
+CompletableFuture<Integer> amzn = CompletableFuture,supplyAsync(() -> getStockprice("AMZN", 1));
+	amzn.thenAccept(value -> System.out.println(value))
+
+	goog.applyCombine(amzn, (g,a) -> g + a)
+		.thenAccept(value -> System.out.println(value));
+	
+	goog.applyCombine(amzn, Integer::sum)
+		.thenAccept(value -> System.out.println(value));
+	

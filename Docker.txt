@@ -1,0 +1,600 @@
+docker version -> What is the version of Docker Server Engine running on the Host?
+docker ps -> How many containers are running on this host?	
+docker images -> How many images are available on this host?
+docker run redis -> Run a container using the redis image?
+Hit CTRL+C if you are on the container's terminal. Or else run docker stop <container-id> -> Stop the container you just created
+docker ps -a -> How many containers are PRESENT on the host now? Including both Running and Not Running ones
+docker stop <container id | container name> -> To stop containers run the command 
+docker rm <container id | container name> -> And then to delete them run 
+docker rmi ubuntu -> Delete the ubuntu Image
+docker rmi nginx mysql mariadb -> Delete all images
+docker pull nginx:1.14-alpine -> Pull the image nginx:1.14-alpine
+EXPOSE -> What port is the web application run within the container?
+docker network ls -> identify the number of networks that exist on this system
+docker logs -f ecf -> live log trail
+
+docker network inspect bridge -> What is the subnet configured on bridge network?
+docker run --name alpine-2 --network=none alpine -> Run a container named alpine-2 using the alpine image and attach it to the none network.
+docker network create --driver bridge --subnet 182.18.0.1/24 --gateway 182.18.0.1 wp-mysql-network
+						->	Create a new network named wp-mysql-network using the bridge driver. Allocate subnet 182.18.0.1/24. Configure Gateway 182.18.0.1
+docker run -d --name mysql-db --network wp-mysql-network -e MYSQL_ROOT_PASSWORD=db_pass123 mysql:5.6
+						->	Deploy a mysql database using the mysql:5.6 image and name it mysql-db. Attach it to the newly created network wp-mysql-network. 
+							Set the database password to use db_pass123. The environment variable to set is MYSQL_ROOT_PASSWORD
+docker run --network wp-mysql-network -e DB_Host=mysql-db --name webapp -p 38080:80 kodekloud/simple-webapp-mysql
+docker run --network=wp-mysql-network -e DB_Host=mysql-db -e DB_Password=db_pass123 -p 38080:8080 --name webapp --link mysql-db:mysql-db -d kodekloud/simple-webapp-mysql
+						-> Deploy a web application named webapp, using image kodekloud/simple-webapp-mysql. Expose port to 38080 on the host. 
+						   The application takes an environment variable DB_Host that has the hostname of the mysql database. 
+						   Make sure to attach it to the newly created network wp-mysql-network
+--------------------------------
+docker run --name webapp nginx:1.14-alpine -> Run a container with the nginx:1.14-alpine image and name it webapp
+0.0.0.0:3456->3456/tcp, 0.0.0.0:38080->80/tcp -> Ports 3456 and 80 are pblished on the container. Ports 3456 and 38080 are published on the host
+docker run -p 38282:8080 kodekloud/simple-webapp:blue -> Run an instance of kodekloud/simple-webapp with a tag blue and map port 8080 on the container to 38282 on the host.
+--------------------------------
+docker inspect container-name/container-id, and look for the values under Env -> Inspect the environment variables set on the running container and identify the value set to the APP_COLOR variable
+docker run --name blue-app -e APP_COLOR=blue -p 38282:8080 -d kodekloud/simple-webapp
+	Run a container named blue-app using image kodekloud/simple-webapp and set the environment variable APP_COLOR to blue. Make the application available on port 38282 on the host. The application listens on port 8080.
+docker run -d --name mysql-db -e MYSQL_ROOT_PASSWORD=db_pass123 mysql
+	Deploy a mysql database using the mysql image and name it mysql-db.Set the database password to use db_pass123. Lookup the mysql image on Docker Hub and identify the correct environment variable to use for setting the root password.
+---------------------------------
+docker build -t webapp-color . -> Build a docker image using the Dockerfile and name it webapp-color. No tag to be specified.
+docker run -p 8282:8080 webapp-color -> Run an instance of the image webapp-color and publish port 8080 on the container to 8282 on the host.
+docker run -d ubuntu sleep 1000 -> Run an instance of the ubuntu image to run the sleep 1000 command at startup. Run it in detached mode.
+
+
+info_outline
+Hint
+Name: mysql-db
+Image: mysql
+Env: MYSQL_ROOT_PASSWORD=db_pass123
+
+
+
++++++++++++++++++++++++
+Best Docker Resources
+	https://github.com/eon01/DockerCheatSheet
+	https://hackr.io/tutorials/learn-docker?sort=recent
+	https://www.youtube.com/watch?v=h0NCZbHjIpY&list=PL9ooVrP1hQOHUKuqGuiWLQoJ-LD25KxI5
+	
+	https://medium.com%2F@medium.com/@gangooteli/must-know-commands-in-docker-to-make-life-easier-b88499059656
+	http://itproguru.com/expert/2016/10/docker-create-container-change-container-save-as-new-image-and-connect-to-container/
+	https://forums.docker.com/t/how-to-expose-port-on-running-container/3252/16
+	https://medium.com%2F@medium.com/@jmarhee/running-multiple-web-applications-on-a-docker-host-with-apache-85f673f02803
+NICE -> https://serversforhackers.com/c/getting-started-with-docker	
+PAID -> https://www.experfy.com/training/courses/a-complete-guide-to-kubernetes-docker-hands-on
+	
+
+docker pull <imagename> -> Only downloads the image and doesn't run the container
+docker run docker/whalesay cowsay boo -> If the image doesn't already exist, it will go to dockerhub and pull the image and runs an instance of the image. On subsequent executions the same image is reused
+docker ps -a -> List running containers (Container id, Name of the image, command, created , status, ports, names
+docker start <containername>
+docker stop <containername>
+docker rm <containername> -> Removing a container
+docker images -> List images
+docker rmi -> Removes images. Before removing ensure no containers are running of that image. Delete all dependent containers to remove that image
+docker exec <containerid> <command> -> Executing a command on a running container.To see the file contents inside a particular container
+docker run docker/whalesay -> attached mode
+docker run -d docker/whalesay -> detached mode
+docker attach <containerid>
+docker run redis:4.0 -> Here we want to run the 4.0 version of redis(also called as tag). If no tag is specified, docker considers the default tag to be latest
+docker run -it kodekloud/simple-prompt-docker -> Runs docker container in interactive(i) and sudo terminal(t) mode  
+RUN : PORT MAPPING -> docker run -p 80:5000 kodecloud/simple-webapp 
+	where 80 is the external port and 5000 is the internal port
+Running a simple web application on Docker container on docker host. Docker host is the underlying host where docker is installed. Docker host
+will assign an internal IP to the docker container that is accessible within the Docker host. Users outside of Docker host will not be able to
+access the internal IP and only be able to access the Docker host IP. We need to map the port used inside the Docker container(internal IP) with a free port on the Docker host
+RUN : VOLUME MAPPING -> docker run -v /opt/datadir:/var/lib/mysql mysql
+	If you want to persist your data, you need to map it to a directory outside of docker host
+INSPECT CONTAINER -> docker inspect <containername>
+CONTAINER LOGS -> docker logs <containername>
+ENVIRONMENT VARIABLES -> docker run -e APP_COLOR=blue <containername>
+export APP_COLOR = blue;
+DOCKER IMAGE
+	- Dockerfile - Text file written in a specific format i.e instruction(CAPS) and argument to those instructions
+		FROM Ubuntu
+		RUN apt-get update
+		RUN apt-get install python
+		RUN pip install flask
+		COPY . /opt/source-code
+		EXPOSE 8080
+		ENTRYPOINT FLASK-APP=/opt/source-code/app.py flask run
+
+	docker build Dockerfile -t vijayontheweb/simple-webapp	-> Builds a new image for the application 
+	docker push vijayontheweb/simple-webapp
+
+
+CMD vs ENTRYPOINT
+
+	FROM Ubuntu
+	CMD sleep 5
+	
+	docker run ubuntu-sleeper sleep 10 -> This will replace the CMD "sleep 5" with "sleep 10"
+	
+	FROM Ubuntu
+	ENTRYPOINT ["sleep"]
+	
+	docker run ubuntu-sleeper 10 -> This will append the ENTRYPOINT "sleep" with "10"
+	
+	FROM Ubuntu
+	ENTRYPOINT ["sleep"]
+	CMD ["5"]
+	
+	docker run ubuntu-sleeper -> This will default the CMD "5" after the ENTRYPOINT "sleep"
+	docker run ubuntu-sleeper 10 -> This will override the default the CMD "5" with "10" after the ENTRYPOINT "sleep"
+	docker run --entrypoint sleepv2 ubuntu-sleeper 10 -> At runtime override the entrypoint i.e command at atartup -> sleepv2 10
+	
+############## NETWORKS ###############
+	Docker creates 3 networks automatically when you install Docker -> Bridge, None and Host
+		docker run ubuntu -> default is bridge that a container gets attached to. Private internal network created by Docker on the host. To access any of these containers from the outside world, map the ports of these
+		containers to the ports of the docker host
+			All containers get an internal IP address(in 172 range). The containers can access each other using this internal IP
+		docker run ubuntu --network=none -> Not attached to any network
+		docker run ubuntu --network=host -> Associate the containers to the host network. Only one container exist for a given port
+	
+	User-defined networks - We could create our own internal network
+		docker network create \
+			--driver bridge \
+			--subnet 182.18.0.0/16
+			custom-isolated-network
+			
+	docker network ls -> to list all the available networks
+	
+	docker inspect <id or container name> -> 
+	
+EMBEDDED DNS -> Docker has a inbuilt DNS server(running at 127.0.0.11) that helps containers to resolve each other using the container name		
+
+################ STORAGE ###############
+docker installed at /var/lib/docker -> has folders such as overlay2, containers, image, volumes
+There are 2 primary layers 1) Image Layers(Read Only) 2)Container Layer(Red/Write)
+Layered Architecture -> Each line of instruction in the Docker file creates a new layer in the Docker image with just the changes from the previous layer
+For example, 
+Dockerfile
+	FROM Ubuntu
+	RUN apt-get update && apt-get -y install python
+	RUN pip install flask flask-mysql
+	COPY . /opt/source-code	
+	ENTRYPOINT FLASK-APP=/opt/source-code/app.py flask run
+	
+docker build Dockerfile -t vijayontheweb/simple-webapp 
+	-> 	Docker builds images faster by reusing the already existing layers from the cache. 
+		All these layers are created when we run the docker build command to form the final docker image. 
+		Once the build is complete you cannot modify the contents of these layers. So they are read only and you can ONLY modify them by initiating a new build
+docker run vijayontheweb/simple-webapp
+	-> When you run a container based on this image docker creates a container based on this image and CREATES A NEW WRITABLE LAYER ON TOP OF THIS IMAGE LAYER
+	-> The writable layer is used to store data created by the container such as log files created by the applications, any temporary files created by the container or just any file modified by the user on that container
+	-> The life of this layer is only as long as the container is alive
+	-> The same image layer is shared by all the containers
+	-> COPY ON WRITE - When you try to edit s read only file from the image layer and save it, docker automatically creates a copy of the file in the read write layer and we will be modifying a different version of the file in the read write layer
+	
+PERSISTENT VOLUME -> For preserving/persisting the data even after the container is destroyed. For example add a persistent volume to the container if you are working with a database
+	docker volume create data_volume -> Create a volume by name "data_volume" under "/var/lib/docker/volumes/data_volume" directory which is outside the container
+	docker run -v data_volume:/var/lib/mysql mysql -> For mounting the "data_volume" inside the docker container's read/write layer "/var/lib/mysql" i.e. the default location where mysql stores data and then the image name mysql.
+	This will create a new container and mount the "data_volume" we created into the /var/lib/mysql folder inside the container
+	
+	NOTE: "docker volume create" is NOT mandatory. if you "docker run -v data_volume2:/var/lib/mysql mysql" without "data_volume2" volume already being created, docker will automatically create the "data_volume2" under "/var/lib/docker/volumes/data_volume2" directory and mount it under the container in "/var/lib/mysql" directory -> VOLUME MOUNTING as we are mounting the volume created by docker under the /var/lib/docker/volumes folder.
+	
+	BIND MOUNTING -> If we want to persist data at some external location on the docker host other than default "/var/lib/docker/volumes" directory
+	docker run -v /data/mysql:var/lib/mysql mysql
+	NEW STYLE
+	docker run --mount type=bind,source=/data/mysql,target=var/lib/mysql mysql
+	
+STORAGE DRIVERS -> Docker uses Storage Drivers to enable Layered architecture. Examples are AUFS(Ubuntu), ZFS, BTRFS, DeviceMapper, Overlay, Overlay2
+	responsible for 
+		Maintaining the layered Architecture
+		Creating a writable layer
+		moving files across layers to enable copy on write
+
+############# DOCKER COMPOSE ####################
+
+docker run vijayontheweb/simple-webapp
+docker run mongodb
+docker run redis:alpine
+docker run ansible
+
+docker-compose.yml
+services:
+	web:
+		image: "vijayontheweb/simple-webapp"
+	database:
+		image: "mongodb"
+	messaging:
+		image: "redis:alpine"
+	orchestration:
+		image: "ansible"
+
+docker-compose up
+++++++++++++++++
+docker run -d --name=redis redis
+docker run -d --name=db postgres:9.4
+docker run -d --name=vote -p 5000:80 --link redis:redis voting-app
+docker run -d --name=result -p 5001:80 --link db:db result-app
+docker run -d --name=worker --link redis:redis --link db:db worker
+
+LINK -> 
+	Command line option which can be used to link 2 containers together		
+	Creates an entry into the ETC HOSTS file by adding a hostname "Redis" with the internal IP of the redis container	
+
+IMPORTANT : ONCE YOU HAVE THE DOCKER RUN COMMANDS TESTED AND READY, IT IS EASY TO GET A DOCKER COMPOSE FILE FROM IT
+	We start by creating a dictionary of container names, create a key with each of them
+	then under each item, 
+		we specify which image to use
+		move those pulished ports under the respective containers
+		whichever container require link(s), provide an array of links
+
+docker-compose.yml
+redis:
+	image: redis
+db:
+	image: postgres:9.4
+vote:
+	image: voting-app
+	ports:
+		- 5000:80
+	links:
+		- redis
+result:
+	image: result-app
+	ports:
+		- 5001:80	
+	links:
+		- db		
+worker:
+	image: worker
+	links:
+		- redis
+		- db	
+		
+BUILD -> We can replace the IMAGE line with a BUILD line and specify the location of a directory which contains application code and a docker file with instructions to build the docker image		
+	build: ./vote
+	
+VERSIONS:
+	v1 -> Limitations - Only bridge network supported, dpendency order cannot be specified
+	v2 -> All the version 1 contents moved to Services section, plus version tag added, Also dedicated bridge network is added and attaches all containers to this new network. All containers are able to communicate with each other using their service names(Hence Links is not needed), in place of LINKS, DEPENDS ON is added 
+	v3 -> Support for Docker swarm
+	
+docker-compose.yml
+version: 2
+services:
+	redis:
+		image: redis
+		networks:
+			- back-end		
+	db:
+		image: postgres:9.4
+		networks:
+			- back-end		
+	vote:
+		image: voting-app
+		ports:
+			- 5000:80
+		links:
+			- redis
+		networks:
+			- front-end
+			- back-end			
+	result:
+		image: result-app
+		ports:
+			- 5001:80	
+		depends_on:
+			- db		
+		networks:
+			- front-end
+			- back-end			
+	worker:
+		image: worker
+		depends_on:
+			- redis
+			- db	
+		networks:
+			- front-end
+			- back-end
+networks:
+		front-end:
+		back-end:
+
+################ DOCKER REGISTRY  #############
+Central repository of all docker images
+Image Naming Conventions -> <USER ACCOUNT>/<IMAGE REPOSITORY>  For example, docker run nginx/nginx   [OR SIMPLY] docker run nginx
+	User Account is usually Dockerhub account or Organization name
+	docker.io -> Default registry where all the imags are stored and pulled from
+	Other popular registries are
+		gcr.io/kubernetes-e2e-test-images/dnsutils
+PRIVATE REGISTRY 
+	docker login private-registry.io
+	username
+	password
+	
+	docker run private-registry.io/apps/internal-app
+	
+HOW TO DEPLOY YOUR OWN PRIVATE REGISTRY
+	docker run -d -p 5000:5000 --name registry registry:2
+	Tag your image with private registry url account
+	docker image tag my-image localhost:5000/my-image
+	docker push localhost:5000/my-image
+	docker pull localhost:5000/my-image
+	
+############## DOCKER ENGINE ##########################	
+
+Docker Engine comprise of 3 docker components
+	Docker CLI -> Command Line Interface uses the REST API to interact with the Docker Dameon. CLI can also be hosted on another machine. For example -> docker -H=remote-docker-engine:2375
+		For example, to run the NGINX container on a remote docker host -> docker -H=10.123.2.1:2375 run nginx
+	REST API -> Interface that programs can use to talk to the Daemon and provide instructions
+	Docker Daemon -> Background process that manages Docker Objects such as images, containers, volumes and networks
+	
+CONTAINERIZATION (NAMESPACES)
+	Docker uses Namespaces to isolate workspaces - PROCESS ID, NETWORK, INTER PROCESS, MOUNT, UNIX TIMESHARING SYSTEMS are created in their own NAMESPACES thereby providing isolation between containers.
+	The underlying Docker host as well as the containers share the same system resources such as CPU and memory
+	
+CGROUPS(Control Groups)	
+	How much of the resources are dedicated to the host and the containers and how does Docker manage the resources between the containers? By default there is no restriction on resource consumption for a container.
+	Docker uses Control groups(groups) to restrict the amount of hardware resources allocated to each container. For example, 
+		docker run --cpus=.5 ubuntu -> Upto 50% of CPU can be utilized
+		docker run --memory=100m ubuntu -> Upto 100m of RAM memory can be utilized
+		
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+OLDER NOTES
+
+MUMSHAD COURSES ON Docker
+https://www.youtube.com/watch?v=zJ6WbK9zFpI
+https://www.youtube.com/watch?v=fqMOX6JJhGo
+
+Containerization -> Consistent, Repeatable, Reliable Deployments
+Kubernetes  -> Deploys and Monitors containerized workloads
+
+These steps listed below are for Ubuntu Desktop 18 LTS. You can find the full official docs and steps for other Linux distributions here:
+
+Ubuntu: https://docs.docker.com/install/linux/docker-ce/ubuntu/
+
+Fedora: https://docs.docker.com/install/linux/docker-ce/fedora/
+
+CentOS: https://docs.docker.com/install/linux/docker-ce/centos/
+
+Debian: https://docs.docker.com/install/linux/docker-ce/debian/
+
+Installing Docker
+
+The Docker docs suggest setting up a Docker repository to install and update from.
+
+This is where you should start:
+https://docs.docker.com/install/linux/docker-ce/centos/#set-up-the-repository
+
+After completing the installation steps, test out Docker:
+
+sudo docker run hello-world
+
+This should download and run the test container printing "hello world" to your console.
+
+Installing Docker Compose
+
+Unlike the Mac and Windows Docker Desktop versions, we must manually install Docker Compose. See the instructions for the installation steps (Click on the tab for Linux)
+
+https://docs.docker.com/compose/install/#install-compose
+
+After completing, test your installation:
+
+docker-compose -v
+
+This should print the version and build numbers to your console.
+
+Run without Sudo
+
+Follow these instructions to run Docker commands without sudo:
+
+https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user
+
+The docker group will likely already be created, but you still need to add your user to this group.
+
+Start on Boot
+
+Follow these instructions so that Docker and its services start automatically on boot:
+
+https://docs.docker.com/install/linux/linux-postinstall/#configure-docker-to-start-on-boot
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ sudo yum install -y yum-utils \
+>   device-mapper-persistent-data \
+>   lvm2
+
+sudo yum-config-manager \
+>     --add-repo \
+>     https://download.docker.com/linux/centos/docker-ce.repo
+
+sudo yum install docker-ce docker-ce-cli containerd.io
+
+yum list docker-ce --showduplicates | sort -r
+
+sudo systemctl start docker
+
+sudo docker run hello-world
+
+	To generate this message, Docker took the following steps:
+	 1. The Docker client contacted the Docker daemon.
+	 2. The Docker daemon pulled the "hello-world" image from the Docker Hub. Docker Hub is a repository of free public images that you 
+		can freely download and run on your personal computer		
+	 3. The Docker daemon created a new container from that image which runs the
+		executable that produces the output you are currently reading.
+	 4. The Docker daemon streamed that output to the Docker client, which sent it
+		to your terminal.
+
+docker version
+
+Kernel - Most operating systems have a KERNEL which is a running software process that governs access between all the programs and the 
+		physical hardware. Programs make use of System calls aka Function invocation to interact with Kernel.
+		
+Application programs interact with the Kernel using System calls
+
+Namespacing/Segmenting(Operating System Feature) - Isolating resources per process (or group of processes). i.e Segmenting a hardware resource
+				based on a process(chrome) that is asking for it. Anytime this particular process asks for a resource, we are going to direct it 
+				to this specific area of this piece of hardware. You can namespace software elements as well - Processes, Network, Hardware, 
+				Users, Hostname, Inter-process Communication
+Control Groups(cgroups) - Used to limit the amount of resources that a particular process can use. i,e Amount of Network Bandwidth, HW I/O, Memory, 
+				CPU Usage
+
+
+Container - A process or a group of processes that has grouping of resources assigned to it. For example, Chrome Process sends System call to 
+Kernel which redirects to Portion of each made available to process (Network, RAM, CPU, Hard Drive). In other words, a container is a running
+process along with a subset of physical resources allocated to that process on your computer
+
+An image is a file system snapshot that contains just a copy paste of very specific set of directories/files. It also contains a specific set
+of commands. File snapshot is copied and pasted into the little segment of hard drive.
+
+Creating and running a container from an image
+++++++++++++++++++++++++++++++++++++++++++++++
+docker run = docker create + docker start 
+Create a container -> Setting/Prepping up the file system to be used in a container
+Start the Container -> Execute the startup command
+
+docker create <image name> -> This returns the id of the container just created
+docker start -a <container id> -> This executes the container. -a returns the output from the container execution
+
+docker run <image name> -> docker reference the docker client, rum tries to create and run a container, <image name> to use for this container
+docker run <image name> <command> -> default command override
+
+List all running containers
++++++++++++++++++++++++++++
+docker ps	
+docker ps --all -> Listing of all containers ever created
+
+Removing all containers
++++++++++++++++++++++++
+docker system prune
+
+Getting logs from container
++++++++++++++++++++++++++++
+docker logs <container id>
+example -> sudo docker logs 946148ee251935a2eb387eefd2240da638e0f37cf7d266e894325390ce534a27
+
+Stop a container
+++++++++++++++++
+docker stop <container id> -> Issues a SIGTERM (Terminate Signal) to the primary process running in the container
+
+Kill a container
+++++++++++++++++
+docker kill <container id> -> Issues a SIGKILL (Kill Signal) to the primary process running in the container
+
+Remove a Container
+++++++++++++++++++
+docker rm <container name> -> To remove a stopped or exited container
+
+Execute an additional command in a container
+++++++++++++++++++++++++++++++++++++++++++++
+docker exec -it <container id> <command> -> exec(run another command) -it(allow us to provide input to the container) <command>(command to execute)
+-i -> stuff you type
+-t -> Indent output
+for example, docker exec -it a894d8133256 redis-cli
+
+docker exec -it a894d8133256 sh -> sh(command processors like bash, sh, zsh, powershell)
+
+docker run -it <container id> <command>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SECTION 3
++++++++++
++++++++++
+Creating Docker Images - A Docker Image will have a File System Snapshot and a Startup Command
+++++++++++++++++++++++
+Docker File - Configuration to define how our container should behave. i.e. What different programs it contains and what it does when it starts
+as container
+
+IMPORTANT : Writing a Docker file is similar to being given a computer with no OS, and being asked to install Chrome.
+
+Creating a docker file flow
+	1)Use an existing docker image as a base
+	2)Run some commands to install additional programs. i.e. Download and install dependencies in order to successfully execute our container
+	3)Specify a startup command for the image to run on container startup i.e Tell the image what to do when it starts as a container
+
+mkdir redis-image
+cd redis-image/
+vi Dockerfile	
+	
+For example..
+	# Use an existing docker image as a base
+	FROM alpine
+
+	# Download and install a dependency
+	RUN apk add --update redis
+
+	# Tell the image what to do when it starts as a container
+	CMD ["redis-server"]
+	
+Why Build the Dockerfile?  Give Docker File as input and Generate an image out of it
+    ++++++++++++++++++++   
+sudo docker build .	 -> This generates an image and returns the image id
+
+Run the Docker Container
+++++++++++++++++++++++++
+sudo docker run 16d86652b2cf -> Use the previously generated image to create a docker container and then start
+
+
+If you want to Run the Docker Container with a NAME instead of an ID i.e Tagging an Image
+			   ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+sudo docker build -t vijayanand/redis:latest .	 -> This generates an image and associates with a name i.e vijayanand/redis
+	where vijayanand = Your Docker Id, redis = Repo or Project Name, latest = version
+	
+	Then we can simply run it by 
+sudo docker run vijayanand/redis
+
+Manual Image Generation with Docker Commit (that was present in the Docker File)
+++++++++++++++++++++++++++++++++++++++++++
+sudo docker run -it alpine sh   -> This is equivalent of Step 1 i.e. FROM alpine
+
+/ # apk add --update redis  -> Inside the shell apply step 2 i.e. RUN apk add --update redis
+
+Now when this shell is running, open another session and get a handle to this container
+docker ps
+
+This will reflect the container session currently running
+CONTAINER ID        IMAGE               COMMAND             CREATED                                                                                                     STATUS              PORTS               NAMES
+75b67377c2d3        alpine              "sh"                3 minutes ago
+
+Now manually create an image out of this running container along with a startup command
+sudo docker commit -c 'CMD ["redis-server"]' 75b67377c2d3  -> This is equivalent to step 3 i.e. CMD ["redis-server"]
+
+List all Docker Images
+++++++++++++++++++++++
+docker images
+
+Remove Docker Image
++++++++++++++++++++
+docker rmi nginx
+NOTE : Delete all dependent containers to remove image
+
+Pull an Image
++++++++++++++
+docker pull nginx
+
+Run - Attach and Detach
++++++++++++++++++++++++
+docker run kodecloud/simple-webapp  -> Runs in attached mode. Opens a console and only prints the console output
+docker run -d kodecloud/simple-webapp  -> Runs in detached mode.
+
+Entry Point 
+++++++++++++
+In case of CMD instruction, the command line parameter passed will get replaced entirely
+	Docker run ubuntu-sleeper sleep 10
+In case of Entry point, the command line parameter will get appended to the entry point
+	Docker run ubuntu-sleeper 10
+	
+	FROM Ubuntu
+	ENTRYPOINT ["Sleep"]
+What if you need a default sleep time, which can be overridden, so that both the below commands can work. Specify both the entry point
+ and command
+	Docker run ubuntu-sleeper
+	Docker run ubuntu-sleeper 10
+
+	FROM Ubuntu
+	ENTRYPOINT ["Sleep"]
+	CMD ["5"]
+
+Kubernetes relation to Docker	
+Pod-Definition.yml		Docker File
+command		<->			EntryPoint
+args		<->			CMD	
+
+Example
+	Under Pod-definition.yml > spec > containers >
+		command:
+		 - "sleep"
+		 - "5000"		

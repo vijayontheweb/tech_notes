@@ -1,0 +1,210 @@
+Shell is a Command Line Interpreter. It translates commands entered by user and converts them into a language that is understood by kernel
+
+Bourne Shell - Bourne Shell, Korn Shell, Bourne-Again Shell(BASH), POSIX shell
+C Shell - C Shell, TENEX/TOPS C-Shell, Z Shell
+VARIABLES - local variables, env variables, shell(global) variables
+	$0 - File Name of Script
+	$1...9 -> Positional Parameters(args) 
+	$# -> Returns number of arguments
+	$* -> returns all arguments that are double quoted
+	$@ -> returns all arguments that are individually double quoted
+	S? -> exit status of the last command that you have executed. For success it is 0. For failure it is 1
+	$$ -> Returns the process number of the current shell for the shell script
+
+OPERATORS  
+	Arithmetic	->	+ - * / % = == !=
+	Relational	->	-eq -ne  -gt -lt  -ge -le
+	Boolean	->	! [logical negation], -o [logical OR], -a [logical AND]
+	String	->	
+		= [equals]
+		!= [not equals]
+		-z [if operand size is zero, return true else false. Example -z $a]
+		-n [if operand size is non-zero, return true else false. Example -n $a]	
+		str [if str is not empty string, return true else false. Example $a]
+	File Test	->	To test various properties associated with a UNIX file		
+		-b $file	[check if file is a block special file]
+		-c $file	[check if file is a character special file]
+		-d $file	[check if file is a directory]
+		-f $file	[check if file is a ordinary file as opposed to a directory]
+		-g $file	[check if file has SGID(Set Group ID) bit set]
+		-k $file	[check if file has its sticky bit set]
+		-p $file	[check if file is a named pipe]
+		-t $file	[check if file descrptor is open and associated with terminal]
+		-u $file	[check if file has SUID(Set User Id) bit set]
+		-r $file	[check if file is readable]
+		-w $file	[check if file is writable]
+		-x $file	[check if file is executable]
+		-s $file	[check if file has size greater than zero]		
+		-e $file	[check if file exists]
+
+SHELL LOOPS
+	WHILE LOOP
+		a=0
+		while [ $a -lt 10]
+		do
+			echo $a
+			a=`expr $a + 1`
+		done
+	FOR LOOP
+		for var in 0 1 2 3 4 5 6 7 8 9
+		do
+			echo $var
+		done			
+	UNTIL LOOP
+		a=0
+		until [ ! $a -lt 10]
+		do
+			echo $a
+			a=`expr $a + 1`
+		done
+	NESTED LOOP
+		a = 0
+		while [ $a -lt 10]
+		do
+			b="$a"			
+			while [ $b -lt 10]
+			do
+				echo $b
+				b=`expr $b + 1`
+			done			
+			a=`expr $a + 1`
+		done
+	LOOP CONTROL
+		NUMS="1 2 3 4 5 6 7 8 9 10"
+		for NUM in NUMS
+		do
+			Q='expr $NUM % 2'
+			if [$q -eq 0]
+			then
+				echo "Even number!!"
+				continue
+			fi
+		done
+
+SHELL FUNCTIONS
+	CREATING FUNCTIONS / PASSING PARAMETERS TO FUNCTIONS / RETURNING VALUES FROM FUNCTIONS / NESTED FUNCTIONS / FUNCTION CALL FROM PROMPT
+		#define
+		Hello(){
+			echo "inside method. hello $1 $2"
+			return 10
+		}
+		
+		#invoke
+		Hello Vijay Anand		
+		
+		#Capture value returned previously
+		ret=$?
+		echo "Return value is $ret"	
+	
+LINUX COMMANDS
+++++++++++++++
+MAN PAGE
+	man + help
+GETTING USER INPUT
+	read USERINPUT
+	echo "$USERINPUT"
+FOR LOOP
+	for TOKEN in $*
+	do
+		echo $TOKEN
+	done	
+REMOVES VARIABLE
+	unset VARIABLENAME
+LIST ALL USER ACCOUNTS
+	cat /etc/passwd
+FIND THE USERID AND GROUPID OF USER
+	id azureuser
+GO DIRECTLY TO A PARTICULAR LINE
+	:84
+TO CLEAR OUT MULTIPLE LINES
+	d100d
+SEARCH FOR A TEXT WITHIN FILE IN VI MODE
+	/texttosearch
+COUNT LINES IN A FILE
+	wc -l file.txt
+LIST ALL PROCESSES
+	ps aux
+SEARCH FOR A TEXT ON A FILE
+	grep -i <TEXT> <FILENAME>
+TO GET ENCODED FORM OF PLAIN TEXT	
+	echo -n '<Your Text Here>' | base64
+	echo -n 'dXlzcWw=' | base64 --decode
+cat /etc/*release* -> For knowing the OS details
+ps aux | grep nginx -> aux will look for ROOT processes
+ifconfig -> To get the IP address(check for eth0 inet)
+For SSH ERROR -> (Warning: Remote Host Identification has changed) 
+	To fix this remove the entry manually from ->  ~/.ssh/known_hosts
+	To do the above automatically -> ssh-keygen -R <IPADDRESS>
+FOR COPYING REMOTELY
+	sudo scp <filename> AzureUser@10.1.0.1:/home/AzureUser 
+TAR COMPRESS/EXTRACT
+tar -cvf conf_110420.tar conf/ 
+tar -xvf nifi.tar 	
+ADD USERS AND GROUPS
+https://www.techrepublic.com/article/how-to-create-users-and-groups-in-linux-from-the-command-line/	
+
+https://stackoverflow.com/questions/16956810/how-do-i-find-all-files-containing-specific-text-on-linux
+
+SED
++++
+substitute 's'	
+	sed	's/t/T/' file.txt -> only the first 't' of every line is substituted. Original file is not modified
+global 'g'
+	sed	's/t/T/g' file.txt -> All the 't's of every line is substituted. Original file is not modified
+	sed	's/t/T/g' file.txt > new.txt -> All the 't's of every line is substituted. Original file is not modified. created a clone
+inline 'i'	
+	sed	-i 's/t/T/g' file.txt-> All the 't's of every line is substituted. Original file is modified inline.
+caret '^'	- beginning of line
+	sed	-i 's/^t/T/g' file.txt		
+dollar '$'	- end of line	
+	sed	-i 's/t$/T/g' file.txt
+Regular Expression
+	sed	-i 's/[0-9]/*/g' file.txt -> Replace all numeric characters with an asterisk	
+	sed	-i 's/[a-z]/*/g' file.txt -> Replace all lower case characters with an asterisk	
+	sed	-i 's/[A-Z]/*/g' file.txt -> Replace all upper case characters with an asterisk	
+	sed	-i 's/[a-z][A-Z]/*/g' file.txt -> Replace all COMBINAION of lower case character followed by upper case character with an asterisk	
+	sed	-i 's/[a-zA-Z]/*/g' file.txt -> Replace all lower/upper case characters with an asterisk	
+	sed	-i 's/[a-zA-Z0-9]/*/g' file.txt -> Replace all lower/upper/numeric case characters with an asterisk	
+	sed	-i 's/[a-z]i/*/g' file.txt -> Replace all COMBINATION of lower case character followed by 'i' with an asterisk	
+ampersand '&' - matched string	
+	sed	-i 's/[A-Z]/(&)/g' file.txt -> wrap each upper case character with a parenthesis	
+	sed	-i 's/[A-Z][A-Z]*/(&)/g' file.txt -> wrap each upper case word with a parenthesis	
+delimitier	
+	Not only /, you can literally use any delimiter
+	For example
+	sed -i 's/find/replace/g' file.txt	
+	sed -i 's_find_replace_g' file.txt	
+escaping
+	what if you use / inside file.txt, then you need to escape them with backward slash
+	sed -i 's/fi\/nd/replace/g' file.txt ->	INSTEAD you can use some other delimiter sed -i 's_fi/nd_replace_g' file.txt
+negation [use caret ^ WITHIN square brackets]
+	sed	-i 's/[^0-9]/*/g' file.txt -> Replace anything which is NOT numeric(i.e.special characters, letters, spaces, tabs) with an asterisk
+multiple replace(use SEMICOLON)
+	sed -i 's/find1/replace1/g;s/find2/replace2/g' file.txt	
+removing first word
+	sed -i 's/\w*.//g' file.txt	-> period means including space as well
+removing last[$] word
+	sed -i 's/\w*$//g' file.txt
+print[p] only matching content rather than all	
+	sed -i 's/\w*$//pg' file.txt
+ignore case[I]	
+	sed -i 's/find/replace/Ig' file.txt	
+externalize sed script[f]	
+	sed -f mysedscript file.txt
+whole(NOT partial) word match[\b means bounds]
+	sed -i 's/\bfind\b/replace/g' file.txt
+remove lines on match[d or D]	
+	sed '/find/d' file.txt
+	sed '/find/D' file.txt
+	sed '/find/Id' file.txt	-> case insensitive	
+Display like HEAD/ Delete lines
+	sed '5,$,d' file.txt -> Both the commands mean the same
+	sed '4,q' file.txt -> Both the commands mean the same	
+Remove all comments except for bash	first line
+	sed -f '1!{/^#/d;}' file.txt
+count lines like (wc -l text)	[n is quiet mode, = is each line number, $ means last one]
+	sed '='	file.txt	-> print line number followed by each line
+	sed -n '$=' file.txt
+numbering lines in a file	[N means append with some character. here it is #]	
+	sed '=' file.txt | sed 'N; s/\n/#/'	-> This will not skip space	
+	sed '/./=' file.txt | sed '/./N; s/\n/-/' -> This will skip spaces	

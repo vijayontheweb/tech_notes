@@ -1,0 +1,14 @@
+Git
+1)Commands to explore
+	git rebase -i
+	git cherry-pick
+	git diff and git apply
+	git stash
+	git bisect	
+
+
+https://linuxize.com/post/how-to-configure-git-username-and-email/
+https://git-scm.com/docs/git-diff
+https://www.atlassian.com/git/tutorials/saving-changes/git-diff
+https://www.freecodecamp.org/news/the-git-push-command-explained/
+https://medium.com/sourcelevel/7-git-best-practices-to-start-using-in-your-next-commit-f9dc54990e86

@@ -1,0 +1,128 @@
+Checkpoints
+	Pipelined Checkpoint barriers flow through the topology. 
+	Operators asynchronously backup their state in checkpoints on a DFS
+Restore
+	Each operator is asigned their corresponding file handles, from which they restore their state
+
+State Serialization 
+	Heap Backend - Lazy serialization(backup), eager deserialization(restore)
+    File System Backend -> Eager Serialization(backup), Lazy deserialization(restore)
+
+Try Registering state as soon as possible. Typically all state declarations can be done in the open lifecycle of operators	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Flink's internal checkpointing mechanism
+Serialization
+State backend
+Checkpoint tuning
+Schema Migration
+Upcoming features
+
+Serializer Types
+	POJO Serializer
+	Row Serializer
+	Tuple Serializer
+	Kryo
+	Avro(Reflect API)
+	Avro(Specific Record API)
+	Protobuf (via Kryo)
+	Apache Thrift(via Kryo)
+	
+Task Manager JVM Process -> Java Heap or Off Heap
+Keyed State Backends -> Java Heap / RocksDB
+
+Flink Framework > Network Buffers > Timer State > Keyed State	
+Timer State and Keyed State are roughly 90-95% of the memory usage
+
+Heap Keyed State Backend
+		Organized as chained hash table key->state. One Hash table per registered state
+		Supports asynchronous state snapshots. 
+		Data is serialized/deserialized only during state snapshots and restore. 
+		High Performance
+
+RocksDB Keyed state backend characteristics
+		State lives as serialized byte strings in off-heap memory and on local disk
+		One column family per registered state(~ table)
+		Key value store organized as log structured merge(LSM) tree
+		LSM naturally supports MVCC
+		Data is de/serialized on every read and update
+		Not affected by garbage collection
+		Relatively low overhead of representation
+		LSM naturally supports incremental snapshots
+		State size is limited by available local disk space
+		Lower performance(orders of magnitude compared to heap space)
+
+RocksDB resource consumption
+		One RocksDB instance per operator subtask
+		block_cache_size ->	Size of block cache
+		write_buffer_size -> Max size of a mem table
+		max_write_buffer_number -> The maximum number of memtables allowed in memory before flushing to SST file
+		Indexes and bloom filters -> optional
+		Table Cache - Caches open file descriptors to SST files. Default is unlimited
+		Performance tuning guide -> https://github.com/facebook/rocksdb/wiki/RocksDB-Tuning-Guide
+		Amplification factors -> Read Amplification / Write Amplification / Space Amplification
+
+General Peformance Considerations
+		Use efficient Type Serialization and Serialization formats
+		Decompose User code objects
+			ValueState<List<Integer>> -> ListState<Integer>
+			ValueState<Map<Integer,Integer>> -> Mapstate<Integer, Integer>
+		Use the correct configuration for your hardware setup
+		Consider enabling RocksDB native metrics to profile your applications
+		File Systems
+			Working directory on fast storage.Ideally local SSD. Could even be memory.
+			EBS or mounted volume performance can be problematic. Ideally, Network should not sit between application and state-backend.
+
+Note: RocksDB is for persistence, not fault tolerance. Checkpoints and savepoints give us fault tolerance			
+
+Full/Incremental checkpoints
+		Full Checkpoint -> Whenever a Full Checkpoint happens, all data currently stored in all state-backends across all task managers is	going to be copied to some DFS, S3 or HDFS. When our application fails we simply restore the state of our most recent checkpoint and continue processing. Each checkpoint is self-contained and the size of the checkpoint is propotional to the size of the full state
+		
+		Incremental Checkpoint -> currently available in only rocksDB. On restore we have to reread all the previous checkpoints. So happy path
+		is more performant, but restore from a failure takes some time. Faster checkpoints and slower recovery. Creation only copies delta(new SST files) to stable storage. Creates WRITE AMPLIFICATION because we also upload compacted SST files so that we can prune checkpoint history. Sum of all increments that we read from stable storagecan be larger than the full state size. No rebuild is required because we simply reopen the rocksDB backend from SST file. SST files are snappy compressed by default.
+
+Anatomy of flink
+		User Code <-> Local State Backend <-> Persistent Save Point
+
+Upcoming features
+        New State backend - in memory state backend that can gracefully spill to disk	
+
+####### Flink Unit Testing ##########
+		
+Stateless Operator Steps
+	1. Instantiate operator
+	2. Create Mock/ListCollector
+	3. Send input
+	4. Validate output
+
+
+Stateful function has implicit state such as window operators, richFlatMap function containing value state
+Challenges:
+	Instatitating the function alone wont suffice
+	We need to have access to the complete lifecycle of the operator
+	We need flink utilities to create state backend for us
+	We need to ensure that we can access the state as if we are running the flink job
+Solution
+	OperationTestHarness comes with the Flink distribution as testing utilities
+	Wrapping our userfunction into the test harness
+	Send inputs one by one and start validating as they come out		
+Stateful Operator Steps
+	1. Create Operator Test Harness
+	2. Send Inputs
+	3. Send Watermarks
+	4. Validate Output
+	
+TEST HARNESS 
+	Allows us to push events and time updates into the operator	
+	You can observe the state / timers that an operator keeps and what it outputs to verify correctness
+	Used internally to verify the correctness of Flink's built-in operators
+	Different layers of abstraction within Flink
+		User Functions
+		Stream Operators -> How a Datastream is implemented under the hood
+		Flink Runtime
+	
+@Before
+public void setup() throws Exception{
+	statefulMapFunction = new MyStatefulMapFunction();
+	testHarness = new KeyedOneInputStreamOperatorTestHarness<>{}
+
+}

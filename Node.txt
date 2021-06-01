@@ -1,0 +1,17 @@
+Using BCrypt
+You know it’s insecure to store plain-text passwords in the database. That would make it easy for someone to find the passwords for all users. One improvement you can make over plain text is to use encryption. Encryption is still a bad way to store passwords, though, since having the key would allow you to simply decrypt the passwords. Therefore, encryption is a totally insecure way to store passwords.
+
+The secure way to deal with passwords is by using a hashing algorithm. A hash is a one-way algorithm. You store the hash result in the database, and then when checking a password, you hash it and compare the result with the hash stored in the database. There is no way to go from the hash back to the original password. Also, having the hash isn’t enough to get a password that matches it (at least without a rainbow table). So if somehow a hacker got a hash for a user’s password, they still couldn’t actually log in.
+I won’t get into the specifics of the algorithm, but research the terms rainbow tables and password salting to learn more.
+There are still problems with straight hashing like rainbow tables or brute-force attacks. The best solution today for dealing with passwords is BCrypt. BCrypt is a hashing algorithm that is intentionally slow, making brute-force attacks too expensive to do.
+Like JWT, it’s not really important to understand how it works, just how to use it. To find the bcrypt hash of your pass password, you can calculate it inside a Node console:
+
+$ npm install --save bcrypt
+$ node
+> require('bcrypt').hashSync('pass', 10)
+'$2a$10$Jmo/n32ofSM9JvzfH0z6Me6TMyn6C/U9JhzDG8xhQC4ExHMG1jXz2'
+
+The 10 is the number of rounds you want it to pass over to generate the hash. More rounds is more secure but slower (10 is sufficient for almost anything). Note that running it again results in a different hash. This is because it’s salted randomly. You can validate the password with compareSync:
+
+> require('bcrypt').compareSync('pass', '$2a$10$Jmo/n32ofSM9JvzfH0z6Me6TMyn6C/U9JhzDG8xhQC4ExHMG1jXz2')
+true

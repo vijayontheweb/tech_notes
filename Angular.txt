@@ -1,0 +1,229 @@
+Include Angular before your closing </body> tag:
+	<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.2.18/angular.js'></script>
+Now declare your <body> element as an Angular app:
+	<body ng-app='app'>
+For this to work, you need to first declare a matching module. Do the following in a <script> tag after the Angular include tag:
+	<script>
+	  angular.module('app', [])
+	</script>
+Modules are a way to separate parts of Angular code. This is a module declaration; the first argument is the name of the module, and the second is an array of modules that this module depends on.
+	<script>
+	  var app = angular.module('app', [])
+	  app.controller('PostsCtrl', function ($scope) {
+		$scope.posts = [
+		  {
+			username: 'dickeyxxx',
+			body: 'Node rules!'
+		  },
+		  {
+			username: 'jeffdickey',
+			body: 'trying out angular.js...'
+		  }
+		]
+	  })
+	</script>
+To declare a controller, you call the .controller() method on an instance of a module. This method takes two arguments: a name and a function used to build an instance of the controller.
+	$scope.addStaticPost = function () {
+		$scope.posts.unshift({
+			username: 'dickeyxxx',
+			body: 'my new post!'
+		})
+	}
+The ng-model directive hooks an input to a $scope property. Now if you access $scope.postBody inside the controller, you’ll get the data inside this text field.
+	<input ng-model='postBody' class='form-control' />
+	
+To perform HTTP calls in Angular, you’ll use its built-in HTTP client: $http	
+
+Promises are a way of writing asynchronous code in JavaScript as an alternative to the traditional callback method that Node uses.
+If you look at a popular Node HTTP client, request, you can see the difference. with promises, you get back an object that you can call methods on to give it different functions based on success/failure. In the callback method, there is just one function that has to handle every case.
+
+	Here’s Angular’s $http:
+		$http.get('http://localhost:3000/api/posts')
+			.success(function (posts) {  
+				// do stuff with posts
+				})
+			.error(function (err) {  
+				// handle the error case (if you care)
+			})
+	And here’s Node’s request:
+		request.get('http://localhost:3000/api/posts', function (err, response, data) {  
+			if (err) { /* handle error */ }	
+			// do something with posts
+		})
+		
+Angular is a javascript framework which allows you to create reactive Single Page Applications(SPAs)
+Why is SPAs cool? When we navigate, from the URL we seem to visit different pages, but the page never changes. Its only one HTML file and a bunch of javascript code we got from the server
+Javascript changes the DOM, by changing the HTML code during run time.
+There was a complete rewrite of framework between Angular 1(AngularJS) and Angular 2(2016 release)
+Angular uses Typescript(superset of Javascript)
+
+ng new my-first-app -> Creates an Angular project
+cd my-first-app
+ng serve -> Starts the server
+"ngModel" is a directive provided by Angular, which tells that whatever you type will be stored under the model property name
+For example
+	<input type="text" [(ngModel)]="name">
+	<p>{{name}}</p>
+
+CONCEPTS
+	Components and Data-binding
+	Directives		
+	Services and Dependency Injection
+	Routing
+	Observables
+	Forms
+	Pipes
+	HTTP
+	Authentication
+	Optimizations and Ng Modules
+	Deployment
+	Animations and Testing
+
+Typescript -> Superset to Javascript. Offers more features than vanilla Javascript(eg. Strong Types, Classes, Interfaces)
+
+npm install --save bootstrap@3
+
+index.html is the Single Page. CLI creates the root component of our application
+app.component.html -> This content gets appended into index.html
+app.component.ts -> @Component{selector(app.root same as index), templateUrl, styleUrl}
+View Page source .. some scripts are injected by the CLI automatically. when ng serve process rebuilds our project, it bundles javascript files and embed them to index.html
+main.ts -> This is the first script file that gets executed -> platformBrowserDynamic().bootstrapModule(AppModule). i.e. it bootstraps our angular application by passing the appModule.ts to this method
+app.module.ts -> @NgModule bootstraps app.component
+#####COMPONENT#####
+Root component holds our entire application. Here’s where we later nest other components
+Each component has their own template(HTML), styling(CSS) and business logic. It allows you to split your complex application into reusable parts
+All other components to be added will NOT be added to the index.html. Rather it will be added to the app.component.html
+A component is usually a typescript class so that Angular will be able to instantiate it to create objects based on the blueprint we setup
+Decorators are typescript features which allows you to enhance your class. Here is a component Decorator
+		import {Component, Component} from '@angular/core';
+		@Component({
+			selector : 'app-server',
+			templateUrl : 'server.component.html'
+		})
+		export class ServerComponent{
+		}
+######MODULE#######
+Angular uses Component to build web pages and it uses Module to bundle different Components into packages
+Here is a module decorator
+		@NgModule({
+		  declarations: [
+			AppComponent
+		  ],
+		  imports: [
+			BrowserModule,
+			FormsModule
+		  ],
+		  providers: [],
+		  bootstrap: [AppComponent]
+		})
+Any new component has to be registered in the module in the "declarations" array		
+"import" allows us to add other modules into this module
+
+######AUTOMATICALLY CREATE COMPONENT#######
+ng generate component <componentname>
+shortcut -> ng g c <componentname>
+	ng g c header --skipTests true -> If you want to skip th generation of test file
+	
+For example..
+C:\Users\91979\angular-workspace\my-first-app>ng generate component autocreate
+CREATE src/app/autocreate/autocreate.component.html (25 bytes)
+CREATE src/app/autocreate/autocreate.component.spec.ts (656 bytes)
+CREATE src/app/autocreate/autocreate.component.ts (291 bytes)
+CREATE src/app/autocreate/autocreate.component.css (0 bytes)
+UPDATE src/app/app.module.ts (556 bytes)
+
+#########inline TEMPLATE(in place of TEMPLATEURL)########
+instead of -> templateUrl: './app.component.html'
+you can use -> template: '<app-server></app-server>'
+
+#########inline STYLES(in place of STYLEURLS)########
+instead of -> styleUrls: ['./app.component.css']
+you can use inline(use back tick) -> 
+styles: [`
+			h3 {
+				color: dodgerblue;	
+			}
+		`]
+
+Note: Unlike Template, styleUrls is an array to accomodate multiple CSS files
+ 		
+#### SELECTOR OPTIONS(similar to CSS selector) #####
+Element Selector
+	selector: 'app-autocreate'
+	<app-autocreate></app-autocreate>
+Attribute Selector
+	selector: '[app-autocreate]'
+	<div app-autocreate></div>
+Class Selector
+	selector: '.app-autocreate'	
+	<div class="app-autocreate"></div>
+	
+#### DATA BINDING ####
+INTERVIEW QUESTION : When do you use String Interpolation and when do you use Property Binding? 
+	ANSWER: When you want to output some content on html template, use String Interpolation and when you want to set value in the HTML property, use Property Binding.
+			String Interpolation has to resolve to a String in the end
+
+Data binding is responsible for communication between typescript code(business logic) and template	
+Typescript to Template Output Data ->
+	String Interpolation	{{data}}	-> It has to resolve to a string in the end or something which can be converted to a string
+	Property Binding		[property]="data"	-> With square brackets, we are directly binding to this native property this HTML element has. Between the quotation marks , an expression
+												   which for this property resolves to a certain type
+Template to Typescript React to user Events ->
+	Event Binding	(event)="expression"
+	
+	Another example, super important "$event" is a reserved variable name which is the data emitted with the event. Target is the html element on which this event occured
+	<input type="text" class="form-control" (input)="onUpdateServerName($event)">	
+	
+2 way data binding	(combining property and event binding)
+	Able to react to events and output something at the same time. i.e. It will trigger on the input event and update the value of server name in our component automatically.
+	On the other hand, since it is two-way binding, it will also update the value of the input element	
+	[(ngModel)]="serverName	"
+	
+	Important: For Two-Way-Binding to work, you need to enable the ngModel directive. This is done by adding the FormsModule to the imports[] array in the AppModule.
+	You then also need to add the import from @angular/forms in the app.module.ts file: 
+		import { FormsModule } from '@angular/forms'; 
+
+### DIRECTIVES ###
+Directives are instructions in the DOM
+For example, Components are Directive with a template. Typically Directives are added b using an attribute selector.
+<p appTurnGreen>Recieves a green background!</p>
+
+@Directive({
+	selector:'[appTurnGreen]'
+})
+export class TurnGreenDirective {
+	...
+}
+
+ngIf is a structural directive(because it adds or remove elements)
+Unlike structural directives, Attribute Directives don't add or remove elements. They only change the element they were placed on.
+
+<p *ngIf="isButtonClicked()">Conditional Text Display</p>
+<button class="btn btn-primary" (click)="myMouseClicked()">NGIF</button>
+<p *ngIf="isButtonClicked();else noServer">Conditional If Display</p>
+<ng-template #noServer>
+    <p>Conditional Else Display</p>
+</ng-template>
+In built Attribute directives
+	ngStyle allows us to change the CSS styles	
+	ngClass allows us to dynamically add or remove CSS classes -> comprise of key value pairs, where keys are CSS class names and values are conditions whether this class should be attached or not
+		For example	->	<p [ngStyle]="{ backgroundColor : getBgColor() }"
+						[ngClass]="{online : serverStatus === 'connected'}">Text in Background Color</p>	
+	ngFor loops through all the elements in the array
+		For example	->	<app-server *ngFor='let server of servers'></app-server>
+							where "servers" is the array property we defined in the typescript file	and assign individual elements to this dynamic variable "server". This server
+							variable can also be used in the template
+						servers = ['Test Server 1','Test Server 2','Test Server 3','Test Server 4']
+						
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+PROJECT - FROM BASICS						
+
+Feature > Component > Model
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+### DEBUGGING ###
+Console Logs
+Developer Tools - Debugging
+Augury
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ 

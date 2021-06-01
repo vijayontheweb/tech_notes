@@ -1,0 +1,155 @@
+Strimzi
+https://www.youtube.com/watch?v=rzHQvImn2XY -> Running Kafka On Kubernetes With Strimzi For Real-Time Streaming Applications
+
+https://github.com/systemcraftsman/strimzi-demo -> Best Link
+https://itnext.io/kafka-on-kubernetes-the-strimzi-way-part-1-bdff3e451788 -> Bestest Link
+
+kubectl get kafkas
+kubectl get kafkatopics
+kubectl get kafkausers
+kubectl get statefulset
+
+
+TLS Client Authenitcation?
+Mirroring
+Storage
+Metrics
+Scale up/Down
+Tolerations
+Encryptions
+Off cluste Access
+Source 2 Image	
+High Availability
+Authentication
+Logging Authorization
+CPU/Memory resource
+Affinity
+JVM configurations
+Configuration
+HealthChecks
+
+Strimzi Operators are fundamental to the project. These Operators are purpose-built with specialist operational knowledge to effectively manage Kafka. 
+Operators simplify the process of: Deploying and running Kafka clusters and components, Configuring and securing access to Kafka, Upgrading and managing 
+Kafka and even taking care of managing topics and users.
+
+
+Provides
+	Docker Images for running Apache Kafka and Zookeeper
+	Templates for deploying Apache Kafka on Kubernetes/openshift
+	Tooling for managing and configuring Apache kafka clusters
+	
+Cluster Controller - Creating and managing Apache Kafka clusters
+	User creates a config map for describing a cluster
+	Watches the config maps and creates apache zookeeper and apache kafka cluster
+	changes in config maps are applied to the clusters as well
+	deploys additional components such as topiccontroller
+
+Topic Controller - Creating and managing Kafka Topics
+
+Kubernetes provides
+	Statefulsets for stable identity and network
+	Together with headless services for internal network
+	Services for accessing the cluster
+	Secrets and Config Maps for handling configurations
+	Persistent Volume and Persistent Volume Claim for durable storage
+	
+		
+
+Initial Deployments
+Updates on Kafka/Zookeeper Cluster
+Operator pattern is the best way to run stateful services with complex operational needs
+Managing kafka resources like brokers, zookeepers, topics, users and mirror maker configurations using Kubernetes custom resources
+using transient and persistent volume storage options
+operational tasks - rolling cluster updates, upgrading scaling broker, moving broker, monitoring, running multiple kafka cluster on the same kubernetes cluster
+
+Initial Deployment
+Managing Zookeeper
+Replacing Brokers
+Topic partition rebalancing - reallocating partitions across brokers
+Decommisioning or adding brokers
+
+Stateful workloads - Databases of Kafka
+Cluster resource mananger use Linux containers and provide isolation
+cgroups constrain resources
+Namespaces isolate file system/process trees
+Docker is just a project to describe and share containers efficiently(others: Rocket, Mesos, LXC(Linux containers))
+Containers are available for several platforms
+
+User Space - Container, Container Engine, Cluster Resource Manager
+kernel Namespace - Namespaces, cgroups, modules, drivers (Linux Kernel)
+Physical or Virtual Machine
+
+Operator Pattern -	
+	Controller/Operator (Strimzi operator written in Java)
+		Active Reconcilaion Loop for {
+			desired := getDesiredState()
+			current := getCurrentState()
+			makeChanges(desired,current)
+		}
+
+	Deploy reconcilation plan
+	
+Kubernetes have resources like pods, replica sets, signal sets, services
+Extend Kubernetes using Custom Resource Definitions. Custom Resource Definition is used for configuring and run the Kafka cluster
+
+Stateful services in Kubernetes
+	Stable pod and network identity
+	Stable persistent storage
+	Ordered deployment and updates
+	Ordered graceful deletion and termination
+	Ordered automated rolling updates
+	
+	-statefulSet = Pod(kafka-brokers-0) -> PersistentVolumeClaim(data-kafka-brokers-0)
+	-statefulSet is basically a container around group of (stateful)pods like databases, kafka
+	-Dynamic provisioning enabled in your Kubernetes cluster. 
+	-PersistentVolumeClaim abstracts the storage. We need to declare what storage we want. Accordinly either a local storage or a distributed block storage solution(cluster/cloud/EBS) will be
+	  assigned. It will eventually get balanced with persistent volume
+	  StorageClass - aws-ebs	
+
+STRIMZI
+++++++++	  
+Strimzi - Open source operator based Apache kafka project for Kubernetes and OpenShift
+Cluster Operator watches Kafka(Configuration/Custom Resource) CRD. Deploys to Kafka(Broker Pod) StatefulSet and Zookeeper(Zookeeper Pod) StatefulSet. Entity Operators(User and Topic Operator)
+
+Strimzi Storage Modes - 
+	Ephemeral(Empty Dir Volume for Dev/test, spun up/destoryed automatically along with pod)
+	Persistent - Ideal for Production
+	Persistent JBOD	- Bunch of mount points to a bunch of persistent volumes
+	
+Connecting Clients
+	simple-strimzi-kafka-bootstrap.strimzi.svc.cluster.local:9092
+	simple-strimzi -> kafka resource metadata name
+	kafka-bootstrap -> broker load balancer name
+	strimzi -> Namespace
+	svc - K8s service
+	9092 -> Plain(TLS - 9093/ Interboker - 9094/ Prometheus- 9404)
+	
+Rolling Configuration Updates
+	Process
+	1.Watched Kafka Resource Change
+	2.Apply new config to Kafka StatefulSet spec	
+	3.Starting from Pod 0, delete the Pod and allow the stateful set to recreate it
+	4.Kafka pod will generate new broker config
+	5.Kafka is started
+	6.Wait until the readiness check is good
+	7.Repeat from step 3 for the next pod
+	
+Scaling brokers up
+	increase replica count -> spec.kafka.replicas
+	reassign partitions -> ./bin/kafka-reasign-partitions.sh
+	
+kubectl delete pod kafka-1
+
+#!/usr/bin/env bash
+set -e
+
+kubectl run -n strimzi --image strimzi/kafka producer --command -- /opt/kafka/bin/kafka-producer-perf-test.sh \
+--topic simple-topic \
+--num-records 1000000 \
+--record-size 100 \
+--throughput 1000 \
+--producer-props bootstrap.servers=simple-strimzi-kafka-bootstrap:9092
+
+	
+	
+	

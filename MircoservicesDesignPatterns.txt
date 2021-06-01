@@ -1,0 +1,96 @@
+Mircoservices Design Patterns (DIDOC) - S3B2T1 - A2BC2PG - CDES2 - HLPD - BESC
++++++++++++++++++++++++++++++
+1)Decomposition
+	Decompose By Business Capability
+	Decompose By Sub-Domain
+	Decompose by Transactions / Two-phase commit (2pc)
+	Strangler
+	Bulk Head
+	Sidecar
+2)Integration
+	API Gateway
+	Aggregator
+	Proxy
+	Gateway Routing
+	Chained Microservice
+	Branch
+	Client-Side UI Composition
+3)Database
+	Database Per Service
+	Shared Database Per Service
+	CQRS
+	Event Sourcing
+	Saga
+4)Observability
+	Log Aggregation
+	Performance Metrics
+	Distributed Tracing
+	Health Check
+5)Cross-Cutting Concerns
+	External Configuration
+	Service Discovery
+	Circuit Breaker
+	Blue-Green Deployment
+++++++++++++++++++++++++++++++++++++++++++++++++
+Decompose by Business Capability - A business capability is a concept from business architecture modeling. i.e Order Management is 
+								responsible for orders	
+Decompose by Subdomain - “God Classes” common among multiple services. Core / Supporting / Generic
+Decompose by Transaction(2 Phase Commit) - 1)Prepare Phase - Participants notify TC(Transaction Coordinator) 2)Commit/Rollback Phase - TC
+											issues either a commit/rollback to all the participants
+Strangler - The Strangler Application steps are transform, coexist, and eliminate
+Bulkhead - Bulkhead resembles the sectioned partitions of a ship’s hull. Partition service instances into different groups, based on 
+			consumer load and availability requirements. This design helps to isolate failures, and allows you to sustain service 
+			functionality for some consumers, even during a failure.
+Sidecar - Resembles a sidecar attached to a motorcycle. The sidecar(component) is attached to a parent application and provides supporting 
+			features for the application. The sidecar also shares the same lifecycle as the parent application, is created and retired 
+			alongside the parent.
+API Gateway - An API Gateway is the single point of entry for any microservice call. It can work as a proxy service to route a request to 
+			the concerned microservice. It can aggregate the results to send back to the consumer. This solution can create a fine-grained 
+			API for each specific type of client. It can also convert the protocol request and respond. It can also offload the authentication
+			/authorization responsibility of the microservice.
+Aggregator - Helps to aggregate the data from different services and then send the final response to the consumer. This can be done in 
+			two ways. 1)A composite microservice will make calls to all the required microservices, consolidate the data, and transform the 
+			data before sending back. 2) An API Gateway can also partition the request to multiple microservices and aggregate the data 
+			before sending it to the consumer.
+Proxy - 
+Gateway Routing - When it receives a request, the API gateway consults a routing map that specifies which service to route the request to.
+Chained Microservice - There will be multiple dependencies for single service or microservice. Chained microservice design pattern will 
+		help you to provide the consolidated outcome to your request.
+Branch -  Branch microservice pattern is a mix of Aggregator & Chain design patterns and allows simultaneous request/response processing from 
+		two or more microservices.
+Client-Side UI Composition - With microservices, the UI has to be designed as a skeleton with multiple sections/regions of the screen/page. 
+		Each section will make a call to an individual backend microservice to pull the data. SPA Frameworks like AngularJS and ReactJS 
+		help to do that easily.
+Database per Service - one database per microservice must be designed; it must be private to that service only.
+Shared Database per Service - anti-pattern for microservices. if the application is a monolith and trying to break into microservices, 
+		denormalization is not that easy. Later phase we can move to DB per services pattern.
+Command Query Responsibility Segregation (CQRS) - Split the application into two parts — the command side and the query side. The command side 
+		handles the Create, Update, and Delete requests. The query side handles the query part by using the materialized views.
+Event Sourcing - Defines an approach to handling operations on data that’s driven by a sequence of events, each of which is recorded in an 
+		append-only store. Application code sends a series of events that imperatively describe each action that has occurred on the data 
+		to the event store, where they’re persisted.
+Saga - When each service has its own database and a business transaction spans multiple services, how do we ensure data consistency across 
+		services. It can be implemented in two ways: 1) Choreography — When there is no central coordination, each service produces and listens 
+		to another service’s events and decides if an action should be taken or not. 2) Orchestration — An orchestrator (object) takes 
+		responsibility for a saga’s decision making and sequencing business logic.
+Log Aggregation - centralized logging service that aggregates logs from each service instance.
+Performance Metrics - A metrics service is required to gather statistics about individual operations. It should aggregate the metrics of an 
+		application service, which provides reporting and alerting. There are two models for aggregating metrics: Push and Pull
+Distributed Tracing - In a microservice architecture, requests often span multiple services. While in troubleshoot it is worth to have trace ID, 
+		we trace a request end-to-end. The solution is to introduce a transaction ID.
+Health Check - Each service needs to have an endpoint which can be used to check the health of the application, such as /health.
+External Configuration -  Externalize all the configuration, including endpoint URLs and credentials. The application should load them either 
+		at startup or on the fly. These can be accessed by the application on startup or can be refreshed without a server restart.
+Service Discovery - A service registry needs to be created which will keep the metadata of each producer service and specification for each. 
+		A service instance should register to the registry when starting and should de-register when shutting down. There are two types of service discovery:
+		client-side : eg: Netflix Eureka
+		Server-side : eg: AWS ALB.
+Circuit Breaker - The consumer should invoke a remote service via a proxy that behaves in a similar fashion to an electrical circuit breaker. 
+		When the number of consecutive failures crosses a threshold, the circuit breaker trips, and for the duration of a timeout period, all 
+		attempts to invoke the remote service will fail immediately. After the timeout expires the circuit breaker allows a limited number of 
+		test requests to pass through. If those requests succeed, the circuit breaker resumes normal operation. Otherwise, if there is a 
+		failure, the timeout period begins again.
+Blue-Green Deployment - The blue-green deployment strategy can be implemented to reduce or remove downtime. It achieves this by running two 
+		identical production environments, Blue and Green. Let’s assume Green is the existing live instance and Blue is the new version of 
+		the application. At any time, only one of the environments is live, with the live environment serving all production traffic.		
+		

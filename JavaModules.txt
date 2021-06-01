@@ -1,0 +1,83 @@
+Multimodule Maven Project
+
+mvn archetype:generate -DgroupId=com.zif.agent.multimodule -DartifactId=parent-agent-project
+mvn archetype:generate -DgroupId=com.zif.agent.multimodule  -DartifactId=cpumodule
+mvn archetype:generate -DgroupId=com.zif.agent.multimodule  -DartifactId=mainappmodule
+mvn archetype:generate -DgroupId=com.zif.agent.multimodule  -DartifactId=agentcoremodule
+mvn archetype:generate -DgroupId=com.zif.agent.multimodule  -DartifactId=agenthelpermodule
++++++++++++++++++++++++++++++++++++++
+
+Plug-in architecture
+Container or Plug-in based system
+Multi module maven build
+JDK ServiceLoader mechanism as alternative to dependency injection
+
+#Tidbits
+https://www.youtube.com/watch?v=bC-j7J2XJ_k
+https://www.youtube.com/watch?v=BnT38yzJk1c&feature=youtu.be
+https://www.baeldung.com/maven-multi-module-project-java-jpms
+https://github.com/eugenp/tutorials/tree/master/core-java-modules/multimodulemavenproject
+http://websystique.com/maven/creating-maven-multi-module-project-with-eclipse/
+http://tutorials.jenkov.com/java/modules.html#migrating-to-java-9
+
+https://www.codeproject.com/Articles/700435/Windows-Service-Auto-Update-Plugin-Framework
+https://www.vogella.com/tutorials/OSGi/article.html
+https://dzone.com/articles/extensionserviceplugin-mechanisms-in-java
+
+Modules are the basic building block of the JPMS. fundamental characteristics
+	A name, preferably one that’s globally unique
+	Declarations of dependencies on other modules
+	A clearly defined API that consists of exported packages
+
+
+java --list-modules -> You can see a list of all modules contained in a JDK or JRE
+java --describe-module ${module-name} -> To get details for a single module. (${module-name} is a placeholder, not valid syntax—replace it with your module of choice.
+->Platform modules are packed into JMOD files, a new format created specifically for this purpose. 
+	But code outside the JDK can create modules just as well. In that case, they’re modular JARs
+	Modular Jars -> plain JARs that contain a new construct, the module descriptor, which defines the module’s name, dependencies, and exports	
+	
+->Code compiled and loaded outside a module ends up in the unnamed module. In contrast, all modules are explicit modules, defining their name
+	in module-info.java. The unnamed module is special: it reads all other modules,	
+
+Example -> module-info.java
+	module java.prefs {
+		requires java.xml;
+		exports java.util.prefs;
+	}
+
+->To package up the Modular Hello World example, execute the following command:
+	jar -cfe mods/helloworld.jar com.javamodularity.helloworld.HelloWorld -C out/helloworld .
+	
+	$ java --module-path mods --module helloworld
+	$ java --show-moduleresolution --limit-modules java.base --module-path mods --module helloworld root helloworld file:///chapter3/helloworld/mods/helloworld.jar
+
+->Even though there’s no dependency information (yet) in this declaration, remember that this module implicitly depends on the java.base platform module.
+
+Making everything easy to change makes the entire system very complex - Ralph Johnson
+Identify which areas of the system demands more flexibility
+Reuse Release Equivalence : Unit of reuse is the Unit of release 
+Design Modules with the right level of granularity and right level of Cohesion
+Modularity Patterns
+	Base Patterns
+		Manage relationships
+		Module Reuse
+		Cohesive Modules
+	Dependency Patterns
+		Acyclic Relationships
+		Levelize Modules
+		Physical Layers
+		Container Independence
+		Independent Deployment
+	Usability Patterns
+		Published Interface
+		External Configuration
+		Default Implementation
+		Module Facade
+	Extensibility Patterns
+		Abstract Modules
+		Implementation Factory
+		Seperate Abstractions
+	Utility Patterns
+		Colocate Exceptions
+		Levelize Build
+		Test Module

@@ -1,0 +1,153 @@
+1.Junit Introduction
+2.Junit versions(Junit3/4/5)	
+3.Junit 5 (Jupiter) Architecture
+4.Junit Jupiter Workflow
+5.Junit Annotations - @Test/@Tag
+6.Handling Assertions
+7.Handling Exceptions
+8.Test Driven Methodology
+9.Junit Maven Example/Surefire Maven Plugin/Eclipse IDE
+10.Junit Test Lifecycle
+11.Junit Nested Classes/@DisplayName
+12.Repeated Tests
+13.Junit Dependency Injection(TestInfo / TestReporter)
+
+
+
+
+
+
+Junit the de facto testing standard for Java
+Junit5 is the newest iteration of the framework
+
+Junit Architecture
+
+Setting up Junit project
+
+Write test and learn Junit API
+	Assertions
+	Lifecycle of Junit
+	Execution Control
+	
+How to handle Scenarios
+	Exception
+	Conditional Execution
+	Repeated Tests
+
+Why testing framework?
+Expected vs Actual
+Alerting the developer
+
+Junit 4 has been more than 10 year. Not up to date. Monolith
+Not Junit 5. 
+3 components built on Platform(junit-jupiter-engine)
+	Jupiter(junit-jupiter-api) i.e. 5th planet in solar system
+	Vintage older junit code(so that you don't have to rewrite all code)
+	Extensions
+	
+Junit Jupiter -> New programming model in Junit. Extension Model	
+test scope is where you want your libraries to be active. i.e we dont want junit to be included in your final build
+
+junit-jupiter-api -> API for writing tests using junit jupiter
+junit-jupiter-engine -> Implementation of the test TestEngine API for Junit Jupiter
+junit-vintage-engine -> A thin layer on top of Junit4 to allow running vintage tests
+
+@Test -> By using this annotation, junit knows it needs to run this test
+	Marks a method as a test
+	Informs the JUnit engine what methods need to run
+		
+	At high level if you run junit test, it will scan all test class and run them
+	No failures mean success	
+
+1.Create an instance of the class under test
+2.set up inputs
+3.Execute the code you want to test
+4.verify the result is what you expect
+
+
+assertEquals(expected , actual);
+Asserts that expected and actual are equal
+
+assertArrayEquals(expectedArray , actualArray);
+Verifies each item in the arrays are equals in the right position
+
+assertIterableEquals(expectedArray , actualArray);
+Verifies each item in the iterable are equals in the corresponding positions
+
+assertNotEquals(expected , actual);
+Asserts that expected and actual are not equal
+
+
+assertFalse(boolean condition, String message)
+Assert that the supplied condition is false
+
+assertEquals(expected , actual, message);
+Asserts that expected and actual are equal, additionally providing message as a clue
+
+
+Test Driven Methodology -> Write test first, then code
+	Basically stub a method, write your test case as final state. Run it make it fail. Iteratively work on your actual code under test
+	When all your test cases are passed, your development is completed
+	
+Agile user stories -> Write your test cases for the expected behavior	
+
+Surefire Maven Plugin 
+	Lets you run your junit test using maven commands. In order to facilitate running your junit as maven test
+	Typically in developer mode, Eclipse IDE calls the testrunner of junit	
+	But in a CI/CD pipeline the build process uses a command line utility(not eclipse)
+	
+
+Exception
+	You may want your method to throw an exception when something happens. How to validate?	
+	assertThrows()
+
+Test Lifecycle -> Process in which the test instance is created, managed and destroyed
+When is the instance getting created
+Junit gives you hooks through which you can execute code at certain points in the lifecycle from the creation of the class till termination
+-Junit has an order annotation @order
+-Junit creates a new class instance for every method run
+@BeforeAll - Initialize before anything in this class runs
+@BeforeEach - initialize before each method	
+@AfterEach - Teardown after each method
+@AfterAll - Teardown after all methods are run
+
+@BeforeAll / @AfterAll methods have to be static
+
+Best practices for Junit lifecycle
+One test should not be dependent on other test
+Should not use member variable. Do not use state outside of test method
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+In 1997, Erich Gamma and Kent Beck created a simple but effective unit testing framework for Java called JUnit: they were on a long plane
+trip, and it gave them something interesting to do.
+
+JUnit quickly became the de facto standard framework for developing unit tests in
+Java. Today, JUnit (https://junit.org) is open source software hosted on GitHub, with
+an Eclipse Public License. And the underlying testing model, known as xUnit, is on its
+way to becoming the standard framework for any language. xUnit frameworks are
+available for ASP, C++, C#, Eiffel, Delphi, Perl, PHP, Python, Rebol, Smalltalk, and
+Visual Basic—to name just a few.
+
+Unit tests often focus on testing whether a method is following the terms of its API
+contract. Like a written contract between people who agree to exchange certain
+goods or services under specific conditions, an API contract is a formal agreement
+made by the signature of a method.
+
+Writing simple unit tests, which are not difficult to create without JUnit.
+As tests are added and become more complex, writing and maintaining tests
+becomes more difficult.
+
+TestInfo contains information about the test. TestInfo is a class whose objects are used to inject information about the currently executed test or container into the @Test,
+@BeforeEach, @AfterEach, @BeforeAll, and @AfterAll methods.
+TestInfoTest(TestInfo testInfo) {
+	assertEquals("TestInfoTest", testInfo.getDisplayName());
+}
+
+TestReporter provides ability to report TestInfo. TestReporter is a functional interface and therefore can be used as the assignment target for a lambda
+expression or method reference.
+@Test
+void testReportSingleValue(TestReporter testReporter) {
+	testReporter.publishEntry("Single value");
+}

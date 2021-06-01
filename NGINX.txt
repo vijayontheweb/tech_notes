@@ -1,0 +1,58 @@
+NGINX free 4 hour course
+https://www.youtube.com/watch?v=lWjZSgXu5VU
+Good SSH clients -> Transmit, Cyberduck, Filezilla
+https://github.com/salmanwaheed/
+
+Russian Igo Sysoev 2004
+Web Server, Reverse Proxy Server at it core
+Introduction
+- About NGINX
+- NGINX vs Apache
+Server Overview
+Installing with a Package Manager
+Building Nginx from Source & Adding Modules
+Adding an NGINX Service
+Nginx for Windows
+Understanding Configuration Terms
+Creating a Virtual Host
+Location blocks
+Variables
+Rewrites & Redirects
+Try Files & Named Locations
+Logging
+Inheritance & Directive types
+PHP Processing
+Worker Processes
+Buffers & Timeouts
+Adding Dynamic Modules
+Headers & Expires
+Compressed Responses with gzip
+FastCGI Cache
+HTTP2
+Server Push
+HTTPS (SSL)
+Rate Limiting
+Basic Auth
+Hardening Nginx
+Let's Encrypt - SSL Certificates
+Reverse Proxy & Load Balancer
+Adding an NGINX Init Service
+GeoIP
+Video streaming
+
+
+##### APACHE vs NGINX #####
+Apache is prefork(receive request upto preconfigured number and reject the rest) whereas Nginx deals with request aysnchronously
+NGINX serves faster static resources and handles higher concurrency(receives 1000s of request on a single processing thread) as compared to Apache
+
+#### INSTALL NGINX #####
+2 OPTIONS 1.Using Package Manager 2.Build from Source code
+
+Using Package Manager
+	yum check-update
+	yum install epel-release
+	yum install nginx (by default yum doesn't come preinstalled with NGINX)
+	NGINX installation path -> ls -l /etc/nginx
+	service nginx start -> Redirects to /bin/systemctl start nginx.service
+
+
