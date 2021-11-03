@@ -1,0 +1,807 @@
+unsplash.com -> Free images
+fontawesome -> Free+Paid Icon Libraries
+https://meyerweb.com/eric/tools/css/reset/
+Developer Tools -> Toggle Device Toolbar
+Interesting Google Fonts -> h1,h2,h3 - Roboto, Nunito  body - Montserrat
+https://www.youtube.com/watch?v=rH1RTwaAeGc -> Colt Steele My Favorite VS Code Extensions
+EMMET
+	Exclamation + tab
+	li*5
+	div>ul>li
+	div+p+bq
+
+MATERIAL THEME	-> Ctrl + K + T Palenight
+LIVESERVER -> Right click open with live server
+CSS PEEK -> 
+	Peek: load the css file inline and make quick edits right there. (Ctrl+Shift+F12)
+	Go To: jump directly to the css file or open it in a new editor (F12)
+	Hover: show the definition in a hover over the symbol (Ctrl+hover)
+COLOR HIGHLIGHT
+	In your jd file, try -> const mycolor = ['#00BCD4','#EC407A','#9c27B0']
+BRACKET PAIR COLORIZER
+
+Favorite colors - Hotpink, Mediumorchid, firebrick, darkkhaki, gold, mediumaquamarine, lightskyblue, tomato	
+Interesting hex colors - #60a9ff
+
+HTML5
+++++++++++++++++++++++++++++++++++++++++
+Inline Elements - Fit in alongside other elements i.e <a> <img>
+Block Elements - Take up the whole "block" of space i.e <h1> <p>
+We can change this behavior using CSS
+
+generic containers - <span><div>
+
+<div> - 
+	Block level element. HTML content division element is a generic container for flow content. 
+	It has no effect on the content or layout until styled using CSS. It's a way to group content 
+	together and with CSS, can style together all at once
+
+<span> -
+	Generic inline container for phrasing content which doesn't inherently represent anything. It can be used to group elements 
+for styling purpose(using the class or id attributes). <span> is very much like <div>, but <div> is a block level element whereas
+<span> is an inline element.
+
+<hr> - The thematic break(horizontal rule) element. Represents a thematic break between paragraph level elements.
+<br> - The line break element. Produces a line break in text(carriage-return. It is useful for writing a poem or address where the division of lines is significant.
+<sup> - Superscript. Specifies inline text which is to be displayed as superscript for solely typographical reasons. Usually rendered with a raised baseline using smaller text.
+<sub> - Subscript. Specifies inline text which is to be displayed as subscript for solely typographical reasons. Usually rendered with a lowered baseline using smaller text.
+
+HTML Entity Code - Special codes or special sequences that we can use instead of our HTML that will result in different characters
+	- Start with an ampersand and end with a semicolon i.e. &lt; or &#62; for less than, &amp; for ampersand
+	- Used to display reserved characters that normally would be invalid
+	- The browser interprets them and renders the correct character instead
+	
+Semantic Markup(similar to DIVs but are meaningful) - Important for Screen readers and improving accessibility, and essential for SEO
+	<section> -> Generic section element
+	<article> -> Represents a self contained composition in a document, intended to be independently distributable or reusable. Example forum post
+	<nav>	-> Navigation section. Represents a section of page shose purpose is to provide navigation links. examples are menus, table of contents, indexes. 
+	<main>	-> represent the dominant content of the body of a document. content of main should be unique to the document. content that is repeated across a set of documents
+				or document sections such as sidebars, navigation links, copyright information, site logos and search forms shouldn't be included unless the search form is the
+				main function of the page.
+	<header>
+	<footer>
+	<aside>	-> represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently
+				presented as sidebars or call-out boxes
+	<summary>
+	<details>
+	<time>	-> represents a specific period in time. It may include datetime attribute to translate dates into machine readable format
+	<figure> -> represents self-contained content potentially with an optional caption
+	<abbr>	->	Abbreviation element. Represents an abbreviation or acronym
+	<data>	->	Data element. Links a given content with a machine readable translation
+
+TABLE
++++++
+
+<table> -> represents tabular data i.e. Information presented in a 2 dimensional table comprised of rows and columns of cells containing data
+<td> -> Table data cell element. Defines a cell of a table that contains data
+<tr> -> Table row element. Defines a row of cells in a table
+<th> -> Defines a cell as a header of a group of table cells
+<thead> -> Defines a set of rows defining he head of the column of the table
+<tbody> -> Table body element encapsulates a set of table rows(<tr> elements), indicating that they comprise the body of the table.
+<tfoot> -> Defines a set of rows summarizing the columns of the table
+<col> -> Defines a column within a table and is used for defining common semantics on all common cells
+<colgroup> -> Defines a group of columns within a table
+<caption> -> Specifies the caption or title of the table
+
+rowspan -> Allows a single table cell to span the height of more than one cell or row
+colspan -> Allows a single table cell to span the width of more than one cell or column
+
+FORMS
++++++
+<form> element is a shell or container that doesn't have any visual impact
+Collection of inputs, checkboxes and buttons are grouped together in a form
+represents a document section containing interactive controls for submitting information
+The "action" attribute specifies WHERE the form data should be sent
+The "method" attribute specifies which HTTP method should be used
+
+INPUT
++++++
+<input> - Used to create a variety of 20+ different form controls. Changing type alters the input's behavior and appearance
+various types are button, checkbox, color, date, datetime-local,email, file, hidden, image, month, number, password, radio, 
+	range, reset, search, submit, tel, text, time, url, week
+	For example  <input type="text" placeholder="enter a username">
+
+LABEL
++++++
+Represents a caption for an item in the user interface
+There is a direct connection between form control and some piece of text
+	<label for="peas">Do you like peas?</label>
+	<input type="checkbox" name="peas" id="peas">
+	
+BUTTON
+++++++
+Represents a clickable button. Used to submit forms or anywhere in a document for accessible standard button functionality
+If you have a button inside a form, the default behavior will be to submit that form
+
+<button type="button">Submit!</button>	-> No longer submits the form
+<button type="submit">Submit!</button>	-> Submits the form(default behavior)
+<input type="submit" value="Click Me!">	-> Submits a form
+
+CHECKBOX
+++++++++
+<label for="peas">Do you like peas?</label>
+<input type="checkbox" name="peas" id="peas" checked>
+
+RADIOBUTTON
++++++++++++
+<label for="peas">Do you like peas?</label>
+<input type="radio" name="peas" value="peas" id="peas">
+
+SELECT
++++++++
+<label for="pet-select">Choose a pet:</label>
+<select name="pets" id="pet-select">
+	<option value="">--please choose an option--</option>
+	<option value="dog">Dog</option>
+	<option value="cat">Cat</option>
+	<option value="pig" selected>Pig</option>
+</select>
+
+RANGE - Lets the user specify a numeric value which must be no less than the given value, and no more than another given value
++++++
+<label for="volume">Volume</label>
+<input type="range" name="volume_level" id="volume" min="0" max="11" step="2">
+
+NUMBER
+++++++
+<input type="number" placeholder="enter a number" name="num" min="1" max="1000" step="2">
+
+TEXT AREA
++++++++++
+<label for="story">Tell us your story:</label>
+<textarea id="story" name="story" rows="5" cols="33">
+	It was a dark and stormy night...
+</textarea>	
+
+FORM VALIDATIONS	required/minlength/maxlength/min/max/pattern
+++++++++++++++++
+<form action="/dummy">
+	<label for="first">Enter first name</label>
+	<input type="text" name="first" id="first" minlength="5" maxlength="20" required>
+	<input type="submit">
+</form>
+
+The pattern attribute specifies a regular expression the form's control value should match. If a non-null value 
+doesn't confirm to the constraints set by the pattern value, the ValidityState object's read-only patternMismatch
+property will be true
+
+<input type="email">
+<input type="url">
+
+CSS(CASCADING STYLE SHEETS)
++++++++++++++++++++++++++++
++++++++++++++++++++++++++++
+https://codepen.io/aybukeceylan/pen/OJRNbZp -> Installer progress bar
+
+Language for describing how documents are presented visually
+
+SYNTAX
+selector {
+	property: value;
+}
+
+Examples
+h1{
+	color: purple;
+}
+
+img{
+	width: 100px;
+	height: 200px;
+}
+
+input[type="text"]:nth-of-type(2n){
+	border:2px solid red;
+}
+
+Including Styles
+	INLINE -> You can write your styles directly inline on each element
+	<STYLE> Element -> You can write your styles inside of a <style> element
+		<style>
+			h2{
+				color: palevioletred;
+			}
+		</style>
+	EXTERNAL STYLE SHEET -> Write your style in an external stylesheet .CSS file and then include them using a <link> in the head of your HTML document. Recommended
+		<link rel="stylesheet" href="style.css">
+		
+CSS Properties
+++++++++++++++
+Different Color Systems are Named color, Hexadecimal, RGB, HSL, HSV, CMYK
+Color - Sets foreground color value of the element's text
+background-color - Sets the background color of an element
+	
+RGB - Example of additive color system	-> RGB(20,30,40)
+HEX - Still RGB, where each ranges from 0-255, ut represented as Hexadecimal
+
+CSS Text Properties
++++++++++++++++++++
+text-align	-> horizontal alignment	-> left/right/center/justify
+font-weight -> boldness of font	-> normal/lighter/light/bolder/bold/100/900	-> 400(normal) and 700(bold)
+text-decoration -> controls appearance of decorative lines on text -> underline/overline/line-through/underline dotted/underline dotted red
+text-decoration-style -> sets the style of the line specified by text-decoration-line -> solid/double/dotted/dashed/wavy
+line-height -> Sets the height of line box -> normal/2.5/3em/150%/32px
+letter-spacing -> sets the horizontal spacing behavor between text characters
+
+font-size -> Sets the size of the font -> 1.2em/x-small/smaller/12px/80%
+	sbxx-small/x-small/small/medium/large/x-large/xx-large/xxx-large
+	Relative - EM, REM, VH,VW, %
+	Absolute - PX, PT, CM, IN, MM. Not recommended for responsive websites
+	
+font-family -> Specifies a priority list of font family names
+ 	Georgia, sans-serif, cursive, Arial, Verdana -> cssfontstack.com
+	Generic Family - serif, sans-serif, cursive, monospace, fantasy
+	Global values - inherit, initial, unset
+	priority order - font-family: Segoe UI, Futura, Arial, sans-serif;
+	
+For example
+
+h1{
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: 100;
+    text-decoration: plum underline wavy;
+    letter-spacing: 20px;
+    font-size: 40px;
+    font-family: monospace;
+}
+
+CSS SELECTORS
++++++++++++++++
+Element Selector
+Class Selector
+ID Selector
+Descendant Selector
+Adjacent Selector
+Direct Descendant Selector
+Attribute Selector
+Pseudo Classes
+Pseudo Elements
+CSS Specificity
+
+UNIVERSAL SELECTOR
+*{
+	color: black;
+}
+
+ELEMENT SELECTOR -> All buttons to look larger
+button{
+	font-size : 30px;
+}
+
+combine various selectors
+h1,h2 {
+	color: pink;
+}
+
+ID SELECTOR	(uses hash #)
+We can use IDs on any element in order to provide a hook for our access to single out a single element	
+Add an ID to your markup and then you reference it using the name of the ID and hash sign(without space)
+coolors.co/palettes/trending
+
+#signup{
+	background-color: green;
+	color: white;
+}
+
+CLASS SELECTOR (uses dot .)
+Similar to id, except that a class can be applied to multiple elements
+Creating a class of elements so we can have different groups of things/classes that you style them similarly
+
+.complete {
+	color: green
+}
+
+DESCENDANT SELECTOR / DESCENDANT COMBINATOR
+i.e. Select all <a>'s that are NESTED (at any level) inside an <li>
+li a {
+	color: teal;
+}
+i.e. Select all <a>'s that are NESTED inside a class by name tag
+.tag a {
+	color: teal;
+}
+Examples
+Limks in the header font size of 30px and teal color
+header a{
+    color: teal;
+    font-size: 30px;
+}
+Links inside the paragraph with the id 'dislikes' -> bolded and red color
+#dislikes a{
+    color: red;
+    font-weight: bold;
+}
+
+ADJACENT SELECTOR (Adjacent Combinator)
+i.e. Select only the paragraph that are immediately preceded by an <h1>
+h1 + p {
+	color: red;
+}
+
+DIRECT DESCENDANT / DIRECT CHILD i.e one level down
+Select only the <li>'s that are direct children of a <div> element
+div > li {
+	color: white;
+}
+
+ATTRIBUTE SELECTOR -> Matches elements based on the presence of value of an given attribute
+Select all input elements where the type attribute is set to "text"
+input[type="text"] {
+	width: 300px;
+	color: yellow;
+}
+
+section[class="post"]{
+	background-color: purple;
+}
+
+section.post {
+	background-color: purple;
+}
+
+<a> elements with a href containing "example"
+a[href*="example"]{
+	font-size: 2em;
+}
+
+<a> elements with a href ending ".org"
+a[href$=".org"]{
+	font-style: italic;
+}
+
+<a> elements whose class attribute begins with word "logo"
+a[class^="logo"]{
+	padding: 2px
+}
+
+PSEUDO CLASSES [states]
+++++++++++++++
+Keyword added to selector that specifies a special state of the selected elements
+:active -> Represents an element(such as button) that is being activated by the user
+			.subscribe:active {
+				color: #fae0e4;
+				background-color: #ff0a54;
+			}
+:checked -> represents any radio,checkbox or option element that is checked or toggled to an on state
+			input[type="checkbox"]:checked {
+				box-shadow: 0 0 0 2px #ff7096;
+				color: crimson;
+			}
+:first
+:first-child
+:hover -> Triggered when the user hovers over an element with the cursor
+			a:hover {
+				color:orange
+			}
+:not()
+:nth-child()
+:nth-of-type() -> Matches elements of a given type, based on their position among a group of siblings
+			section:nth-of-type(2n) {
+				background-color: #c5dedd;
+			}
+
+PSEUDO ELEMENTS [part]
++++++++++++++++
+Keyword added to a selector that lets you style a particular part of selected element(s)
+::after
+::before
+::first-letter
+	h2::first-letter {
+		color: red;
+		font-size: 50px;
+	}
+::first-line
+	h2::first-letter {
+		color: red;
+		font-size: 50px;
+	}
+::selection
+	p::selection {
+		color: #9d4edd;
+		background-color: darkseagreen;
+	}
+	
+CASCADE
++++++++
+The order your styles are declared in and linked to matters	
+
+SPECIFICITY	[https://specificity.keegan.st/]
+++++++++++++
+What happens when conflicting styles target the same elements?
+Specificity is how the browser decides which rules to apply when multiple
+rules could apply to the same element. It is a measure of how specific a given selector is.
+The more specific selector wins.
+
+INLINE STYLE - Most Specific
+ID - More specific
+CLASS/ATTRIBUTE/PSEUDO-CLASS SELECTORS - Less specific
+ELEMENT/PSEUDO ELEMENT SELECTORS - Least specific
+
+!important -> This declartion overrides any other declarations
+
+INHERIT
++++++++
+button and input don't inherit style from their parents by default. In order to inherit, use
+
+	button,input {
+		color:inherit;
+	}
+
+Note: Certain properties are inheritable while others aren't. 
+For example, border CANNOT inherit from its parent
+
+CSS BOX MODEL - Everything in CSS is a box and those box has some properties
++++++++++++++
++++++++++++++
+chrome developer tools - blue(contentbox) under green(padding) under orange(margin) color
+
+width & height - of the "content area" by default. but if "box-sizing" is set to "border-box", it sets the width of the "border area"
+border
+	border-width -> controls the thickness of elements border
+	border-color -> controls the color of the border
+	border-style -> controls the line style - none, hidden, dashed, solid, dotted, inset, outset, groove, ridge, dashed solid[V-H], double etc.
+	border radius
+
+		div {
+			background-color: #e8e8e4;
+			width: 200px;
+			height: 200px;
+			border-width: 5px;
+			border-color: #0096c7;
+			border-style: groove;
+			box-sizing: border-box; -> This brings the border within the width and height specified
+		}
+			
+	border-radius -> rounds the corners of an element's outer border edge
+		div {
+			border-radius: 10px;
+			border-radius: 50%; -> common approach to make circles
+			
+		}
+	Examples
+		div{
+			width: 210px;    
+			border: 1px solid grey;	i.e. border-width border-style border-color
+			border-radius: 5px;
+			text-align: center;
+		}
+
+		img{
+		   width: 200px;
+		   border: 5px solid rgb(236,183,191);
+		   border-radius: 50%;
+		}
+	
+	
+padding	- space between the content box and the border of the element
+	padding-left, padding-right, padding-top, padding-bottom
+	padding -> all at once
+	
+	examples of padding shorthand
+	apply to all 4 sides
+		padding: 10px;
+	
+	apply to vertical and horizontal sides
+		padding: 5px 10px;
+	
+	apply to top horizontal bottom
+		padding: 1px 2px 2px;
+		
+	apply to top right bottom left
+		padding: 1px 2px 0 2px;
+
+			button {
+				padding: 50px;
+			}
+
+			#btn {
+				padding: 5px 10px 0 10px;
+			}		
+
+margin - Spacing outside of an element's border between that element and some other elements
+	margin-left, margin-right, margin-top, margin-bottom
+	margin -> all at once
+
+	examples of margin shorthand
+	apply to all 4 sides
+		margin: 10px;
+	
+	apply to vertical and horizontal sides
+		margin: 5px 10px;
+	
+	apply to top horizontal bottom
+		margin: 1px 2px 2px;
+		
+	apply to top right bottom left
+		margin: 1px 2px 0 2px;
+
+
+display
+	INLINE - Width and Height are ignored. Margin and Padding push elements away horizontally, but not vertically
+	BLOCK - Block elements break the flow of a document. Width, Height, Margin and Padding are respected
+	INLINE-BLOCK - Behave like an inline element, except that Width, Height, Margin and Padding are respected
+
+BORDER PADDING MARGIN CONTENTBOX
+
+units - Percentages, EMS and REMS
+
+Percentages are always relative to some other value. Sometimes it is a value from its parent. Sometimes its a value from the element itself.
+For example
+	width: 50% - half of the width of the parent
+	line-height: 50% - half of the font-size of the element itself
+
+EMs and REMs
+EMs are relative units. With fontsize, 1em equals the font-size of the parent. 2em equals twice the font size of the parent. 
+With other properties, 1em is equal to the computed font size of the element itself. i.e. margin-left
+
+<article id="ems_snowball">
+    <ul>
+        <li>
+            1
+            <button id="em-btn">Hello REM</button>
+            <ul>
+                <li>1.1</li>
+                <li>
+                    1.2
+                    <button id="em-btn">Hello REM</button>
+                    <ul>
+                        <li>1.2.1</li>
+                        <li>
+                            1.2.2
+                            <button id="em-btn">Hello REM</button>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </li>    
+    </ul>
+</article>
+
+#ems_snowball {
+	font-size: 50px;
+}
+
+ul {
+	font-size: 0.7em;
+}
+
+/*Maintains the shape of border radius, no matter the size*/
+#em-btn {
+	background-color: blue;
+	font-size: 1em;
+	padding: 0 1em;
+	border-radius: 0.5em;
+}
+
+ROOT EMs - Relative to the root HTML element's font size. Often easier to work with. 
+If the ROOT font-size is 20px, 1 rem is ALWAYS 20 px, 2 rem is ALWAYS 40 px etc. i.e. NO snowballing effect.
+
+
+OTHER ASSORTED USEFUL CSS PROPERTIES
++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++
+Opacity and Alpha Channel
+Transition
+Position Property
+Transforms
+Google Fonts
+Background
+
+ALPHA CHANNEL -> Fourth Channel. Governs the transparency(see through) of the color. Ranges from 0(transparent) to 1(opaque).
+	NOTE: ALPHA APPLIES ONLY TO BACKGROUND COLOR. NOT TO TEXT
+	rgba(0,209,112,0.5)
+	background-color: rgba(255, 255, 255,0); - Transparent
+	background-color: rgba(255, 255, 255,1); - Opaque
+
+	#rgba {
+		width: 50%;
+		height: 50%;
+		font-size: 1.25rem;
+		font-weight: bold;
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+OPACITY -> Opposite of transparency. Opacity is the degree to which the content behind an element is hidden. Ranges from 0(trasparent) to 1(opaque)
+With Opacity the entire set of elements display transparency (including its contents and descendants)
+
+	#opacity {
+		width: 50%;
+		height: 50%;
+		font-size: 1.25rem;
+		font-weight: bold;
+		background-color: rgba(255, 255, 255);
+		opacity: 0.25;
+	}
+
+	#opacity_hex {
+		width: 50%;
+		height: 50%;
+		font-size: 1.25rem;
+		font-weight: bold;
+		background-color: #00bc29d8;
+	}
+
+
+POSITION - Sets how an element is positioned in a document. 
+	The top,right,bottom,left properties determine the final location of positioned elements
+
+static -> This is the default value.
+	The element is positioned according to the normal flow of the document. The top, right, bottom, left, and z-index properties have no effect. 
+	For example, 
+		position: static;
+
+
+relative
+	The element is positioned according to the normal flow of the document, and then offset relative to itself based on the values of top, right, bottom, and left. 
+	The offset does not affect the position of any other elements; thus, the space given for the element in the page layout is the same as if position were static
+	For example, 
+		position: relative;
+		top: 40px; left: 40px;	
+absolute
+	The element is removed from the normal document flow, and NO space is created for the element in the page layout. 
+	It is positioned relative to its closest positioned(NOT static) ancestor, if any; otherwise, it is placed relative to the initial containing block i.e. body 
+	Its final position is determined by the values of top, right, bottom, and left.
+	For example,
+		position: absolute;
+		top: 40px; left: 40px;
+fixed
+	The element is removed from the normal document flow, and no space is created for the element in the page layout. 
+	It is positioned relative to the initial containing block established by the viewport
+sticky
+	The element is positioned according to the normal flow of the document, and then offset relative to its nearest scrolling ancestor
+	and containing block(nearest block-level ancestor), including table-related elements, based on the values of top, right, bottom, and left. 
+	The offset does not affect the position of any other elements. 
+	Like sticky notes, not fixed within bounds and later become fixed as you scroll and leave the bounded area	
+	
+TRANSITION -> https://easings.net/
+	Allows us to animate the transition of one propery value to another property value
+	Transitions enable you to define the transition between two states of an element. Different states may be defined using pseudo-classes like :hover or :active or dynamically set using JavaScript.
+	
+	Property Name
+	Duration	- How long i want that one property to take the transition
+	Timing Function - Sets how intermediate values are calculated for CSS properties being affected by a transition effect.
+		/* Keyword values */
+		transition-timing-function: ease;
+		transition-timing-function: ease-in;
+		transition-timing-function: ease-out;
+		transition-timing-function: ease-in-out;
+		transition-timing-function: linear;
+		transition-timing-function: step-start;
+		transition-timing-function: step-end;
+
+		/* Function values */
+		transition-timing-function: steps(4, jump-end);
+		transition-timing-function: cubic-bezier(0.1, 0.7, 1.0, 0.1);
+
+		/* Steps Function keywords */
+		transition-timing-function: steps(4, jump-start);
+		transition-timing-function: steps(10, jump-end);
+		transition-timing-function: steps(20, jump-none);
+		transition-timing-function: steps(5, jump-both);
+		transition-timing-function: steps(6, start);
+		transition-timing-function: steps(8, end);
+
+		/* Multiple timing functions */
+		transition-timing-function: ease, step-start, cubic-bezier(0.1, 0.7, 1.0, 0.1);
+
+		/* Global values */
+		transition-timing-function: inherit;
+		transition-timing-function: initial;
+		transition-timing-function: unset;
+		
+	Delay - Delay even before that transition begins
+
+	.circle {
+		width: 100px;
+		height: 100px;
+		border-radius: 50%;
+		background-color: mediumaquamarine;
+		transition: 1s;
+	} 
+
+	div:hover {
+		background-color: red;
+		border-radius: 0%;
+	}
+	
+TRANSFORMATION
+		The transform CSS property lets you rotate, scale, skew, or translate(move) an element. It modifies the coordinate space of the CSS visual formatting model.
+		
+		
+		/* Keyword values */
+		transform: none;
+
+		/* Function values */
+		transform: matrix(1.0, 2.0, 3.0, 4.0, 5.0, 6.0);
+		transform: matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+		transform-origin: top left; -> transform-origin sets the origin for an element's transformations
+		transform: perspective(17px);
+		transform: rotate(0.5turn); -> rotates an element around a fixed point on a 2d plane
+		transform: rotate3d(1, 2.0, 3.0, 10deg);
+		transform: rotateX(10deg); -> rotates an element around horizontal axis
+		transform: rotateY(10deg); -> rotates an element around vertical axis
+		transform: rotateZ(10deg); -> rotates an element around z axis
+		transform: translate(12px, 50%); -> moves an element on 2d plane
+		transform: translate3d(12px, 50%, 3em);
+		transform: translateX(2em);
+		transform: translateY(3in);
+		transform: translateZ(2px);
+		transform: scale(2, 0.5);	-> resizes an element on 2d plane
+		transform: scale3d(2.5, 1.2, 0.3);
+		transform: scaleX(2);
+		transform: scaleY(0.5);
+		transform: scaleZ(0.3);
+		transform: skew(30deg, 20deg);
+		transform: skewX(30deg);
+		transform: skewY(1.07rad);
+
+		/* Multiple function values */
+		transform: translateX(10px) rotate(10deg) translateY(5px);
+		transform: perspective(500px) translate(10px, 0, 20px) rotateY(3deg);
+
+		/* Global values */
+		transform: inherit;
+		transform: initial;
+		transform: unset;
+		transform:rotate(0.5turn)
+
+BACKGROUND	
+	sets all background style properties at once, such as color, image, origin and size, or repeat method.		
+	background-clip
+	background-color
+	background-image
+	background-origin
+	background-position -> Sets the initial position for each background image. The position is relative to the position layer set by background-origin
+	background-repeat -> Sets how background images are repeated
+	background-size
+	background-attachment
+	
+	background-color: violet;
+	background-image: url("https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=715&q=80");
+	background-size: cover;
+	background-position: bottom;
+    background: bottom/cover
+		url("https://images.unsplash.com/photo-1557683316-973673baf926?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=715&q=80");
+    
+GOOGLE FONTS -> fonts.google.com	
+
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Lato&family=Raleway:wght@800&display=swap" rel="stylesheet">
+
+FLEXBOX -> creating flexible layouts
+	MediaQueries
+	Flex-basis, Grow and Shrink
+	Flex-direction
+	Flex Shorthand
+	Justify Content
+	Align Items
+	Flex Wrap
+	Align-content and Align-self
+	
+	FLEXBOX is a one-dimensional layout method for laying out items in rows or columns
+	It's a recent addition to CSS included to address common layout frustrations
+	Why FLEX? Flexbox allows us to distribute space dynamically across elements of an unknown size, hence the term flex
+	
+	Within one container, how do we distribute space across different elements or make those elements larger or move them to the left or right
+	
+	flex model -> Main axis(Horizontal - Default Left->Right) and Cross axis(Vertical - Default Top->Bottom)
+	
+	flex-direction -> Allows us to decide on the main axis direction in the container
+		flex-direction: row;	-> Default Left->Right
+		flex-direction: row-reverse;	-> Right->Left
+		flex-direction: column;	-> Top->Bottom
+		flex-direction: column-reverse;	-> Bottom->Top
+	
+	justify-content	-> determines how the actual elements(contents) is distributed across the main axis i.e ROW
+		justify-content: flex-start;	-> Default  Starts from the main axis
+		justify-content: flex-end;	-> Moves it to the end of the main axis
+		justify-content: center;	-> Center our content along the main axis
+		justify-content: space-between;	-> Takes all the extra space and distributes it between the elements, but not on the outside edges
+		justify-content: space-around;	-> Gives each element the same amount of space around it. Edges take half of the space
+		justify-content: space-evenly; -> Even space between every element, and between the elements and the container
+		
+	flex-wrap	-> It determines whether our elements are going to wrap along the main axis/cross axis
+		wrap
+		nowrap
+		wrap-reverse
