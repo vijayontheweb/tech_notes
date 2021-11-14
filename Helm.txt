@@ -1,0 +1,39 @@
+Helm Charts -> Where we specify all the manifests that should be deployed as part of application deployment
+	helm create <chart name> -> creates an empty chart with some sample manifests
+	helm install <releasename> -n <namespacename> <directory> -> Applies all the resource manifests after going through the rendering 
+	helm install <releasename> -n <namespacename> <directory> --dry-run
+	helm install <releasename> -n <namespacename> <directory> --set <FullyQualifiedKeyMinusValues> <value>	-> Using set flag
+	helm install <releasename> -n <namespacename> <directory> -f <CustomValuesYamlFile>
+	helm list -n <namespacename> -> Lists all the charts in specific namespace
+	helm list --all-namespaces
+	helm delete <releasename> -n <namespacename> -> Uninstalls the release
+Helm Repository
+	helm repo list
+Helm Releases
+
+
+
+[vagrant@master-node DUMMY]$ helm create mychart
+[vagrant@master-node DUMMY]$ tree mychart/
+mychart/
+├── charts
+├── Chart.yaml
+├── templates
+│   ├── deployment.yaml
+│   ├── _helpers.tpl
+│   ├── hpa.yaml
+│   ├── ingress.yaml
+│   ├── NOTES.txt
+│   ├── serviceaccount.yaml
+│   ├── service.yaml
+│   └── tests
+│       └── test-connection.yaml
+└── values.yaml
+
+Subcharts -> One application depending on another application. Details about subcharts are stored in charts directory
+In deployment.yaml, you can iterate over the list of values from helm
+predefined templating functions such as quote, upper case
+	storageClassName: {{ .Values.storageClass.Name | quote }}
+Like Values, we can read .Charts .Release	
+
+kubectl exec -it -n database mysql-6544cd96f8-fklzv bash

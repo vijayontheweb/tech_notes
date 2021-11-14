@@ -1,0 +1,94 @@
+HAProxy Architecture
+Frontend - Anything in front of HAProxy
+	Timeou Client
+	Bind	(which port?)
+	ACL
+Backend - Anything behind HAProxy
+	Timeout Connect
+	Timeout Server
+	Balance(roundrobin, leastconn, source)
+Multiple Frontends or Multiple Backends
+Frontend binds to one or more ports
+A Frontend connects to a backend
+E.g. Two frontends	
+	Frontend-http - binds 80(forwards to https backend)
+	Frontend-https - binds 443
+
+HAProxy Modes - TCP and HTTP
+	Frontend and backend can have mode of protocol
+	Which layer they work on Layer 4(TCP) Layer 7(http)
+	Using mode tcp becomes layer 4 proxy	(SSL Passhrough. Just Load balance)
+	Using mode http becomes layer 7 proxy    (SSL Terminate. Can look through data)
+
+ACL(Access Control List)
+	Conditionals applied to route traffic
+	Applies on both frontend and backend
+	Ex. block any request to /admin(needs http mode)
+	Reroute traffic to different backend microservices
+	ACL can also be applied to layer4 in addition to layer7
+
+TLS termination vs TLS Passthrough
+	Frontend is TLS(https) backend is not(http)
+	HAProxy terminates TLS, decrypts and send encrypted
+	Can look at the data, L7 ACL(can play with data), re-write headers,cache but requires cert
+
+TLS Passthrough
+	Backend is TLS
+	Haproxy frontends proxy directly to the backend
+	No Caching, L4 ACL only(can play with ip alone, not data), but more secure, haproxy doesn't need cert
+	
+Demo
+	Install HAProxy
+	Simple Frontend :80 backend with many servers loadbalance
+	ACL
+		Conditional app1 app2
+		prevent admin access
+	Enable HTTPS on HAProxy
+	Enable HTTP/2 on HAProxy
+	
+sudo yum install haproxy
++++
+test.cfg
+frontend http80
+	bind *.80	-> Listen on all network interfaces(multiple network cards)
+	timeout client 60s	-> I want to disconnect the client if they don't communicate to me in 60 seconds
+	mode http	-> tcp by default
+	default_backend allservers
+
+backend allservers
+	timeout connect 10s -> How long to wait before i connect to these backend servers
+	timeout server 100s	-> How long to wait for the app to complete processing
+	server server2222 127.0.0.1:2222
+	server server3333 127.0.0.1:3333
+	server server4444 127.0.0.1:4444
+	server server5555 127.0.0.1:5555
+	mode http	-> tcp by default
++++
++++
+test.cfg
+frontend http80
+	bind *.80	-> Listen on all network interfaces(multiple network cards)
+	timeout client 60s	-> I want to disconnect the client if they don't communicate to me in 60 seconds
+	mode http	-> tcp by default
+	acl app1 path_end -i /app1
+	acl app2 path_end -i /app2
+	use_backend app1Servers if app1
+	use_backend app2Servers if app2
+	default_backend allservers
+
+backend app1Servers
+	timeout connect 10s -> How long to wait before i connect to these backend servers
+	timeout server 10s	-> How long to wait for the app to complete processing
+	balance source -> sticky/stateful
+	server server2222 127.0.0.1:2222
+	server server3333 127.0.0.1:3333
+	mode http	-> tcp by default
+
+backend app2Servers
+	timeout connect 10s -> How long to wait before i connect to these backend servers
+	timeout server 100s	-> How long to wait for the app to complete processing
+	server server4444 127.0.0.1:4444
+	server server5555 127.0.0.1:5555
+	mode http	-> tcp by default	
++++
+haproxy -f test.cfg	

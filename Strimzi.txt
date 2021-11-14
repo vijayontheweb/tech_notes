@@ -150,6 +150,112 @@ kubectl run -n strimzi --image strimzi/kafka producer --command -- /opt/kafka/bi
 --throughput 1000 \
 --producer-props bootstrap.servers=simple-strimzi-kafka-bootstrap:9092
 
++++++++++++++++++++++++++++++++++++++++++++++
+https://www.youtube.com/watch?v=GSh9aHvdZco -> Introduction to Strimzi: Apache Kafka on Kubernetes - Jakub Scholz & Paolo Patierno, Red Hat
+
+Kafka Custom Resources
+
+Kafka is a Kubernetes Native Resource
+	- KafkaUser and KafkaTopic for handling users and topics
+	- KafkaConnect and KafkaConnector for handling a Kafka Connect deployment
+	- KafkaBridge for enabling HTTPAccess to the Cluster
+	- KafkaMirrorMaker and KafkaMirrorMaker2 for mirroring data across clusters
+	- KafkaRebalance for rebalancing the cluster through CruiseControl
+
+https://strimzi.io/docs/operators/latest/quickstart.html
+
+https://www.youtube.com/watch?v=4bKSPrENDQQ&list=PLpI4X8PMthYdZ6NNELjNFjKR87Egh_ZPw&index=4 -> SOOPER -> Develop Apache Kafka applications with Strimzi and Minikube
+
+curl -L0 https://strimzi.io/install/latest | sed 's/namespace: .*/namespace: default/' | kubectl apply -f -	
+
+curl -L0 https://strimzi.io/install/latest?namespace=default | kubectl apply -f -
+
+ > | kubectl apply -f -
+	listeners:
+      external:
+        type: loadbalancer
+        tls: false
+    --- 
+    listeners:
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+      - name: tls
+        port: 9093
+        type: internal
+        tls: true
+        authentication:
+          type: tls
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: false
+
+
+curl -L0 https://strimzi.io/examples/latest/topic/kafka-topic.yaml | kubectl apply -f -
+
+kubectl wait kafka/my-cluster --for=condition=Ready	--timeout=300s
+
+kubectl get kafka -o yaml
+
+
+PVC - data-my-cluster-zookeeper-0
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-kafka-pv2
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  claimRef:
+    namespace: default
+    name: data-my-cluster-zookeeper-2
+  hostPath:
+    path: "/opt/zif/volumes/kafka2"
+
+ENABLING TLS
++++++++++++++
+kubectl get secret my-cluster-cluster-ca-cert -o jsonpath='{.data.ca\.p12}' | base64 -d > ca.p12
+kubectl get secret my-cluster-cluster-ca-cert -o jsonpath='{.data.ca\.password}' | base64 -d 
+
+
+props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,"SSL"); //security protocol change from plain text to SSL
+props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG,"pwd");
+props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,"./ca.p12");
+
+ENABLING AUTHENTICATION/AUTHORIZATION
++++++++++++++++++++++++++++++++++++++
+SCRAM SHA-512, OAUTH TOKENS, TLS CERTIFICATES
+
+kubectl edit kafka my-cluster
+
+	external:
+		tls: true
+		type: loadbalancer
+		authentication:
+			type: scram-sha-512
+	plain{}
+	tls{}
+authorization:
+	type: simple
+replicas: 3	
 	
-	
-	
+curl -L0 https://strimzi.io/examples/latest/user/kafka-user.yaml | kubectl apply -f -
+
+		authentication:
+			type: scram-sha-512	
+kubectl get secret my-user -o jsonpath='{.data.password}' | base64 -d
+
+props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG,"SASL_SSL"); //security protocol change from plain text to SSL
+props.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG,"pwd");
+props.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG,"./ca.p12");
+props.put(SaslConfigs.SASL_MECHANISM,"SCRAM_SHA_512");
+props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"my-user\" password=\"Sasassf\";");

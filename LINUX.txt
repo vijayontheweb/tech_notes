@@ -1,3 +1,5 @@
+https://cloudacademy.com/course/red-hat-enterprise-linux-technical-overview
+
 Shell is a Command Line Interpreter. It translates commands entered by user and converts them into a language that is understood by kernel
 
 Bourne Shell - Bourne Shell, Korn Shell, Bourne-Again Shell(BASH), POSIX shell
@@ -208,3 +210,23 @@ count lines like (wc -l text)	[n is quiet mode, = is each line number, $ means l
 numbering lines in a file	[N means append with some character. here it is #]	
 	sed '=' file.txt | sed 'N; s/\n/#/'	-> This will not skip space	
 	sed '/./=' file.txt | sed '/./N; s/\n/-/' -> This will skip spaces	
+
+NAT - NETWORK ADDRESS TRANSLATION
++++++++++++++++++++++++++++++++++
+NAT Applications
+	Private to Public IP translation
+	Port Forwarding
+	L4 Load Balancing
+
+	SRCPORT | SRCIP | DESTIP | DESTPORT
+
+Computers within the same Subnet can connect to each other directly, since they will be able to find their respective MAC address using ARP
+	
+IPTABLES
+++++++++
+Tables - 3 Tables
+Chains - Add Rules
+Matches - How do you match as packets come in to your server
+Targets - Extension to do actual work
+
+IPTABLES - NAT TABLE 

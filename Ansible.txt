@@ -1,3 +1,7 @@
+github.com/geerlingguy/ansible-for-devops
+docs.ansible.com
+ansible.com/blog
+
 ANSIBLE
 	Redhat
 	Python based
@@ -46,12 +50,17 @@ and no extra daemon to manage), unlike most other configuration management tools
 
 pip3 install ansible
 
+ansible --version
+
+Using Ansible, you can run commands on Servers using Inventory. Uses secure transport protocols.
+
 Ansible uses an inventory file (basically, a list of servers) to communicate with your
 servers. Like a hosts file (at /etc/hosts) that matches IP addresses to domain names,
 an Ansible inventory file matches servers (IP addresses or domain names) to groups.
 
 /etc/ansible/hosts
 [example]
+107.20.106.183
 www.example.com
 	where example is the group of servers you’re managing and www.example.com is the
 	domain name (or IP address) of a server in that group.
@@ -68,12 +77,1968 @@ ansible -i inventory multi -a "free -h"
 ansible -i inventory multi -a "date"
 ansible -i inventory db -m setup
 
+prerequisites - Server is on and has SSH available
+ssh <user>@<ipaddress>
+ansible -i inventory example -m ping -u centos
+	inventory - Inventory file
+	example - Inventory group
+	-m ping -> m for module (Ansible defaults to command module)
 
+ansible.cfg - general configuration directives
 
+	[defaults]
+	INVENTORY = inventory
 
+ansible example -m ping -u centos
 
+key based authentication -> -k 
+provide password in command line -> --ask-pass
+
+private key on your computer and put public keypair on your server
+
+ansible example -a "free -h" -u centos
+ansible example -a "date" -u centos
+	-a -> a for argument
+	-u -> u for user and here it is centos
+
+vagrant ssh-config
+ssh vagrant@192.168.214.252 -p 22 -i D:/VAGRANTBOX/.vagrant/machines/default/hyperv/private_key
+
+idempotence - you can run it once or a 1000 times, and it wont affect a change after the first time
+
+---
+- hosts: all
+  become: yes
+  tasks:
+	- name: Ensure NTP is installed
+	  yum: name=ntp state=present
+	- name: Ensure NTP is running
+	  yum: name=ntpd state=started enabled=yes	  
+	- shell: |
+		if ! rpm -qa | grep -qw ntp; then
+			yum install -y ntp
+		fi	
+
++++++++++++++++++++++
+Inventory
++++++++++
+#Application Servers 
+[app]
+192.168.60.4
+192.168.60.5
+
+#Database Servers 
+[db]
+192.168.60.6
+
+#Group has all the servers
+[multi:children]
+app
+db
+
+#variables for all servers
+[multi:vars]
+ansible_ssh_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+
+++++++++++
+
+ansible multi -i inventory -a "hostname" -> Uses 5 parallel forks
+ansible multi -i inventory -a "hostname" -f 1 -> Used only 1 fork i.e Serial
+ansible multi -i inventory -a "df -h"
+ansible multi -i inventory -a "free -h"
+ansible multi -i inventory db -m setup
+ansible multi -i inventory -b -m yum -a "name=ntp state=present"	-> b for become can also be "--become"
+ansible multi -i inventory -K -m yum -a "name=ntp state=present"	-> K for ask password
+ansible multi -i inventory -b -m service -a "name=ntpd state=started enabled=yes" -> Is ntpd actually running. When i reboot, it actually starts on reboot
+ansible multi -i inventory -b -a "service ntpd stop"
 
 
 
 
  JUnit 5 aims to adapt java 8 style of coding and several other features as well, that’s why java 8 is required to create and execute tests in JUnit 5 (though it is possible to execute tests written with JUnit 3 or JUnit 4 for backward compatibility).
+ 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SEP 2021
+https://www.ansible.com/resources/webinars-training/introduction-to-ansible
+
+Agentless Architecture
+Idempotent - Run the same command again and it will not reinstall
+Uses OpenSSH and WinRM
+No agents to exploit or update
+More efficient and more secure
+Comes bundled with over 450 modules - Cloud, Container, Database, Files, Messaging, Monitoring, Network, Notifications, Packaging,
+	Source Control, System, Testing, Utilities, Web Infrastructure
+
+Installing
+		pip install ansible
+		sudo yum install ansible
+		
+Ansible Automation Engine -> Inventory(Host/Groups), API, Modules, Plugins
+Ansible Playbooks -> Written in YAML, invokes Ansible Modules
+Hosts
+Networking		
+
+Modules -> apt/yum, copy, file, get_url, git, ping, debug, service, synchronize, template, uri, user, wait_for, assert
+Run Commands
+	Command -> Takes the command and executes it. The most secure and predictable
+	Shell -> Executes through a shell like /bin/sh so you can use pipes etc
+	Script -> Euns a local script on a remote node after transferring it
+	Raw -> Executes a command without goinf through the ansible module subsystem
+
+Adhoc Commands 
+	ansible all -m ping -> check all inventory hosts are ready to be managed by Ansible
+	ansible web -m command -a "uptime" -> Run the uptime command on all hosts in the web group
+	ansible localhost -m setup -> collect and display the discovered for the localhost
+
+Inventory -> Collection of hosts(nodes) against which Ansible can work with
+	Hosts, Group Sources, Inventory-specific data, Static or Dynamic
+
+Static Inventory Example - INI format
+[control]
+control ansible_host=10.42.0.2
+
+[web]
+node1 ansible_host=10.42.0.6
+node2 ansible_host=10.42.0.7
+node3 ansible_host=10.42.0.8
+
+[haproxy]
+haproxy ansible_host=10.42.0.9
+
+[all:vars]
+ansible_user=vagrant
+ansible_ssh_private_key_file=~/.vagrant.d/insecure_private_key
+
+
+ansible all -i hosts -u vagrant -m ping
+ansible all -i hosts -u vagrant -m setup
+ansible web -i hosts -u vagrant -m yum -a "name=httpd state=present" -b   -> Escalate to root user after logging in as vagrant
+ansible web -i hosts -u vagrant -m yum -a "name=httpd state=present" -b   -> Roll back
+
+Variables - Ansible can work with Metadata from various sources and manage their context in the form of variables.
+	Variables provides a nice layer of abstraction in playbooks
+	Variable Precedence - Order in which the same variables are going to override each other
+		1.Extra Vars
+		2.Task Vars(Only for the task)
+		3.Block Vars(Only for the task in the block)
+		4.Role and include vars
+		5.Play vars_files
+		6.Play vars_prompt
+		7.Play vars
+		8.Set_facts
+		9.Registered vars
+		10.Host facts
+		11.Playbook host_vars
+		12.Playbook group_vars
+		13.Inventory host_vars
+		14.Inventory group_vars
+		15.Inventory vars
+		16.Role defaults
+
+module examples
+file: A directory should exist
+yum: A package should be installed
+service: A service should be running
+template: Render a config file from a template
+get_url: Fetch an archive file from a URL
+git: Clone a source code repository
+
+tasks:
+	- name: add cache dir
+	  file:
+		path: /opt/cache
+		state: directory
+	
+	- name: install nginx
+	  yum:
+		name: nginx
+		state: latest
+		
+	- name: restart nginx
+      service:
+		name: nginx
+		state: restarted
+
+HANDLER TASKS
+	Handlers are special tasks that run at the end of the play if notified by another task. If a configuration file gets changed,notify a 
+	service restart task it needs to run. These are going to run at the end of the play, regardless of how many times it has been triggered
+
+	- name: install nginx
+	  yum:
+		name: nginx
+		state: latest
+	  notify: restart nginx
+
+handlers:		
+	- name: restart nginx
+      service:
+		name: nginx
+		state: restarted
+
+PLAYS AND PLAYBOOK
+	Plays are ordered set of tasks to execute against host selection from your inventory. A playbook is a file containing one or more plays	
+
+Playbook Example (we can connect as user and escalate privilege as root)
+---
+- name: install and start apache
+  hosts: web
+  vars:				-> variables can also be defined as inventory, extra vars at runtime, output from previous play, ansible tower
+	http_port: 80
+	max_clients: 200
+  remote_user: root	-> conducting user information.
+  become: yes -> Escalate to root user once i connect to the machine  
+
+  tasks:
+  - name: install httpd
+    yum: pkg=httpd state=latest			-> here pkg is an alias for name
+  - name: write the apache config file
+    template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+  - name: start httpd
+    service: name=httpd state=started
+
+
+site.yml
+---
+- name: install and start apache
+  hosts: webservers
+  remote_user: vagrant
+  become: yes
+  
+  tasks:
+  - name: install epel repo
+    yum: name=epel-release state=present
+   
+  - name: install python bindings for SELinux
+    yum: name={{item}} state=present
+    with_items:
+    - libselinux-python
+    - libsemanage-python
+
+  - name: test to see if selinux is running	
+    command: getenforce
+	register: sestatus -> Register the return of the task into a new variable i.e.sestatus
+	changed_when: false -> command module is always going to be returning "changed=true" even when nothing happened. This will revert it
+
+  - name: install apache
+    yum: name=httpd state=present		
+	
+  - name: start apache
+    service: name=httpd state=started enabled=yes
+
+ansible-playbook -i hosts site.yml
+
+ROLES
+Roles are packages of closely related ansible content that can be shared more easily than plays alone
+project with embedded roles
+site.yml
+roles/
+	common/
+		files/
+		templates/
+		tasks/
+		handlers/
+		vars/
+		defaults/
+		meta/
+	webservers/		
+		files/
+		templates/
+		tasks/
+		handlers/
+		vars/
+		defaults/
+		meta/
+
+
+ansible-galaxy init [options] role_name
+ansible-galaxy init apache
+ansible-galaxy init common
+ansible-galaxy init web
+
+BREAK AN EXISTING PLAYBOOK INTO A ROLE
+
+group_vars
+	all
+	dbservers
+	lbservers
+	webservers
+
+roles/
+	apache/		
+		files/
+		templates/
+			httpd.conf-Redhat.j2
+			index.html.j2
+		tasks/
+			main.yml
+		handlers/
+			main.yml
+		vars/
+		defaults/
+		meta/
+	common/
+		files/
+		templates/
+		tasks/
+			main.yml
+			ntp.yml
+			selinux.yml	
+		handlers/
+			main.yml
+		vars/
+		defaults/
+		meta/
+	web/
+		files/
+		templates/
+		tasks/
+			main.yml
+		handlers/
+			main.yml
+		vars/
+		defaults/
+		meta/
+
+roles/apache/tasks/main.yml
+---
+- name: install apache
+  yum: name=httpd state=present		
+
+- name: create sites directories
+  file: path={{item}} state=directory
+  with_items={{apache_dirs}}
+
+- name: copy an index.html
+  template: src=index.html.j2 dest={{apache_docroot}}/index.html
+  
+- name: copy httpd conf
+  template: src=httpd.conf-{{ansible-os-family}}.j2 dest={{apache_config}}
+  notify: restart apache
+  
+- name: start apache
+  service: name=httpd state=started enabled=yes
+
+
+roles/apache/handlers/main.yml
+---
+- name: restart apache
+  service: name=httpd state=restarted
+
+roles/common/tasks/main.yml
+---
+- name: install epel repo
+  yum: name=epel-release state=present
+
+- include: selinux.yml
+- include: ntp.yml
+
+roles/common/tasks/selinux.yml
+---
+- name: install python bindings for SELinux
+  yum: name={{item}} state=present
+  with_items:
+  - libselinux-python
+  - libsemanage-python
+
+- name: test to see if selinux is running	
+  command: getenforce
+  register: sestatus
+  changed_when: false		
+
+roles/common/tasks/ntp.yml
+---
+- name: install ntp
+  yum: name=ntp state=present
+
+- name: configure ntp
+  template: src=ntp.conf.j2 dest=/etc/ntp.conf
+  notify: restart ntp	-> check handlers
+
+- name: start ntp
+  service: name=ntpd state=started 
+
+roles/common/handlers/main.yml
+---
+- name: restart ntp
+  service: name=ntpd state=restarted
+
+
+
+groupvars/all
+---
+#variables here are applicable to all host groups
+httpd_port: 80
+ntpserver: 192.168.1.2
+
+
+CREATING A NEW ROLE
+
+roles/web/tasks/main.yml
+---
+- name: install git
+  yum: name=git state=present
+
+- name: checkout lameapp
+  git: repo=https://github.com/jsmartin/lameapp.git version="{{lameapp_version|string}}" -> casting to a string to prevent errors
+
+- name: set permissions on the app
+  file: name=/var/www/lameapp/lame.py mode=0755
+
+- name: add apache config file
+  copy: src=lameapp.conf dest={{sites_available}}
+  notify: restart apache
+
+- name: link app config
+  file: src="{{sites_available}}/lameapp.conf" dest="{{sites_enabled}}/lameapp.conf" state=link
+
+- meta: flush_handlers -> Makes run the handler right away rather than at the end of the play
+
+- name: check for proper response
+  uri:
+	url: http://localhost/lame
+	return_content: yes
+  register: result
+  until: '"Hello Moon" in result.content'
+  
+UTILIZING ROLES IN YOUR MAIN PLAYBOOK  
+site.yml
+---
+- name: apply the common configuration to all hosts
+  hosts: all
+  remote_user: vagrant
+  become: yes
+
+  roles:
+  - common
+
+- name: apply the database configuration
+  hosts: dbservers
+  remote_user: vagrant
+  become: yes
+  
+  roles:
+  - mariadb
+  
+- name: apply the apache and web roles  
+  hosts: webservers
+  remote_user: vagrant
+  become: yes
+  
+  roles:
+  - apache
+  - web
+
+- name: apply the lb configuration
+  hosts: lbservers
+  remote_user: vagrant
+  become: yes
+
+-------------------------------
+ansible-playbook -i hosts site.yml  
+
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SEP 2021
+
+ANSIBLE FOR ABSOLUTE BEGINNERS(UDEMY)
+Provisioning
+Configuration Management
+Continuous Delivery
+Application Deployment
+
+Agentless - You don't need to install any additional software on the target machine to work with ansible
+
+mobaxterm - Alternative for putty
+https://www.osboxes.org -> Preconfigured images of OSes
+VDI - Virtual Disk
+
+changing hostname
+/etc/hostname
+<your hostname>
+/etc/hosts
+127.0.0.1 localhost <your hostname>
+::1 localhost <your hostname>        
+shutdown now -r -> reboot
+
+installing ansible
+sudo yum install ansible
+ansible --version
+
+Enabling SSH on VM
+	apt-get update
+	apt-get install openssh-server
+	service sshd start
+
+SSH to target server
+	ssh <ipaddress>
+
+INVENTORY
+Ansible uses SSH for Linux and PowerShell Remoting for Windows for establishing connectivity with the target machine
+Information about target system is stored in an inventory file
+Default inventory file -> /etc/ansible/hosts
+INI format
+
+#Application Servers 
+[app]			-> Inventory Group
+192.168.60.4
+192.168.60.5
+
+#Database Servers 
+[db]
+192.168.60.6
+
+web ansible_host=server1.company.com -> web is alias for server1.company.com
+
+Inventory Parameters
+	ansible_host - FQDN for Host i.e. server1.company.com
+	ansible_connection - Defines how ansible connects to target server i.e. ssh/winrm/localhost
+	ansible_port - Defines which port to connect to. 22 is default. i.e. 22/5986
+	ansible_user - Defines user used to make connections. root is default i.e. root/administrator
+	ansible_ssh_pass - SSH password for LINUX i.e. Password
+
+Note: For linux use ansible_ssh_pass and for windows use ansible_password. Connector for windows is winrm
+
+inventory.txt
+<target host name> ansible_host=<target ip> ansible_ssh_pass=<target password>
+target1 ansible_host=192.168.110.10 ansible_ssh_pass=S38rwerw
+target2 ansible_host=192.168.110.11 ansible_ssh_pass=S38rsds35w
+
+# Sample Inventory File
+web1 ansible_host=server1.company.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=Password123!
+web2 ansible_host=server2.company.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=Password123!
+web3 ansible_host=server3.company.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=Password123! ansible_ssh_pass=Password123!
+db1 ansible_host=server4.company.com ansible_connection=winrm ansible_user=administrator ansible_password=Password123!
+
+[web_servers]
+web1
+web2
+web3
+
+[db_servers]
+db1
+
+[all_servers:children]
+web_servers
+db_servers
+
+ansible target1 -m ping -i inventory.txt 	-> m stands for module 
+ansible target2 -m ping -i inventory.txt
+
+/etc/ansible/ansible.cfg	-> Not recommended for Production
+	uncomment this to disable SSH key host checking
+	host_key_checking = False
+
+Another Inventory Example
+
+sql_db1 ansible_host=sql01.xyz.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=Lin$Pass
+sql_db2 ansible_host=sql02.xyz.com ansible_connection=ssh ansible_user=root ansible_ssh_pass=Lin$Pass
+web_node1 ansible_host=web01.xyz.com ansible_connection=winrm ansible_user=administrator ansible_password=Win$Pass
+web_node2 ansible_host=web02.xyz.com ansible_connection=winrm ansible_user=administrator ansible_password=Win$Pass
+web_node3 ansible_host=web03.xyz.com ansible_connection=winrm ansible_user=administrator ansible_password=Win$Pass
+
+[db_nodes]
+sql_db1
+sql_db2
+
+[web_nodes]
+web_node1
+web_node2
+web_node3
+
+[boston_nodes]
+sql_db1
+web_node1
+
+[dallas_nodes]
+sql_db2
+web_node2
+web_node3
+
+[us_nodes:children]
+boston_nodes
+dallas_nodes
+
+PLAYBOOKS -> List of Plays(Dictionaries) in YAML
+Ansible Orchestration Language
+Play defines a set of activities/tasks to be run on the hosts. Each play has properties such as name. host, tasks etc
+Task defines an action to be performed on the host
+	- Execute a command
+	- Run a script
+	- Install a package
+	- Shutdown/restart
+
+Usecases
+Deploy VMs on public/private cloud
+provision storage to all VMs
+Setup network configuration on private VMs
+Setup cluster configuration
+Configure web/db servers
+setup load balancing between web servers
+setup monitoring components
+install and configure backup clients on VMs
+update CMDB database with new VM information
+
+Example Playbook
+
+- 
+  name: play1
+  hosts: localhost	->   Always set a a play level
+  tasks:
+  - name: install httpd
+    yum: pkg=httpd state=latest			-> here pkg is an alias for name
+  - name: write the apache config file
+    template: src=/srv/httpd.j2 dest=/etc/httpd.conf
+  - name: start httpd
+    service: name=httpd state=started
+- 
+  name: play2
+  hosts: localhost
+  tasks:
+  - name: install web service
+    yum:
+		pkg: httpd
+		state: present
+  - name: start web server
+    service: 
+		name: httpd
+		state: started
+
+
+modules -> Different actions done by tasks i.e. cmd, service, script, yum
+	ansible-doc -l -> To list all the modules
+
+Run -> Execute ansible playbook.
+	syntax: ansible-playbook <playbook file name>
+	ansible-playbook --help
+
+2 ways to execute 
+	1)ansible	-> Imperative style of communication
+	2)ansible-playbook -> Declarative style of communication
+	
+	For example	
+		ansible <hosts> -a <command>	->	ansible all -a "/sbin/reboot"
+		ansible <hosts> -m <module>		-> 	ansible target1 -m ping
+		ansible-playbook playbook.yml
+ 
+all -> default built-in group that ansible creates by default that has all the servers in the inventory
+
+ansible all -m ping -i inventory.txt	
+ 
+playbook-pingtest.yaml
+-
+  name: Test connectivity to target servers
+  hosts: all
+  tasks:
+    - name: Ping test
+      ping:	
+
+ansible-playbook playbook-pingtest.yaml -i inventory.txt 
+
+ATOM IDE
+yamllint.com
+https://atom.io/packages/linter-js-yaml
+Atom remote sync package - sync local files with ansible controller remote machine
+
+
+-
+    name: Execute a date command on localhost
+    hosts: boston_nodes
+    tasks:
+        -
+            name: 'Execute a date command'
+            command: date
+        -
+            name: 'Execute a command to display hosts file'
+            command: cat /etc/hosts
+++++++
+-
+    name: 'Stop the web services on web server nodes'
+    hosts: web_nodes
+    tasks:
+        -
+            name: 'Stop the web services on web server nodes'
+            command: 'service httpd stop'
+-
+    name: 'Shutdown the database services on db server nodes'
+    hosts: db_nodes
+    tasks:
+        -
+            name: 'Shutdown the database services on db server nodes'
+            command: 'service mysql stop'
+-
+    name: 'Restart all servers (web and db) at once'
+    hosts: all_nodes
+    tasks:
+        -
+            name: 'Restart all servers (web and db) at once'
+            command: '/sbin/shutdown -r'
+-
+    name: 'Start the database services on db server nodes'
+    hosts: db_nodes
+    tasks:
+        -
+            name: 'Start the database services on db server nodes'
+            command: 'service mysql start'
+-
+    name: 'Start the web services on web server nodes'
+    hosts: web_nodes
+    tasks:
+        -
+            name: 'Start the web services on web server nodes'
+            command: 'service httpd start'
+
+++++
+
+ANSIBLE MODULES
+
+idempotency - An operation is idempotent if the result of performing it once is exactly the same as the result of performing it 
+	repeatedly without any intervening actions
+
+
+System	-> Actions to be performed at a system level
+	User -> Adds a user
+			  -	name: 'Add user'
+				user:
+					uid: 1040
+					group: 'developers'	
+	Group
+	Hostname
+	Iptables
+	Lvg
+	Lvol
+	Make
+	Mount
+	Ping
+	Timezone
+	Systemd
+	Service	->	Manage Services i.e start, stop, restart
+					  - name: start web server
+						service: 
+							name: httpd
+							state: started		-> Ensure httpd service is started
+
+	
+Command -> Used to execute commands/scripts on a host
+	Command -> Execute a command on remote node. For example chdir, creates, executable, free_form, removes, warn
+		command: cat resolv.conf chdir=/etc	-> change directory before executing the command
+		command: mkdir=/folder creates=/folder -> creates folder only if the folder doesn't exist
+	Expect - Interactive execution by responding to prompts
+	Raw 
+	Script -> Runs a local script on a remote node after automatically transferring it
+				1.Copy script to remote systems
+				2.Execute script on remote systems
+				    name: 'Play 1'
+					hosts: web_nodes
+					tasks:
+					-
+						name: 'Run a script on remote server'
+						script: /some/local/script.sh -arg1 -arg2
+	Shell
+Files	-> Help work with files
+	Acl
+	Archive
+	Copy
+	File
+	Find
+	Lineinfile	-> Search for a line in file and replace it or add it if it doesn't exist
+						For example,
+							/etc/resolv.conf
+							nameserver 10.1.250.1
+							nameserver 10.1.250.2
+							
+							playbook.yml
+								name: 'Add DNS server to resolv.conf'
+								hosts: localhost
+								tasks:
+								-
+									name: 'Add entry'
+									lineinfile:
+									  path: /etc/resolv.conf
+									  line: 'nameserver 10.1.250.10'
+
+	Replace
+	Stat
+	Template
+	Unarchive
+Database -> Helps in working with databases
+	Mongodb
+	Mssql
+	Mysql
+	Postgresql
+	Proxysql
+	Vertica
+Cloud
+	Amazon
+	Atomic
+	Azure
+	Centrylink
+	Cloudscale
+	Cloudstack
+	Digital Ocean
+	Docker
+	Google
+	Linode
+	Openstack
+	Rackspace
+	Smartos
+	Softlayer
+	VMware
+Windows - Helps you to use ansible in Windows environment
+	Win_copy
+	Win_command
+	Win_domain
+	Win_file
+	Win_iis_website
+	Win_msg
+	Win_msi
+	Win_package
+	Win_ping
+	Win_path
+	Win_robocopy
+	Win_regedit
+	Win_shell
+	Win_service
+	Win_user
+
++++
+ANSIBLE VARIABLES
+Stores information that varies with each host
+Variables can be read from a)Inventory b)vars within playbook c)External dictionary file
+
+{{}} -> Jinja2 Templating. Remember to enclose within quotes, except if it is within a sentence
+	source: {{ inter_ip_range }}  -> WRONG
+	source: '{{ inter_ip_range }}'  -> CORRECT
+	source: Something {{ inter_ip_range }} Something -> CORRECT
+
+Update the inventory file to add a new variable snmp_port and assign the value used here. Then update the playbook to use value from the variable.
+
+a)AS INVENTORY
+Inventory
+localhost ansible_connection=localhost nameserver_ip=10.1.250.10 snmp_port=160-161
+
+Playbook
+-
+    name: 'Update nameserver entry into resolv.conf file on localhost'
+    hosts: localhost
+    tasks:
+        -
+            name: 'Update nameserver entry into resolv.conf file'
+            lineinfile:
+                path: /etc/resolv.conf
+                line: 'nameserver {{nameserver_ip}}'
+
+        -
+            name: 'Disable SNMP Port'
+            firewalld:
+                port: '{{snmp_port}}'
+                permanent: true
+                state: disabled
+
+
+b)AS VARS WITHIN PLAYBOOK
+-
+    name: 'Update nameserver entry into resolv.conf file on localhost'
+    hosts: localhost
+    vars:
+        car_model: 'BMW M3'
+        country_name: 'USA'
+        title: 'Systems Engineer'
+    tasks:
+        -
+            name: 'Print my car model'
+            command: 'echo "My car''s model is {{car_model}}"'
+        -
+            name: 'Print my country'
+            command: 'echo "I live in the {{country_name}}"'
+        -
+            name: 'Print my title'
+            command: 'echo "I work as a {{title}}"'
+
++++
+CONDITIONAL
+
+Only when a condition is true, a task is run
+ansible_os_family - built in variable
+
+Conditional(when)
+---
+- name: install NGINX
+  hosts: all
+  tasks:
+  - name: Install NGINX on Debian
+    apt:
+		name: nginx
+		state: present
+	when: ansible_os_family == "Debian" and
+	      ansible_distribution_version = "16.04"
+	
+  - name: Install NGINX on Redhat
+    yum:
+		name: nginx
+		state: present
+	when: ansible_os_family == "RedHat" or 
+		  ansible_os_family == "SUSE" 
+  		
+
+Conditional(Loop)
+---
+- name: install software
+  hosts: all
+  vars:
+	packages:
+	  - name: nginx
+	    required: true
+	  - name: mysql
+	    required: false
+	  - name: apache
+	    required: true
+	  - name: redis
+	    required: false
+  tasks:
+  - name: Install "{{item.name}}" on Debian
+	apt:
+		name: "{{item.name}}"
+		state: present
+	when: item.required == True
+	loop: "{{packages}}"
+
+Examples
+when condition to run this task if the host (ansible_host) is the database server
+-
+    name: 'Execute a script on all web server nodes'
+    hosts: all_servers
+    tasks:
+        -
+            service: 'name=mysql state=started'
+            when: ansible_host == 'server4.company.com'
+
+
+when conditional to print if I am a child or an Adult based on weather my age is < 18 (child) or >= 18 (Adult)
+-
+    name: 'Am I an Adult or a Child?'
+    hosts: localhost
+    vars:
+        age: 25
+    tasks:
+        -
+            command: 'echo "I am a Child"'
+            when: age < 18
+        -
+            command: 'echo "I am an Adult"'
+            when: age >= 18
+	
+Conditional(Register i.e. with output of previous task)
+---
+- name: Check status of a service and email if its down
+  hosts: localhost
+  tasks:
+    - command: service httpd status
+	  register: result
+	- mail:
+        to: admin@company.com
+        subject: Service Alert
+        body: Httpd Service is down
+        when: result.stdout.find('down') != -1		
+
+Example
+-
+    name: 'Add name server entry if not already entered'
+    hosts: localhost
+    tasks:
+        -
+            shell: 'cat /etc/resolv.conf'
+            register: command_output
+        -
+            shell: 'echo "nameserver 10.0.250.10" >> /etc/resolv.conf'
+            when: command_output.stdout.find('10.0.250.10') == -1
+
++++
+LOOPS
+
+Looping directive that executes the same task multiple number of times
+item default variable
+"loop" is synonymous to "with_items"
+
+- 
+	name: create users
+	hosts: localhost
+	tasks: 
+		user: name='{{item}}' state=present
+		loop:
+			- joe
+			- george
+			- ravi
+			- mani
+- 
+	name: create users
+	hosts: localhost
+	tasks: 
+		user: name='{{item.name}}' state=present uid='{{item.uid}}'
+		loop:
+			- name: joe
+			  uid: 100
+			- name: george
+			  uid: 101			
+			- name: ravi
+			  uid: 102			
+			- name: mani
+			  uid: 103			
+
+- 
+	name: create users
+	hosts: localhost
+	tasks: 
+		user: name='{{item}}' state=present
+		with_items:
+			- joe
+			- george
+			- ravi
+			- mani
+
+Examples
+++++++++
+-
+    name: 'Print list of fruits'
+    hosts: localhost
+    vars:
+        fruits:
+            - Apple
+            - Banana
+            - Grapes
+            - Orange
+    tasks:
+        -
+         command: 'echo "{{item}}"'
+         with_items:
+            "{{fruits}}"
+---
+-
+    name: 'Install required packages'
+    hosts: localhost
+    vars:
+        packages:
+            - httpd
+            - binutils
+            - glibc
+            - ksh
+            - libaio
+            - libXext
+            - gcc
+            - make
+            - sysstat
+            - unixODBC
+            - mongodb
+            - nodejs
+            - grunt
+    tasks:
+        -
+            yum: 'name={{item}} state=present'
+            with_items:
+                "{{packages}}"
+
+with_file
+with_url
+with_mongodb
+with_dict
+with_etcd
+with_env
+with_filetree
+with_ini
+with_inventory_hostnames
+with_k8s
+with_manifold
+with_nested
+with_nios
+with_openshift
+with_password
+with_pipe
+with_rabbitmq
+with_redis
+with_sequence
+with_skydive
+with_template
+with_together
+with_subelements
+with_varnames
+
+LOOKUP PLUGINS - Custom scripts that can perform specific tasks i.e connecting to a URL
+
++++
+ROLES - Makes it easy to develop, reuse and share ansible-playbooks
+Helps organize your code within ansible
+Package a set of tasks into a role and reuse it
+Also helps to share you code within ansible community i.e Ansible Galaxy findsthousands of roles
+Directories
+	- tasks
+	- handlers
+	- templates
+	- vars
+	- default
+
+Ansible Galaxy	has tool for creating skeleton
+	ansible-galaxy init mysql -> initializes and creates a directory structure in order to create a role from scratch
+
+my-playbook
+ |- playbook.yml	
+ |- roles
+    |- mysql
+		|- README.md
+		|- templates
+		|- tasks
+		|- handlers
+		|- vars
+		|- default
+		|- meta
+
+How can playbook finds the role?
+/etc/ansible/ansible.cfg
+	roles_path = /etc/ansible/roles
+Default location where anible searches for roles	-> /etc/ansible/roles
+
+playbook.yml
+
+- name: install and configure mysql
+  hosts: db-server
+  roles:
+	-mysql
+
+Find Roles
+	https://galaxy.ansible.com/
+	command line - ansible-galaxy search mysql
+	
+Use Role
+	ansible-galaxy install geerlingguy.mysql
+	
+playbook.yml	
+- 
+	name: Install and configure mysql
+	hosts: db-server
+	roles:
+		-geerlingguy.mysql
+
+- 
+	name: Install and configure mysql
+	hosts: db-server
+	roles:
+		role: geerlingguy.mysql
+		become: yes
+		vars:
+			mysql_user_name: db-user
+
+Playbook-all-in-one.yml
+-
+
+	name: Install and configure Mysql
+	hosts: db-and-webserver
+	roles:
+		- geerlinguy.mysql
+		- nginx
+
+List Roles
+	ansible-galaxy list
+	ansible-config dump | grep ROLE	
+	ansible-galaxy install geerlingguy.mysql -p ./roles	-> To install roles in a particular directory 
+
+ADVANCED
+
+PREPARING WINDOWS
+Ansible Control Machine can only be Linux and not Windows
+
+PATTERNS
+Host1,Host2, Host3
+Group1, Host1
+Host*
+*.company.com
+
+DYNAMIC INVENTORY
+ansible-playbook -i inventory.txt playbook.yml
+ansible-playbook -i inventory.py playbook.yml
+
+CUSTOM MODULES
+
+LAMP(Linux Apache Mysql PHP) Stack
+
+DEMO
+Install Firewall
+	sudo yum install firewalld
+	sudo service firewalld start
+	sudo systemctl enable firewalld
+
+Install MariaDB
+	sudo yum install mariadb-server
+
+Configure Maria DB
+	sudo vi /etc/my.cnf #configure the file with the right port
+	
+Start maria db
+	sudo service mariadb start
+	sudo systemctl enable mariadb
+
+Configure firewall
+	sudo firewall-cmd --permanent --zone=public --add-port=3306/tcp
+	sudo firewall-cmd --reload
+
+Configure database
+	mysql
+	CREATE DATABASE ecomdb;
+	CREATE USER 'ecomuser'@'localhost' IDENTIFIED BY 'ecompassword';
+	GRANT ALL PRIVILEGES ON *.* TO 'ecomuser'@'localhost';
+	FLUSH PRIVILEGES;
+	
+	mysql < db-load-script.sql
+
+install httpd & php
+	sudo yum install -y	httpd php php-mysql
+
+configure firewall	
+	sudo firewall-cmd --permanent --zone=public --add-port=80/tcp
+	sudo firewall-cmd --list-all
+	sudo firewall-cmd --reload	
+
+Configure httpd
+	sudo vi /etc/httpd/conf/httpd.conf
+	
+Start httpd
+	sudo service httpd start
+	sudo systemctl enable httpd
+	
+download code
+	sudo yum install -y git
+	git clone https://github.com/<application>.git /var/www/html
+	#update index.php to use the right database address, name and credentials
+
+test
+	curl http://localhost
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ANSIBLE ADVANCED
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Roles
+Asynchronous Actions
+Error Handling
+Jinja 2 Templating
+Lookups
+Vault
+Dynamic Inventory
+Custom Modules
+Plugins	
+
+https://docs.docker.com/samples/running_ssh_service/	-> Dockerize an SSH service
+Running sshd inside a container is discouraged, however, it might be still useful for certain use cases such as port forwarding.
+
+Web Application Steps -> https://github.com/mmumshad/simple-webapp-flask
+1	Identify Server
+2	Install Python Dependencies
+3	Install, Configure and Start Mysql
+4	Install Flask
+5	Clone source code
+6	Run
+
+# Install Python Pip and dependencies on Centos 7 -> https://computingforgeeks.com/how-to-install-python-3-on-centos/
+-------------------------------------------------
+sudo yum install -y epel-release python python-pip
+sudo pip install flask flask-mysql
+# If you come across a certification validation error while running the above command, please use the below command.
+# sudo pip install --trusted-host files.pythonhosted.org --trusted-host pypi.org --trusted-host pypi.python.org flask flask-mysql
+
+# Install MySQL Server on Centos 7
+----------------------------------
+wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+sudo rpm -ivh mysql-community-release-el7-5.noarch.rpm
+sudo yum update
+sudo yum -y install mysql-server
+sudo service mysql start
+The complete playbook to get the same workin on CentOS is here:
+https://github.com/kodekloudhub/simple_web_application
+
+-
+  name: Deploy a web application
+  hosts: db_and_web_server
+  vars:
+    db_name: employee_db
+    db_user: db_user
+    db_password: Passw0rd
+  tasks:
+    - name: Install dependencies
+      apt: name={{ item }} state=present
+      with_items:
+       - python
+       - python-setuptools
+       - python-dev
+       - build-essential
+       - python-pip
+       - python-mysqldb
+
+    - name: Install MySQL database
+      apt:
+        name: "{{ item }}"
+        state:  present
+      with_items:
+       - mysql-server
+       - mysql-client
+
+    - name: Start Mysql Service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Create Application Database
+      mysql_db: name={{ db_name }} state=present
+
+    - name: Create Application DB User
+      mysql_user: name={{ db_user }} password={{ db_password }} priv='*.*:ALL' host='%' state='present'
+
+    - name: Install Python Flask dependencies
+      pip:
+        name: '{{ item }}'
+        state: present
+      with_items:
+       - flask
+       - flask-mysql
+
+    - name: Copy web-server code
+      copy: src=app.py dest=/opt/app.py
+
+    - name: Start web-application
+      shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 &
+	  
+FILE SEPARATION
++++++++++++++++
+Inventory File	(Not a best practice)
+	[db_and_web_servers]
+	db_and_web_server1	ansible_ssh_pass=P@ssW0rd	ansible_host=192.168.1.14
+	db_and_web_server2	ansible_ssh_pass=P@ssW0rd	ansible_host=192.168.1.15	
+
+Creae a host_vars directory next to the playbook and then create a file with the same name as that of the server i.e. db_and_web_server.yml
+When ansible playbook is executed, ansible automatically reads the values from this file and associates them with the host
+
+host_vars - Host variables
+group_vars - Group variables
+
+
+playbook.yml
+group_vars
+	db_and_web_servers.yml
+		db_name: employee_db
+		db_user: dbuser
+		db_user_password: P@ssW0rd
+
+host_vars
+	db_and_web_server1.yml		-> Sample variable file
+		ansible_ssh_pass: P@ssW0rd	
+		ansible_host: 192.168.1.14
+	db_and_web_server2.yml		-> Sample variable file
+		ansible_ssh_pass: P@ssW0rd	
+		ansible_host: 192.168.1.14
+
+INCLUDE
++++++++
+Includes tasks from external files
+
+Playbook
+---
+-
+	name: deploy web application
+	hosts: db_and_web_server
+	tasks:
+		- include: tasks/deploy_db.yml
+		- include: tasks/deploy_web.yml
+
+
++++++++++++
+Inventory
+	db_and_web_server
+
+host_vars/db_and_web_server1.yml	
+	ansible_ssh_pass: Passw0rd
+	ansible_host: 192.168.1.14
+	db_name: employee_db
+	db_user: db_user
+	db_password: Passw0rd
+
+playbook.yml
+
+## ------------------------------
+##           BEFORE
+## ------------------------------
+#-
+#  name: Deploy a web application
+#  hosts: db_and_web_server
+#  vars:
+#    db_name: employee_db
+#    db_user: db_user
+#    db_password: Passw0rd
+#  tasks:
+#    - name: Install dependencies
+#      apt: name={{ item }} state=installed
+#      with_items:
+#       - python
+#       - python-setuptools
+#       - python-dev
+#       - build-essential
+#       - python-pip
+#       - python-mysqldb
+#
+#    - name: Install MySQL database
+#      apt:
+#        name: "{{ item }}"
+#        state:  installed
+#      with_items:
+#       - mysql-server
+#       - mysql-client
+#
+#    - name: Start Mysql Service
+#      service:
+#        name: mysql
+#        state: started
+#        enabled: yes
+#
+#    - name: Create Application Database
+#      mysql_db: name={{ db_name }} state=present
+#
+#
+#    - name: Create Application DB User
+#      mysql_user: name={{ db_user }} password={{ db_password }} priv='*.*:ALL' host='%' state='present'
+#
+#    - name: Install Python Flask dependencies
+#      pip:
+#        name: '{{ item }}'
+#        state: present
+#      with_items:
+#       - flask
+#       - flask-mysql
+#
+#    - name: Copy web-server code
+#      copy: src=app.py dest=/opt/app.py
+#
+#    - name: Start web-application
+#      shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 &
+
+# ------------------------------
+#           AFTER
+# ------------------------------
+-
+  name: Deploy a web application
+  hosts: db_and_web_server
+  tasks:
+    - name: Install dependencies
+      apt: name={{ item }} state=installed
+      with_items:
+       - python
+       - python-setuptools
+       - python-dev
+       - build-essential
+       - python-pip
+       - python-mysqldb
+
+    - include: tasks/deploy_db.yml
+
+    - include: tasks/deploy_web.yml
+
+tasks/deploy_db.yml  
+  - name: Install MySQL database
+    apt:
+      name: "{{ item }}"
+      state:  installed
+    with_items:
+     - mysql-server
+     - mysql-client
+
+  - name: Start Mysql Service
+    service:
+      name: mysql
+      state: started
+      enabled: yes
+
+  - name: Create Application Database
+    mysql_db: name={{ db_name }} state=present
+
+  - name: Create Application DB User
+    mysql_user: name={{ db_user }} password={{ db_password }} priv='*.*:ALL' host='%' state='present'
+
+
+tasks/deploy_web.yml
+    - name: Install Python Flask dependencies
+      pip:
+        name: '{{ item }}'
+        state: present
+      with_items:
+       - flask
+       - flask-mysql
+
+    - name: Copy web-server code
+      copy: src=app.py dest=/opt/app.py
+
+    - name: Start web-application
+      shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 &
+
+ROLES
++++++++++++++++++
+Why Roles? Organize, Reuse, Share
+	Organize our project in standard structure
+	Share our work with open community through github or ansible galaxy
+
+Use "roles" directive to assign a role to a server. Ansible automatically loads all the tasks from the tasks folder etc and makes them available to the playbook
+
+	sample playbook
+	---
+		name: Deploy app
+		hosts: web
+		roles:
+			- webserver
+
+
+ansible-galaxy init webserver
+
+webserver
+	|-README.md
+	|-tests
+	|-tasks
+	|-handlers
+	|-vars
+	|-defaults
+	|-meta
+
+ansible-galaxy import webserver
+
+Instead of include tasks, we can use roles
+-
+  name: Deploy a web application
+  hosts: db_and_web_server
+  tasks:
+  	- include: tasks/python.yml
+	- include: tasks/deploy_db.yml
+	- include: tasks/deploy_web.yml
+
+-
+  name: Deploy a web application
+  hosts: db_and_web_server
+  roles:
+    - python
+    - mysql_db
+    - flask_web
+
+Full Example
+++++++++++++
+Inventory
+	db_server
+	web_server	
+
+host_vars/db_server.yml	
+	ansible_ssh_pass: Passw0rd
+	ansible_host: 192.168.1.14
+	db_name: employee_db
+	db_user: db_user
+	db_password: Passw0rd
+
+host_vars/web_server.yml	
+	ansible_ssh_pass: Passw0rd
+	ansible_host: 192.168.1.15
+
+roles/flask_web/tasks/main.yml
+
+    - name: Install Python Flask dependencies
+      pip:
+        name: '{{ item }}'
+        state: present
+      with_items:
+       - flask
+       - flask-mysql
+
+    - name: Copy web-server code
+      copy: src=app.py dest=/opt/app.py
+
+    - name: Start web-application
+      shell: FLASK_APP=/opt/app.py nohup flask run --host=0.0.0.0 &
+
+roles/mysql_db/tasks/main.yml
+    - name: Install MySQL database
+      apt:
+        name: "{{ item }}"
+        state:  installed
+      with_items:
+       - mysql-server
+       - mysql-client
+
+    - name: Start Mysql Service
+      service:
+        name: mysql
+        state: started
+        enabled: yes
+
+    - name: Create Application Database
+      mysql_db: name={{ db_name }} state=present
+
+    - name: Create Application DB User
+      mysql_user: name={{ db_user }} password={{ db_password }} priv='*.*:ALL' host='%' state='present'
+
+roles/python/tasks/main.yml
+    - name: Install dependencies
+      apt: name={{ item }} state=installed
+      with_items:
+       - python
+       - python-setuptools
+       - python-dev
+       - build-essential
+       - python-pip
+       - python-mysqldb
+	   
+playbook.yml
+-
+  name: Deploy a mysql DB
+  hosts: db_server
+  roles:
+    - python
+    - mysql_db
+-
+  name: Deploy a web server 
+  hosts: web_server
+  roles:
+    - python  
+    - flask_web
+
+++++++++++++++++++++++
+
+ASYNCHRONOUS ACTIONS
+++++++++++++++++++++++
+Ansible establishes connectivity to target servers over SSH. 
+This means the SSH connections stay alive throughout the execution of the task in a playbook
+At times, we may want to execute a long running task or a process that exceeds SSH timeout
+	or we may simply dont want the SSH connection to stay alive throughout the operation, 
+		instead invoke the process and check on it at a later time
+	or we may want to run multiple processes at once and check on them later
+Using ASYCHRONOUS ACTIONS we can achieve all of these	
+
+
+Run a process and check on it later
+Run multiple processes at once and check on them later
+Run  processes and forget
+
+async -> How long to run. To specify the maximum time we would expect the task to execute
+poll -> How frequently to check the status of script? default 10 seconds
+async_status -> Check status of an async task
+register -> Inorder to make Ansible wait for the task to finish, Register the result of the task to a variable
+
+# Ansible Playbook
+-
+	name: Deploy web application
+	hosts: db_and_web_server
+	tasks:
+		- command: /opt/monitor_webapp.py
+		  async: 360
+		  poll: 0
+		  register: webapp_result
+
+		- command: /opt/monitor_database.py
+		  async: 360
+		  poll: 0	-> Poll value of zero means .. Not to wait there polling the task. Instead immediately go to the next task
+		  register: database_result
+
+		- name: check status of tasks
+		  async_status: jid={{ webapp_result.ansible_job_id }}	-> Get the job id of previous task using webapp_result.ansible_job_id
+		  register: job_result
+		  until: job_result.finished    -> Wait here until the task is finished
+		  retries: 30
+
++++++++++++++++++++++++++++
+STRATEGY
++++++++++++++++++++++++++++
+strategy directive - Defines how a playbook is executed in Ansible. i,e, strategy: free, serial: 3, serial: 30%
+LINEAR STRATEGY - Default. Ansible executes each task acros all servers in parallel at the same time. It waits for a given task	
+	to finish on all servers before proceeding to the next task	
+FREE STRATEGY - Each server runs all of its task independent of the other servers, and doesn't wait for the task to finish
+ on the other servers
+ -
+  name: Deploy a web application
+  hosts: app_servers
+  strategy: free
+ 
+BATCH STRAGEGY - Similar to Linear Strategy, but you can control the number of servers executed in a batch. using "serial" we can 
+	specify how many servers we would like to process together
+Develop Custom strategy using Custom Plugins	
+
+We can also provide an array as input against serial directive - Useful for rolling updates
+-
+  name: Deploy a web application
+  hosts: app_servers
+  serial:
+    - 2
+    - 3
+    - 5
+
+++++++++
+FORKS
++++++++++
+Ansible uses parallel processes or forks to communicate with remote hosts. By default Ansible can create 5 forks at a time and 
+it is defined in ansible.cfg i.e. forks = 5
+
++++++++++++++
+ERROR HANDLING	(ignore_errors | any_errors_fatal | failed_when)
++++++++++++++
+Default Behavior - When ansible runs a play against a group of servers and if a task fails on one of the servers, ansible takes the server out of the
+list and continues to execute the remainder of the tasks across the other healthy and available servers
+
+-
+  name: Deploy a web application
+  hosts: app_servers
+  any_errors_fatal: true	->  To override the default behavior and stop execution on all servers even if one server fail at a task
+
+    - name: "Send notification email"
+      mail:
+        to: devops@corp.com
+        subject: Server Deployed!
+        body: Web Server Deployed Successfully
+      ignore_errors: yes 			-> Playbook execution will not stop and fail. It will ignore the error and continue
+
+ - command: cat /var/log/server.log
+   register: command_output
+   failed_when: "'ERROR' in command_output.stdout"	-> When the condition is true, ansible will fail the execution
+
++++++++++++++++++++++
+
+JINJA2 TEMPLATING
++++++++++++++++++++++
+Templating is process of generating dynamic content or expressions
+My name is {{ my_name }}
+
+#Ansible Playbook
+-
+  name: Test Jinja2 Templating
+  hosts: localhost
+  vars:
+    first_name: james
+    last_name: bond
+  tasks:
+  - debug:
+      msg: 'The name is {{last_name}}!{{first_name}} {{last_name}}!' -> The debug module let you print a simple message out on the screen
+
+String Manipulation Filters - lower, upper, title, default
+	
+My name is {{ my_name | upper }}			-> For upper Case
+My name is {{ my_name | lower }}			-> For lower Case
+My name is {{ my_name | title }}			-> For title Case
+My name is {{ last_name | default("Shanmughadass) }}	{{ my_name }}		-> For undeclared variable, playbook will fail as undefined
+
+List and Set Filters
+
+{{ [1,2,3] | min }}
+{{ [1,2,3] | max }}
+{{ [1,1,2,3] | unique }}
+{{ [1,2,3] | union([3,4,5]) }}
+{{ [1,2,3] | intersect([3,4,5]) }}
+{{ 100 | random }}	-> Generate a random number
+{{ ["My","name","is","Vijay"] | join(" ")}}
+
+File Filters
+{{ "/etc/hosts" | basename }}	-> hosts
+{{ "c:\windows\hosts" | win_basename }}	-> hosts
+{{ "c:\windows\hosts" | win_splitdrive }}	-> ["c:","\windows\hosts"]
+{{ "c:\windows\hosts" | win_splitdrive | first }}	-> "c:"
+{{ "c:\windows\hosts" | win_splitdrive | last }}	-> "\windows\hosts"
+
+other filters
+{{ "10.10.10.10" | ipaddr }} -> Returns true/false based on valid ip address
+
+-
+  name: Generate random file name
+  hosts: localhost
+  tasks:
+  - name: Install dependencies
+    file:
+      path: /tmp/random_file{{1000|random}}
+      state: touch
+
+++++++++++++++++++
+LOOKUPS
+++++++++++++++++++	  
+# CSV File - credentials.csv file
+Hostname, Password
+Target1, P@ssword123
+Target2, P@ssword123
+
+{{ lookup('csvfile', 'target1 file=/tmp/credentials.csv delimiter=,') }}		-> P@ssword123
+
+First argument = File Type i.e. csvfile
+Second argument = Value to lookup i.e. target1 and File to lookup i.e. /tmp/credentials.csv and delimiter i.e. comma
+
+Other Lookup plugins - INI, DNS, MongoDB
+
+-
+  name: Test Connectivity
+  hosts: web_server
+  vars:
+    ansible_ssh_pass: "{{ lookup('csvfile', 'web_server file=credentials.csv delimiter=,') }}"
+
+credentials.ini
+# Credentials File
+
+[web_server]
+password=Passw0rd
+
+[db_server]
+password=Passw0rd
+
+
+-
+  name: Test Connectivity
+  hosts: web_server
+  vars:
+    ansible_ssh_pass: "{{ lookup('ini', 'password section=web_server file=credentials.ini') }}"
+	
+++++++++++++
+VAULT
+++++++++++++
+Storing Passwords and other confidential information in plaintext is not a good practice
+Ansible valut helps us store this data in encrypted format
+Multiple options
+1)Encrypt the inventory file itself
+	ansible-vault encrypt inventory.txt
+		ansible-playbook  playbook.yml -i inventory.txt -> This will now fail "Attempted to read inventory.txt as ini file. decryption failed on inventory.txt"
+	ansible-playbook playbook.yml -i inventory.txt -ask-vault-pass	-> Ansible prompts for password	
+	ansible-playbook playbook.yml -i inventory.txt -vault-password-file ~./vault_pass.txt	-> Ansible reads vault password from file
+	ansible-playbook playbook.yml -i inventory.txt -vault-password-file ~./vault_pass.py -> Use python script instead of vault password plaintext
+		This could be any program that retrieves vault password from secure location
+	ansible-vault view inventory.txt -> To view the contents of an inventory file	
+	ansible-vault create inventory.txt -> To create an encrypted file
+	
++++++++++++++++++	
+DYNAMIC INVENTORY
++++++++++++++++++
+Dynamic inventory is the inventory retrieved programatically, when ansible playbook is run .. as opposed to defining it in static text
+Ansible runs this inventory script as uses the output as inventory information
+
+ansible-playbook playbook.yml -i inventory.txt
+ansible-playbook playbook.yml -i inventory.py
+
+INVENTORY SCRIPT
+#!/usr/bin/env python	-> What enviroment to run the script in. In this case, Python using shebang. Otherwise ansible will execute it as 
+	bash script and it wont work
+	
+# if __name__ = "__main__":
+	inventory_data = get_inventory_data()	->Retrieves inventory information
+	print(json.dumps(inventory_data))
+	
+
+ansible-playbook playbook.yml -i inventory.py --list
+ansible-playbook playbook.yml -i inventory.py --host web
+
+++++++++++++++
+CUSTOM MODULES
+++++++++++++++
+
+#Playbook.yml
+- name: Debug Something
+  hosts: target1
+  tasks:
+	- custom_debug:
+		msg: 'This is a test message'
+
+
+Ansible Module is a built in class that helps us parse the arguments passed to our module
+
+import ansible module
+	from ansible.module_utils.basic import AnsibleModule
+instantiate ansible module
+	Argument spec is a dictionary containing a set of arguments we expect for the module
+	For example, msg is an argument we are expecting the user to pass and that particular argument
+	is received in the main function while instantiating the ansible module
+	
+	def main():
+		module = AnsibleModule(
+			argument_spec = dict(
+				msg=dict(required=True, type='str')
+			)
+		)
+Read the value of msg parameter
+	msg = module.params['msg']
+	
++++++++
+PLUGINS
++++++++
+Action Plugin - Invoke modules
+Connection Plugin - Establish communication with hosts
+Filter Plugin - Manipulate data
+Lookup Plugin - Work with data from external sources
+Strategy Plugin - Control flow and execution of play
+Callback Plugin - Handle events or results of execution
+
+FILTER PLUGIN
+#Playbook.yml
+-
+  name: Print average marks
+  hosts: localhost
+  vars:
+	marks:
+		- 10
+		- 20
+		- 30
+		- 40
+  tasks:
+	- debug:
+		-msg: '{{ marks | average }}'
+
+/filter_plugins/average.py
+def(average_list):
+	return sum(list)/float(len(list))
+
+class FilterModule(object):
+	def filters(self):
+		return {
+			'average': average
+		}
+
+export ANSIBLE_FILTER_PLUGINS=/filter_plugins;
+ansible-playbook playbook1.yml
+
+CALLBACK PLUGIN
+Callback Plugin prints the information that we see in a certain format on the screen at the end of each task or play execution.
+This default output is called skippy
+We could change the callback plugin to use JSON instead of text format. For this we need to set the enviroment variable 
+	
+	export ANSIBLE_STDOUT_CALLBACK=json; ansible-playbook playbook.yml
+
+And it will now print the results of execution in a json format
+
+Usecases: 
+	Mail
+	Hipchat
+	Jabber
+	Logstash
+	Slack
+	Timer
+
+from ansible.plugins.callback.default import CallbackModule as CallbackModule_default
+
+class CallbackModule(CallbackModule_default):
+	CALLBACK_VERSION = 2.0
+	CALLBACK_TYPE = 'stdout'
+	CALLBACK_NAME = 'custom_callback_plugin'
+	
+	def v2_playbook_on_task_start(self, task, is_conditional):
+		self.outlines = []
+		'''When task starts'''
+		
+	def v2_runner_on_failed(self, result,  ignore_errors=false):
+		self.display()
+		super(CallbackModule, self).v2_runner_on_failed(result,  ignore_errors)
+		'''When execution fails'''
+
+	def v2_runner_on_ok(self, result):
+		self.display()
+		super(CallbackModule, self).v2_runner_on_ok(result)
+		'''When execution Succeeds'''
+	
+	def v2_runner_on_skipped(self, result):
+		self.outlines = []
+		'''When Skipped'''
+		
+		
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Automation with Ansible Playbooks -> https://www.youtube.com/watch?v=sGeZm__pZ9I&list=PL2qzCKTbjutIyQAe3GglWISLnLTQLGm7e&index=1
+	
+Ansible Engine
+Playbooks 
+ 

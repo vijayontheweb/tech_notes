@@ -104,7 +104,7 @@ https://github.com/Pierian-Data/Complete-Python-3-Bootcamp
 EXECUTE CODE 
 ++++++++++++
 SHIFT + ENTER -> Equivalent of PLAY button
-	
+SHIFT + TAB -> Help on a particular statement	
 ++++++++++++++++++++++
 Comments 
 ++++++++
@@ -423,6 +423,13 @@ for letter in name:
         break        
     print(letter)	
 
+items = [1,2,3]
+print("Items are: ",*items,sep='\n')
+OUTPUT:
+	Items are:
+	1
+	2
+	3
 ++++++++++++++++++++++++++	
 RANGE
 ++++++
@@ -1118,26 +1125,1669 @@ Simple interactive program
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 OBJECT ORIENTED PROGRAMMING
 +++++++++++++++++++++++++++++
+Class is a blueprint that defines the nature of future object
+Objects are sometimes called as Classes in Python
+
 
 class NameOfClass():	-> Name of class in Camelcase
 
-	def __init__(self,param1,param2):	-> Allows you to create instance of the actual object
+	def __init__(self,param1,param2):	-> Allows you to create instance of the actual object. Called automatically when you create an object
 		self.param1=param1
 		self.param2=param2
 		
-	def some_method(self):				-> Using self keyword connect this method to the class
+	def some_method(self):				-> Using self keyword connect this method to the instance of the class
 		#perform some action
 		print(self.param)
 		
-class Sample():
-	pass
+class Sample():			-> Creates a class
+	pass				-> Does Nothing
 
-my_sample = Sample()
+my_sample = Sample()	-> Creates instance of the class
 type(my_sample)	->	__main__.Sample
 
+
+class Dog():
+    def __init__(self, breed):	-> __init__ is a constructor for a class. This method is called automatically when you create an instance of a class
+        self.breed = breed		-> self keyword represents the instance of the object itself
+lab_dog = Dog(breed = 'lab')
+print(lab_dog.breed)		->	lab
+type(lab_dog)				-> 	__main__.Dog
+
+
+class Dog():
+
+    # CLASS OBJECT ATTRIBUTE
+    species = 'mammal'			-> Same for any instance of the class
+
+    def __init__(self, breed, has_spots):
+        self.breed = breed
+        self.has_spots = has_spots
+
+lab_dog = Dog(breed = 'lab', has_spots = True)
+type(lab_dog.breed)			-> str
+type(lab_dog.has_spots)		-> bool
+print(lab_dog.species)		-> mammal
+
+METHODS
++++++++
+Functions defined in the body of the class. 
+Operations that sometimes utilize the actual attributes of the object we created
+
+print(lab_dog.bark)		-> <bound method Dog.bark of <__main__.Dog object at 0x00000132084356A0>>
+
+class Dog():
+    # CLASS OBJECT ATTRIBUTE
+    species = 'mammal'
+    def __init__(self, breed, name):
+        self.breed = breed
+        self.name = name
+        
+    def bark(self):
+        print('WOOF! My name is {}'.format(self.name))
+   
+    #you can additionally pass in new arguments that user provides in addition to self
+    def weigh(self, pound):
+        print('WOOF! My name is {} and i weigh {} pounds'.format(self.name, pound))    
+        
+lab_dog = Dog('lab', 'Tommy')
+lab_dog.bark()				-> WOOF! My name is Tommy
+lab_dog.weigh(40)			-> WOOF! My name is Tommy and i weigh 40 pounds
+
+
+class Circle():
+    pi = 3.14
+    
+    def __init__(self, radius=1):
+        self.radius = radius
+        self.area = radius * radius * Circle.pi
+        
+    def get_circumference(self):
+        return 2 * Circle.pi * self.radius
+    
+circle_default = Circle()
+print(circle_default.radius)				->	1
+print(circle_default.get_circumference())	->	6.28
+
+circle_override = Circle(10)
+print(circle_override.radius)				->	10
+print(circle_override.get_circumference())	->	62.8
+
+INHERITANCE
+++++++++++++
+Way to form new classes using class that has already been defined
+
+class Animal():
+    def __init__(self):
+        print('I am an animal')
+    
+    def eat(self):
+        print('I eat food')
+    
+    def speak(self):
+        print('I make sound')
+        
+class Dog(Animal):
+    def __init__(self):
+        Animal.__init__(self)
+        print('I am a dog')
+    
+    #OVERRIDE SPEAK    
+    def speak(self):
+        print('I make WOOF sound')
+
+animal = Animal()
+dog = Dog()
+dog.eat()
+dog.speak()
+
+OUTPUT
+	I am an animal
+	I am an animal
+	I am a dog
+	I eat food
+	I make WOOF sound	
+
+POLYMORPHISM
+++++++++++++
+
+class Dog():
+    def __init__(self,name):
+        self.name = name
+    
+    def introduce(self):
+        print('Woof! My name is '+self.name)
+
+class Cat():
+    def __init__(self,name):
+        self.name = name
+    
+    def introduce(self):
+        print('Meow! My name is '+self.name)
+
+tomy = Dog('tomy')
+felix = Cat('felix')
+        
+for pet in [tomy,felix]:
+    print(type(pet))
+    pet.introduce()
+	
+OUTPUT
+
+	<class '__main__.Dog'>
+	Woof! My name is tomy
+	<class '__main__.Cat'>
+	Meow! My name is felix	
+	
+ABSTRACT CLASS
+++++++++++++++	
+class Animal():
+    def __init__(self,name):
+        self.name = name
+    
+    def introduce(self):
+        raise NotImplementedError("Subclass must implement this abstract method")
+
+class Dog(Animal):
+    def __init__(self,name):
+        Animal.__init__(self,name)
+    
+    def introduce(self):
+        return 'Woof! My name is '+self.name
+
+animal = Animal('animal')
+animal.introduce()			->	Throws error ...NotImplementedError: Subclass must implement this abstract method
+								It is expecting to inherit the abstract method and override	
+
+dog = Dog('Tomy')
+print(dog.introduce())		->	Woof! My name is Tomy
+
+SPECIAL METHODS(MAGIC/DUNDER)
++++++++++++++++++++++++++++++
+Special Methods allow us to use some built-in operators in python i.e length function/print function
+Also called as Magic/Dunder methods because they use double underscore
+
+__str__ -> Equivalent to toString() in Java. Returns back string representation so that you can print out user defined objects
+__len__	-> Returns back the length of user defined objects
+__del__ -> Deletes the self object
+
+
+class Book():
+    def __init__(self, title, author, pages):
+        self.title = title
+        self.author = author
+        self.pages = pages
+    
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+    
+    def __len__(self):
+        return self.pages
+    
+    def __del__(self):
+        print(f"{self.title} book is getting deleted")
+        
+book = Book("Python", "Portilla", 200)
+print(str(book))
+print(len(book))
+del(book)
+
+OUTPUT:
+	Python by Portilla
+	200
+	Python book is getting deleted
+
+Now when we try to access 'book' object again, we get the following error
+	NameError                                 Traceback (most recent call last)
+	<ipython-input-10-92f3aa8bac21> in <module>
+	----> 1 book
+
+	NameError: name 'book' is not defined
+
+
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-Pip INSTALL AND PyPI
+PIP INSTALL AND PyPI
 ++++++++++++++++++++
 
 PyPI - repository for open-source third party Python packages
+		Similar to RubyGems in ruby world, PHP's Packagist, CPAN for Perl and NPM for Node.js
+		
+Other than python built-in libraries, there are many open-source libraries shared on PyPi
+We can use pip install at the command line to install these packages
 
+PIP - Simple way to download packages at your command line directly from PyPi repository
+	For example
+
+Search - 'Python package for any partcular library'
+	https://pypi.python.org/pypi/openpyxl
+
+
+C:\Users\vijayanand.s>pip install openpyxl
+Collecting openpyxl
+  Downloading openpyxl-3.0.9-py2.py3-none-any.whl (242 kB)
+     |...| 242 kB 3.3 MB/s
+Collecting et-xmlfile
+  Downloading et_xmlfile-1.1.0-py3-none-any.whl (4.7 kB)
+Installing collected packages: et-xmlfile, openpyxl
+Successfully installed et-xmlfile-1.1.0 openpyxl-3.0.9
+WARNING: You are using pip version 21.1.2; however, version 21.3 is available.
+You should consider upgrading via the 'C:\Users\vijayanand.s\AppData\Local\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\python.exe -m pip install --upgrade pip' command.
+
+C:\Users\vijayanand.s>python
+Python 3.9.7 (tags/v3.9.7:1016ef3, Aug 30 2021, 20:19:38) [MSC v.1929 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import openpyxl
+
+MODULES AND PACKAGES
++++++++++++++++++++++++
+Modules are just .py scripts that you call in another .py script
+Packages are a collection of Modules
+
+__init__.py -> Empty file that needs to be placed inside of a folder to let python know that this collection of .py scripts
+				should be treated as an entire package
+
+module1.py
+----------
+def module1_function1():
+    print("function1 called from module1")
+
+package1/__init__.py
+--------------------
+
+package1/module3.py
+-------------------
+def package1_module3_function1():
+    print("function1 called from module3 from package1")
+
+package1/subpackage1/__init__.py
+--------------------------------
+
+package1/subpackage1/module4.py
+-------------------------------
+def subpackage1_module4_function1():
+    print("function1 called from module4 from subpackage1")
+
+
+module2.py
+----------
+from module1 import module1_function1
+from package1 import module3
+from package1.subpackage1 import module4
+
+module1_function1()
+module3.package1_module3_function1()
+module4.subpackage1_module4_function1()
+
+OUTPUT
+------
+	function1 called from module1
+	function1 called from module3 from package1
+	function1 called from module4 from subpackage1	
+
+
+if __name__ == "__main__":
++++++++++++++++++++++++++++++
+Clarifies whether a MODULE's FUNCTION is used as an IMPORT, or if you are using the original .PY file of that MODULE
+
+Unlike other languages, there is no main() method in Python that gets invoked automatically.
+When you call Python3 <filename>.py, all of the code at indentation level zero is going to IMPLICITLY get run.
+
+In python there is a BUILT_IN VARIABLE called __name__
+Depending on how you are running the actual script, this BUILT_IN VARIABLE gets assigned a string. 
+If you run the script DIRECTLY, python will assign __name__ = "__main__"
+Else the script would have been IMPORTED
+That allows you to have an IF block that are equal to each other.
+
+if __name__ == "__main__":
+	<DO SOMETHING>
+
+one.py
+------
+def function1():
+    print('function1 called from one.py')
+
+print('top level called from one.py')
+
+if __name__ == "__main__":
+    print('one.py is called DIRECTLY')
+else:
+    print('one.py is IMPORTED')
+
+two.py
+------
+from one import function1
+
+def function2():
+    print('function1 called from two.py')
+
+print('top level called from two.py')
+function1()
+
+if __name__ == "__main__":
+    print('two.py is called DIRECTLY')
+else:
+    print('two.py is IMPORTED')
+
+	
+OUTPUT
+------
+	top level called from one.py
+	one.py is IMPORTED
+	top level called from two.py
+	function1 called from one.py
+	two.py is called DIRECTLY	
+	
+ERRORS AND EXCEPTIONAL HANDLING
++++++++++++++++++++++++++++++++
+By default if there is any error in your code the entire script will STOP
+We can use Error Handling to let the script continue with other code, even if there is an error
+
+TRY -> This is the block of code to be attempted(may lead to an error)
+EXCEPT -> Block of code will execute in case there is an error in TRY block
+FINALLY -> A final block of code to be executed regardless of the error
+
+def add(n1, n2):
+    return n1+n2
+
+n1=10
+n2=input('Enter a number? ')
+sum = n1 + n2
+print(sum)
+
+Enter a number? 5
+
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-2-64be144d39bb> in <module>
+      4 n1=10
+      5 n2=input('Enter a number? ')
+----> 6 sum = n1 + n2
+      7 print(sum)
+
+TypeError: unsupported operand type(s) for +: 'int' and 'str'
+---
+try:
+    file = open('testfile','r')
+    file.write('write a test line')
+except TypeError:
+    print('You got a TypeError')
+except OSError:
+    print('You got a OSError')
+else:
+    print('No Errors')
+finally:
+    print('I always run')	
+	
+OUTPUT:
+	You got a OSError
+	I always run
+---
+try:
+    file = open('testfile','r')
+    file.write('write a test line')
+except:
+    print('All other exceptions')
+else:
+    print('No Errors')
+finally:
+    print('I always run')
+
+OUTPUT:
+	All other exceptions
+	I always run
+---
+def get_user_input():
+    while True:
+        try:
+            number = int(input('Please enter number:'))
+        except:
+            print('Oops! Not a number. Please retry')
+            continue
+        else:
+            print('Thats a valid number. Thank You')
+            break
+        finally:
+            print('I always run')
+
+OUTPUT:
+	Please enter number:word
+	Oops! Not a number. Please retry
+	I always run
+	Please enter number:10
+	Thats a valid number. Thank You
+	I always run
+---
+
+PYLINT AND UNITTEST	-> testing tools
++++++++++++++++++++++
+
+PYLINT
+------
+Library that looks at your code and reports back possible issues i.e styling issues and invalid code
+UNIT TEST - Built-in Library that allows you to test your own programs and check whether you are getting desired outputs
+Python has a set of style convention rules known as "PEP 8"
+
+pip install pylint
+
+pylint square_of_number.py -r y
+************* Module square_of_number
+square_of_number.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+square_of_number.py:1:0: C0103: Constant name "isRetry" doesn't conform to UPPER_CASE naming style (invalid-name)
+square_of_number.py:5:4: W0702: No exception type(s) specified (bare-except)
+square_of_number.py:10:8: C0103: Constant name "isRetry" doesn't conform to UPPER_CASE naming style (invalid-name)
+
+
+Report
+======
+11 statements analysed.
+
+Statistics by type
+------------------
+
++---------+-------+-----------+-----------+------------+---------+
+|type     |number |old number |difference |%documented |%badname |
++=========+=======+===========+===========+============+=========+
+|module   |1      |NC         |NC         |0.00        |0.00     |
++---------+-------+-----------+-----------+------------+---------+
+|class    |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+|method   |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+|function |0      |NC         |NC         |0           |0        |
++---------+-------+-----------+-----------+------------+---------+
+
+
+
+Raw metrics
+-----------
+
++----------+-------+-------+---------+-----------+
+|type      |number |%      |previous |difference |
++==========+=======+=======+=========+===========+
+|code      |14     |100.00 |NC       |NC         |
++----------+-------+-------+---------+-----------+
+|docstring |0      |0.00   |NC       |NC         |
++----------+-------+-------+---------+-----------+
+|comment   |0      |0.00   |NC       |NC         |
++----------+-------+-------+---------+-----------+
+|empty     |0      |0.00   |NC       |NC         |
++----------+-------+-------+---------+-----------+
+
+
+
+Duplication
+-----------
+
++-------------------------+------+---------+-----------+
+|                         |now   |previous |difference |
++=========================+======+=========+===========+
+|nb duplicated lines      |0     |NC       |NC         |
++-------------------------+------+---------+-----------+
+|percent duplicated lines |0.000 |NC       |NC         |
++-------------------------+------+---------+-----------+
+
+
+
+Messages by category
+--------------------
+
++-----------+-------+---------+-----------+
+|type       |number |previous |difference |
++===========+=======+=========+===========+
+|convention |3      |NC       |NC         |
++-----------+-------+---------+-----------+
+|refactor   |0      |NC       |NC         |
++-----------+-------+---------+-----------+
+|warning    |1      |NC       |NC         |
++-----------+-------+---------+-----------+
+|error      |0      |NC       |NC         |
++-----------+-------+---------+-----------+
+
+
+
+Messages
+--------
+
++-------------------------+------------+
+|message id               |occurrences |
++=========================+============+
+|invalid-name             |2           |
++-------------------------+------------+
+|missing-module-docstring |1           |
++-------------------------+------------+
+|bare-except              |1           |
++-------------------------+------------+
+
+------------------------------------------------------------------
+Your code has been rated at 6.36/10 (previous run: 6.36/10, +0.00)
+
+UNITTEST
+--------
+cap_utils.py
+----
+def to_title(text):
+    return text.title()
+
+def to_capital(text):
+    return text.capitalize()
+
+test_cap.py
+----
+import cap_utils
+import unittest
+
+
+class TestCap(unittest.TestCase):
+    def test_title(self):
+        word = "vijay anand"
+        self.assertEqual(cap_utils.to_title(word), "Vijay Anand")
+
+    def test_caps(self):
+        word = "vijay anand"
+        self.assertEqual(cap_utils.to_capital(word), "Vijay Anand")
+
+
+if __name__ == "__main__":
+    unittest.main()
+
+OUTPUT
+----
+python3 test_cap.py 
+F.
+======================================================================
+FAIL: test_caps (__main__.TestCap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "test_cap.py", line 12, in test_caps
+    self.assertEqual(cap_utils.to_capital(word), "Vijay Anand")
+AssertionError: 'Vijay anand' != 'Vijay Anand'
+- Vijay anand
+?       ^
++ Vijay Anand
+?       ^
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+FAILED (failures=1)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DECORATORS
++++++++++++
+Decorators allow you to "decorate" a function i.e. add more capabilities to an existing function using something like an on/off switch
+Decorators allow you to tack on extra functionality to an already existing function
+They use @ operator and are placed on top of the original function
+
+@some_decorator
+def simple_func():
+	#Do some stuff
+	#Return something
+
+Passing a function within another function
+We can actually assign a function to variables and execute that function off that variable
+Functions are objects that can be actaully passed into other objects
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+GENERATORS	(YIELD/NEXT/ITER)
++++++++++++
+Generator function allows us to write a function that can send back a value and then later resume to pick up where it left off
+Generator function allows us to generate a sequence of values over time
+The main difference in syntax will be the use of YIELD statement
+
+When a generator function is compiled they become an object that supports an iteration protocol
+That means when they are called in your code, they actually dont return a value and then exit
+Generator functions will automatically suspend and resume their execution and state around the last point of value generation
+
+The advantage is that instead of having to compute an entire series of values upfront, 
+the generator computes one value waits until the next value is called for
+
+Example, range function doesnt produce an in-memory list for all values from start to stop.
+Instead it keeps track of last number and step size, to provide a flow of numbers
+If the user did need a list, they have to transform the generator to a list -> list(range(0,10))
+
+ITER function allows us to automatically iterate through a normal object. For example, we can call ITER function over a string
+and then only be able to call the NEXT function on it
+
+GENERATOR COMPREHENSION(parenthesis) in place of LIST COMPREHENSION(square brackets)
++++++++++++++++++++++++
+Python provides a sleek syntax for defining a simple generator in a single line of code; 
+this expression is known as a generator comprehension.
+
+Written in a long form, the pseudo-code for:
+	(<expression> for <var> in <iterable> if <condition>)
+
+is:
+	for <var> in <iterable>:
+    if bool(<condition>):
+        yield <expression>
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ADVANCED PYTHON MODULES
++++++++++++++++++++++++
+COLLECTIONS
+OS MODULE AND DATETIME
+MATH AND RANDOM
+PYTHON DEBUGGER
+TIMEIT
+REGULAR EXPRESSIONS
+UNZIPPING AND ZIPPING MODULES
+
+COLLECTIONS
++++++++++++
+Built-in base Python and implements specialized container types that are essentially alternatives to python's general purpose built-in containers
+
+COUNTER 
+	Specialized dictionary/tuple like objects. Count of each unique item in the list
+	Inside of it, ELEMENTS are stored as dictionary keys and COUNTS of elements are stored as values
+	from collections import Counter
+	mylist = [1,1,1,1,1,2,2,3,3,3,3,3,3,4,4]
+	Counter(mylist)	-> Counter({1:5, 2:2, 3:6, 4:2})	
+		-> Returns a specialized counter object that has now counted the instances for each unique item in that list
+			This works for Strings as well
+			Counter is technically a dictionary subclass where elements are stored as dicionary keys 
+			and the counts of objects are stored as values
+	
+	Common patterns when using counter object
+		sum(c.values())                 # total of all counts
+		c.clear()                       # reset all counts
+		list(c)                         # list unique elements
+		set(c)                          # convert to a set
+		dict(c)                         # convert to a regular dictionary
+		c.items()                       # convert to a list of (elem, cnt) pairs
+		Counter(dict(list_of_pairs))    # convert from a list of (elem, cnt) pairs
+		c.most_common()[:-n-1:-1]       # n least common elements
+		c += Counter()                  # remove zero and negative counts
+		
+DEFAULTDICT
+	defaultdict is a dictionary-like object which provides all methods provided by a dictionary 
+	but takes a first argument (default_factory) as a default data type for the dictionary. 
+	Using defaultdict is faster than doing the same using dict.set_default method.
+	A defaultdict will never raise a KeyError. Any key that does not exist gets the value returned by the default factory.
+	
+	normal_dict = {'a': 10}
+	normal_dict['a'] = 10
+	print(normal_dict['b'])	->	Normal dictionary will throw KeyError
+	
+	d = defaultdict(lambda:0) -> Default value of zero
+	d['CORRECT_KEY'] = '1'
+	d['WRONG_KEY'] -> This will not throw any keyerror. Instead it returns default value i.e. 0 in this case
+
+NAMEDTUPLE
+	Standard tuple uses numerical index to access its members
+		ex, t = (3,4,5)
+		t[2] = 5
+	
+	The Named tuple tries to improve upon a normal tuple by having named indices. 
+	Named Tuple assigns names as well as numerical index to each member
+	Similar to constructing a new object using Object Oriented Programming. Mix of OOP and Tuple
+	2 Parameters - Type Name(similar to class), Field Names(similar to attributes of class) passed as a list
+	
+		from collections import namedtuple
+
+		Human = namedtuple('Human', ['age', 'height', 'weight'])
+		vijay = Human(39, 172, 80)
+		type(vijay)	->	__main__.Human
+		print(vijay)
+		print(vijay.age)
+		print(vijay[2])
+		priya = Human(age='35', height=160, weight=65)
+		print(priya)			->		Human(age='35', height=160, weight=65)
+		print(type(priya))		->		<class '__main__.Human'>
+	
+	We construct the namedtuple by first passing the object type name (Human) and then passing a string with the variety of fields 
+	as a string with spaces between the field names. We can then call on the various attributes:
+	Accessing at index position i.e. vijay[0] is same as calling by attribute i.e.vijay.age
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SHUTIL and OS Module - Opening and Reading Files and Folders
+++++++++++++++++++++++
+Usecases
+	Navigate files and folders on the computer
+	Opening every file in a directory
+	Move files around, Delete files in computer
+
+pwd - present working directory	(only works with Jupier notebook)
+
+import os
+os.getcwd()		->	current working directory
+os.listdir()	->	lists all items in currrent working directory
+	['file_example.py', 'practice.txt']
+os.listdir('C:\\Users')
+
+import shutil
+shutil.move('practice.txt', 'myfolder\\practice.txt')	-> Programatically move a file from source to destination
+
+Deleting files - The OS Module provides 3 methods for deleing files
+	os.unlink(path)	-> Deletes a file at specified path
+	os.rmdir(path)	-> Deletes a folder(folder must be empty) at specified path
+	shutil.rmtree(path) ->	Removes all files and folders in the path. Cannot be reversed.
+	send2trash -> Outside module. Sends deleted files to the trash bin instead of permanently removing them
+		pip install send2trash
+		import 	send2trash
+
+os.walk()	->	Directory tree generator
+
+	for folder, sub_folders, files in os.walk(os.getcwd()):
+		print(f'Currently looking at Directory: {folder}')
+		for folder in sub_folders:
+			print(f'\tSub Directory: {folder}')
+		for file in files:
+			print(f'\tTop Level Files: {file}')
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DATETIME MODULE
++++++++++++++++
+import datetime
+mytime = datetime.time()	-> hour, minute, second, microsecond, tzinfo
+
+mytime = datetime.time(2,20)	
+mytime.minute -> 20
+mytime.hour -> 2
+print(mytime) -> 02:00:00
+mytime.microsecond -> 0
+
+mytime = datetime.time(13,20,1,20)
+print(mytime)	->	13:20:01.000020
+
+type(mytime)	->	dateime.time
+
+today = datetime.date.today()
+print(today)	-> Default European	-> 2020-06-12
+today.year	-> 2020
+today.month	-> 6
+today.day	-> 12
+
+today.ctime()	->	'Fri Jun 12 00:00:00 2020' -> Certain databases store time in this format
+
+datetime -> combines both date and time information -> year, month, day, hour, minute, second, microsecond, tzinfo
+
+from datetime import datetime
+mydatetime = datetime(2021,10,3,14,20,1)
+print(mydatetime)	->	2021-10-03 14:20:01
+mydatetime = mydatetime.replace(year=2020)
+print(mydatetime)	->	2020-10-03 14:20:01
+
+Simple arithmetic on date/datetime object
+	from datetime import date
+	date1 = date(2021,11,3)
+	date2 = date(2020,11,3)	
+	result = date1-date2	->	datetime.timedelta(365)
+	type(result)	->	datetime.timedelta
+	result.days	-> 365
+	
+	datetime1 = datetime(2021,11,3,22,0)
+	datetime2 = datetime(2020,11,3,12,0)	-> 1 year and 10 hours apart
+	datetime1 - datetime2	-> datetime.timedelta(365,36000)	->	i.e. 1 yr=365, 10hrs=36000
+	mydiff = datetime1 - datetime2
+	mydiff.seconds	-> 36000	-> Only the seconds including time
+	mydiff.total_seconds	-> 31572000.0	->Everything in seconds including date and time
+	
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MATH AND RANDOM MODULE
+++++++++++++++++++++++
+import math		-> basic mathematical functions such as trignometric, logarithmic, floor, ceiling
+
+value = 4.35
+math.floor(value)	-> 4
+math.ceil(value)	-> 5
+round(value)		-> 4	Built into Python itself
+math.pi				-> 3.14159...
+from math import pi
+	pi				-> 3.14159...
+math.e				-> 2.71828...
+math.inf
+math.nan
+
+NUMPY library - Specifically designed for numerical processesing much deeper than Python's built in module. 	
+
+math.e -> 2.71628...
+math.log(math.e) -> 1.0
+math.log(x,base) -> Returns the logarithm of X to the given base
+math.log(100,10) -> 2.0  i.e. 10 to the power of 2 gives 100
+
+Trignometric Functions
+math.sin(10) -> -0.54402...
+math.degrees(pi/2)	->	90.0
+math.radians(180)	-> 3.1415...
+
+Random Module	- Pseudo Random Number Generators
+Allows us to create random numbers and we can even set a SEED to produce the same random set every time
+Setting a SEED allows us to start from a seeded pseudorandom number generator, which means the same random numbers will
+show up in a series
+
+random.randint()	->	Return random integer in range [a,b] including both end points
+
+import random
+
+random.seed(101)		-> Seed number is completely arbitrary
+random.randit(0,100)	-> 74
+random.randit(0,100)	-> 24
+random.randit(0,100)	-> 69
+Using Seed, the same random numbers are generated
+
+mylist = list(range(0,20))	->	[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+random.choice(mylist)		->	16	i.e grab one item from the list
+grab multiple items from the list
+	-> Allow yourself to pick the same number more than once. Sampling with replacement
+		random.choices(population=mylist,k=10)	->	[4,4,5,13,4,19,1,3,1,15]	
+	-> Allow yourself to pick the same number ONLY once. Sampling without replacement
+		random.sample(population=mylist,k=10)	->	[4,7,5,13,1,19,2,3,14,15]
+
+random.shuffle(mylist)	->	Shuffle list inplace permanently
+random.uniform(a=0, b=100)	->	46.4105... Continuous/uniform distribution. Every number in range has same likelihood of being chosen.	 Floating point allowed	
+random.gauss(mu=0, sigma=1)	->	-0.8984...	Normal/Gaussian Distribution
+
+NUMPY - Powerful Library
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+PYTHON DEBUGGER
++++++++++++++++++
+print() -> default debugging option
+Python comes with a built-in debugger tool that allows you to interactively explore variables within mid-operation of your Python code
+x=[1,2,5]
+y = 2
+z = 3
+result = x+y	->		TypeError: can only concatenate list (not "int") to list
+
+Trace is essentially going to pause operations mid-script and then allow you to play with variables to understand whats going on
+
+import pdb
+x=[1,2,5]
+y = 2
+z = 3
+pdb.set_trace()		-> Allows you to explore and call variables at this point in time
+	(Pdb) x
+	[1, 2, 5]
+	(Pdb) y
+	2
+	(Pdb) z
+	3
+	(Pdb) q
+result = x+y
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+REGULAR EXPRESSIONS
++++++++++++++++++++
+Regular Expressions(regex) allow us to search for general patterns in text data. 
+ex: user@email.com	-> "text" + "@" + "text" + ".com"
+
+Python "re" library allows us to create specialized pattern strings and then search for matches within text
+Phone Number (555)-555-5555	->	Regex Pattern r"(\d\d\d)-\d\d\d-\d\d\d\d" can also be described using quantifiers as r"(\d{3})-\d{3}-\d{4}"
+
+import re
+text = "The agent's phone number is 444-555-6666. Call soon!"
+print('phone' in text)  # returns true
+
+'''
+re.search function takes a pattern, search the text and returns the first match object. 
+And if no pattern is found, none is returned
+If there are multiple matches in the string, re.search() would only get the first match
+re.findall() will find just the list all the matches indicating strings that matched
+re.finditer() iterates through the text and then returns each match object that's found
+'''
+pattern = "number"
+# <re.Match object; span=(18, 24), match='number'>
+print(re.search(pattern, text))
+match = re.search(pattern, text)
+print(match.span())  # (18, 24) -> returns the actual index location of the span
+print(match.start())  # 18 -> returns the starting index of the span
+print(match.end())  # 24 -> returns the ending index of the span
+
+pattern = "notexist"
+# None  -> We dont get back anything because there is no match
+print(re.search(pattern, text))
+
+text = "my phone once, my phone twice"
+pattern = "phone"
+matches = re.findall(pattern, text)
+print(matches)  # ['phone', 'phone'] -> returns the actual text that matched
+print(len(matches))  # 2 -> how many matches
+for match in matches:
+    print(match)
+for match in re.finditer(pattern, text):  # iterates through the match object
+    # first itertion -> <re.Match object; span=(3, 8), match='phone'>
+    # second iteration -> <re.Match object; span=(18, 23), match='phone'>
+    print(match)
+    print(match.span())  # returns the actual index location of the span
+    print(match.group())  # returns the actual text that matched
+
+
+CHARACTER IDENTIFIERS
+Character	Description			Example Pattern Code	Example Match
+\d			A digit				file_\d\d				file_25
+\w			Alphanumeric		\w-\w\w\w				A-b_1
+\s			White space			a\sb\sc					a b c
+\D			A non digit			\D\D\D					ABC
+\W			Non-alphanumeric	\W\W\W\W\W				*-+=)
+\S			Non-whitespace		\S\S\S\S				Yoyo
+
+QUANTIFIER
+Character	Description					Example	Pattern Code	Example Match
++			Occurs one or more times	Version \w-\w+			Version A-b1_1
+{3}			Occurs exactly 3 times		\D{3}					abc
+{2,4}		Occurs 2 to 4 times			\d{2,4}					123
+{3,}		Occurs 3 or more			\w{3,}					anycharacters
+\*			Occurs zero or more times	A\*B\*C*				AAACC
+?			Once or none				plurals?				plural
+
+QUANTIFIER
+Quantifier is appended immediately after the character identifier
+We can use quantifiers to indicate repitition of the same character
+	
+	quantified_phone_pattern = r"\d{3}-\d{3}-\d{4}"
+	phone_match = re.search(quantified_phone_pattern, text)
+	print(phone_match)  # <re.Match object; span=(19, 31), match='405-443-2343'>
+
+COMPILE & GROUP
+We can use GROUP for any general tasks that involves grouping together regular expressions 
+	and that allows us to later break them down
+COMPILE - compiles together different regular expression pattern codes using parenthesis. 
+    A parenthesis indicate group or pattern	
+It takes multiple pattern codes and each pattern code is seperated with parenthesis as a group 
+	and it compiles them into a single expression
+Later you could call the groupings individually	
+
+	compiled_phone_pattern = re.compile(r"(\d{3})-(\d{3})-(\d{4})")
+	phone_match = re.search(compiled_phone_pattern, text)
+	print(phone_match)  # <re.Match object; span=(19, 31), match='405-443-2343'>
+	print(phone_match.group())  # 405-443-2343
+	print(phone_match.group(1))  # 405
+	print(phone_match.group(2))  # 443
+	print(phone_match.group(3))  # 2343
+	# print(phone_match.group(4)) # Results in IndexError: no such group
+
+WILDCARD
+'''
+Wildcard acts as a placement that will match any character
+'''
+import re
+# <re.Match object; span=(4, 7), match='dog'>
+print(re.search(r'cat|dog', "The dog is here"))
+# wildcard period(.) meaning anything here
+# ['cat', 'hat', 'lat']
+print(re.findall(r'.at', 'The cat with the hat splat there'))
+# wildcard caret(^) meaning starts with
+# ['1']
+print(re.findall(r'^\d', '1 is a number'))
+# wildcard dollar($) meaning ends with
+# ['2']
+print(re.findall(r'\d$', 'The number is 2'))
+# EXCLUSION - wildcard caret(^) used in conjunction with square brackets[]
+phrase = 'There are 3 cases in 4 cities since 2 days'
+exclude_pattern = r'[^\d]+'
+# ['There are ', ' cases in ', ' cities since ', ' days']
+print(re.findall(exclude_pattern, phrase))
+phrase = 'There are 3 cases in 4 cities since 2 days'
+exclude_pattern = r'[^\d\s]+'
+# ['There', 'are', 'cases', 'in', 'cities', 'since', 'days']
+print(re.findall(exclude_pattern, phrase))
+punctuation_phrase = 'This is a string! But it has punctuation. How can we remove it?'
+exclude_pattern = r'[^!.?\s]+'
+# ['This', 'is', 'a', 'string', 'But', 'it', 'has', 'punctuation', 'How', 'can', 'we', 'remove', 'it']
+print(re.findall(exclude_pattern, phrase))
+sentence = re.findall(exclude_pattern, phrase)
+# This is a string But it has punctuation How can we remove it
+print(' '.join(sentence))
+hyphen_phrase = 'This sentence has some hyphen-words. Find them and collect them cow-boy!!'
+include_pattern = r'\w+-\w+'
+include_pattern_with_group = r'[\w]+-[\w]+'
+# ['hyphen-words', 'cow-boy']
+print(re.findall(include_pattern, hyphen_phrase))
+# ['hyphen-words', 'cow-boy']
+print(re.findall(include_pattern_with_group, hyphen_phrase))
+partial_match_phrase1 = 'Would you like to have lemontea'
+partial_match_phrase2 = 'Would you like to have gingertea'
+partial_match_phrase3 = 'Would you like to have greentea'
+include_pattern = r'(lemon|ginger|green)tea'
+# <re.Match object; span=(23, 31), match='lemontea'>
+print(re.search(include_pattern, partial_match_phrase1))
+# <re.Match object; span=(23, 32), match='gingertea'>
+print(re.search(include_pattern, partial_match_phrase2))
+# <re.Match object; span=(23, 31), match='greentea'>
+print(re.search(include_pattern, partial_match_phrase3))
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TIMING YOUR PYTHON CODE
++++++++++++++++++++++++
+Timing your code's performance
+	->	Simply tracking time elapsed
+	->	Using the timeit module
+	->	Special %%timeit 'magic' for jupiter notebook
+
+import time
+import timeit
+
+
+def get_default_array(num):
+    num_array = []
+    for index in range(num):
+        num_array.append(str(index))
+    return num_array
+
+
+def get_list_comprehension_array(num):
+    return [str(index) for index in range(num)]
+
+
+def get_mapped_array(num):
+    return list(map(str, range(num)))
+
+
+start_time = time.time()
+get_default_array(10000000)
+# print(get_default_array(1000000))
+end_time = time.time()
+print(end_time-start_time)
+start_time = time.time()
+get_list_comprehension_array(10000000)
+# print(get_list_comprehension_array(1000000))
+end_time = time.time()
+print(end_time-start_time)
+start_time = time.time()
+get_mapped_array(10000000)
+# print(get_mapped_array(1000000))
+end_time = time.time()
+print(end_time-start_time)
+'''
+timeit module
+'''
+print('using timeit module')
+stmt1 = '''
+get_default_array(100)
+'''
+
+setup1 = '''
+def get_default_array(num):
+    num_array = []
+    for index in range(num):
+        num_array.append(str(index))
+    return num_array
+'''
+print(timeit.timeit(stmt1, setup1, number=100000))
+
+stmt2 = '''
+get_list_comprehension_array(100)
+'''
+
+setup2 = '''
+def get_list_comprehension_array(num):
+    return [str(index) for index in range(num)]
+'''
+
+print(timeit.timeit(stmt2, setup2, number=100000))
+
+stmt3 = '''
+get_mapped_array(100)
+'''
+
+setup3 = '''
+def get_mapped_array(num):
+    return list(map(str, range(num)))
+'''
+
+print(timeit.timeit(stmt3, setup3, number=100000))
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ZIP/UNZIP FILES & FOLDERS - zipfile & shutil
++++++++++++++++++++++++
+
+'''
+Compresses a set of files into zip archive
+'''
+import zipfile
+
+f = open('file1.txt', 'w+')
+f.write('content')
+f.close()
+
+f = open('file2.txt', 'w+')
+f.write('content')
+f.close()
+
+compr_file = zipfile.ZipFile('compr_file.zip', 'w')
+compr_file.write('file1.txt', compress_type=zipfile.ZIP_DEFLATED)
+compr_file.write('file2.txt', compress_type=zipfile.ZIP_DEFLATED)
+compr_file.close()
+
+
+'''
+Extracts a zip archive into target location
+'''
+import zipfile
+compr_file = zipfile.ZipFile('compr_file.zip', 'r')
+compr_file.extractall('folder')
+compr_file.close()
+
+
+'''
+Compresses a folder into zip archive
+'''
+import shutil
+
+shutil.make_archive(base_name='shutil_compr_folder',
+                    format='zip', root_dir='folder')
+
+shutil.unpack_archive(filename='shutil_compr_folder.zip',
+                      extract_dir='shutil_extract_folder', format='zip')
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+WEB SCRAPING
+++++++++++++
+Web Scraping is a general term for techniques involving automating the gathering of data, downloading images from a website
+BEAUTIFULSOUP, LXML and REQUESTS external libraries are used to web scrape with Python. 
+LXML - Engine that parses the HTML text
+BEAUTIFUL SOUP - Uses LXML on the backend to go through the HTML document and figure out the details of the document
+
+pip install -> command line
+	pip install requests
+	pip install lxml
+	pip install bs4
+conda install -> anaconda distribution
+
++++++++++++++++++++++++
+soup.select('div')	->	All elements with the <div> tag
+soup.select('#some_id')	->	The HTML element containing the id attribute of some_id
+soup.select('.notice')	->	All the HTML elements with the CSS class named notice
+soup.select('div span')	->	Any elements named <span> that are within an element named <div>
+soup.select('div > span')	->	Any elements named <span> that are directly within an element named <div>, with no other element in between
+
+Inspect particular element of the page and grab the class
+BeautifulSoup can scan apage, locate the image tag and grab the URLs. Then we can download the URLs as images and write them to the computer.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+WORKING WITH IMAGES
++++++++++++++++++++
+pillow.readthedocs.io
+pip install pillow
+Open / Save images
+Interact with Images - Grab section of image, overlap of one image with another, have transparency in image
+
+PILLOW library  is a fork of PIL(Python Imaging Library) with easy to use function calls
+
+from PIL import Image	# Import
+img = Image.open('example.jpg')	# Opening image
+print(type(img))    # <class 'PIL.JpegImagePlugin.JpegImageFile'>
+print(img.size)  # (1993, 1257)
+print(img.filename)  # example.jpg
+print(img.format_description)   # JPEG (ISO 10918)
+img.crop((0, 0, 500, 500))	# Cropping an image
+
+# copy and paste
+Image1 = Image.open('purple.png')
+Image1copy = Image1.copy()
+print(Image1copy.size)
+Image2 = Image.open('blue_color.png')
+Image2copy = Image2.crop((0, 0, 50, 50)).copy()
+print(Image2copy.size)
+Image1copy.paste(Image2copy, (12, 12))
+Image1copy.save('remix.png')
+
+# resize an image
+Image.open('example.jpg').resize((1000, 500)).show()
+
+# rotate an image
+Image.open('example.jpg').rotate(90).show()
+
+Color Transparency - RGBA - Red Green Blue Alpha
+Range is from 0 to 255
+Alpha - 0(Transparent) 255(Opaque)
+
+# Color Transparency. Alpha range 0-255
+purple_img = Image.open('purple.png')
+red_img = Image.open('red_color.jpg')
+red_img_copy = red_img.copy()
+red_img_copy.putalpha(100)
+red_img_copy.show()
+red_img_copy.save('red_color_alpha.png')
+
+purple_img_copy = purple_img.copy()
+purple_img_copy.putalpha(100)
+purple_img_copy.show()
+purple_img_copy.save('purple_color_alpha.png')
+
+red_img.paste(im=purple_img_copy, box=(0, 0), mask=purple_img_copy)
+red_img.save('purple_red_alpha_remix.png')
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+PDFs AND SPREADSHEETS
+++++++++++++++++++++++
+Built in CSV module for Python, which allows us to grab columns, rows and values from a .csv file as well as write to a .csv file
+Ability to export into a CSV file
+
+Other libaries to consider:
+Pandas:
+	Full data anaysis library. Can work with almost any tabular data type
+	Run visualizations and analysis
+
+Openpyxl:
+	Designed specifically for Excel files
+	Retains a lot of Excel specific functionality
+	Supports Excel Formulas
+	python-excel.org tracks various other excel based python libraries
+
+Google Sheets Python API:
+	Direct Python interface for working with google spreadsheets
+	Allows you to directly make changes to the spreadsheets hosted online
+	More complex syntax, but available in many programing languages
+
+import csv
+
+# open file
+data = open('example.csv', encoding='utf-8')
+# csv read
+csv_data = csv.reader(data)
+# reformat it into a python object i.e list of lists
+data_lines = list(csv_data)
+# total number of rows
+print(len(data_lines))
+# column header
+print(data_lines[0])
+# grab email of the tenth datapoint
+print(data_lines[10][3])
+# grab all emails
+all_emails = []
+for line in data_lines[1:]:
+    all_emails.append(line[3])
+print(len(all_emails))
+# ----------------------------------------
+# Saving to CSV file
+# new line is an empty string
+file_to_save = open('to_save_file2.csv', mode='w', newline='')
+# semicolon and tabs can also be provided as delimiters
+csv_writer = csv.writer(file_to_save, delimiter=',')
+csv_writer.writerow(['ch1', 'ch2', 'ch3'])
+csv_writer.writerows([['a', 'b', 'c'], ['d', 'e', 'f'], ['g', 'h', 'i']])
+file_to_save.close()
+# appending to an existing file
+file_to_save = open('to_save_file2.csv', mode='a', newline='')
+csv_writer = csv.writer(file_to_save, delimiter=',')
+csv_writer.writerows([['j', 'k', 'l'], ['m', 'n', 'o']])
+file_to_save.close()
+
+	
+UnicodeDecodeError: 'charmap' codec can't decode byte	-> Happens when reading @ symbols from email
+
+PDF - Portable Document Format. Developed by Adobe in 1990s
+PDFs mainly encapsulate and display a fixed layout flat document, there is no machine readable standard format, unlike CSV files
+Many PDFs are not machine readable through Python
+Addition to PDFs such as images, tables, format adjustments can also render a PDF unreadable by Python
+pyPDF2 library can be used to read and extract data from files
+
+pip install PyPDF2
+Limitation: We can only add a new PDF page with PyPDF2. We cannot edit an existing PDF page
+
+import PyPDF2
+
+# READING FROM PDF
+# rb stands for read binary
+f = open('Working_Business_Proposal.pdf', 'rb')
+pdf_reader = PyPDF2.PdfFileReader(f)
+print(type(pdf_reader))
+print(pdf_reader.numPages)
+page_one = pdf_reader.getPage(0)
+page_one_text = page_one.extractText()
+print(page_one_text)
+f.close()
+
+# GRAB A PAGE AND WRITING TO ANOTHER PDF
+f1 = open('Working_Business_Proposal.pdf', 'rb')
+pdf_reader = PyPDF2.PdfFileReader(f1)
+page_one = pdf_reader.getPage(0)
+f2 = open('Output_file.pdf', 'wb')
+pdf_writer = PyPDF2.PdfFileWriter()
+print(type(pdf_writer))
+pdf_writer.addPage(page_one)
+pdf_writer.write(f2)
+f2.close()
+
+# GRAB ALL TEXT FROM PDF
+f = open('Working_Business_Proposal.pdf', 'rb')
+pdf_reader = PyPDF2.PdfFileReader(f)
+print(type(pdf_reader))
+print(pdf_reader.numPages)
+all_page_texts = []
+for page_num in range(pdf_reader.numPages):
+    page = pdf_reader.getPage(page_num)
+    page_text = page.extractText()
+    all_page_texts.append(page_text)
+# Array of page texts for each page
+print(all_page_texts)
+f.close()
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EMAIL - smtplib (built in library)
+++++++++++++++++++++++++++++++++++
+How to send emails
+How to check emails for received messages
+
+Connect to an email server
+Confirm connection
+Setting protocol
+Logging on
+Sending the message
+
+SMTP - Simple Mail Transfer Protocol
+example, gmail has smtp.gmail.com
+For gmail, for security reasons, use app password instead of normal password
+This lets GMAIL know that the python script attempting to access your account is authorized by you
+
+SEND EMAIL
+import smtplib
+import getpass
+# 587 - TLS connection meaning its encrypted. Port 465 is SSL
+smtp_object = smtplib.SMTP('smtp.gmail.com', 587)
+# (250, b'smtp.gmail.com at your service, [183.82.28.15]\nSIZE 35882577\n8BITMIME\nSTARTTLS\nENHANCEDSTATUSCODES\nPIPELINING\nCHUNKING\nSMTPUTF8')
+print(smtp_object.ehlo())
+# (220, b'2.0.0 Ready to start TLS')
+print(smtp_object.starttls())
+# demonstrating masked input
+plain_text_password = input('What is your password?')
+masked_password = getpass.getpass('What is your (masked)password?')
+email = input('Email?')
+# provide app password here
+password = input('Password?')
+# (235, b'2.7.0 Accepted')
+print(smtp_object.login(email, password))
+from_address = email
+to_address = email
+subject = input('enter mail subject')
+message = input('enter message')
+msg = 'Subject: '+subject+'\n'+message
+smtp_object.send(msg)
+smtp_object.quit()
+
+RECEIVE EMAIL
+Built-in imaplib and email libraries
+imaplib library has a special syntax for searching your inbox
+
+we should be able to search for it using the specialized syntax of IMAP. Here are the different search keys you can use:
+	'BEFORE date'	Returns all messages before the date. Date must be formatted as 01-Nov-2000.
+	'ON date'	Returns all messages on the date. Date must be formatted as 01-Nov-2000.
+	'SINCE date'	Returns all messages after the date. Date must be formatted as 01-Nov-2000.
+	'FROM some_string '	Returns all from the sender in the string. String can be an email, for example 'FROM user@example.com' or just a string that may appear in the email, "FROM example"
+	'TO some_string'	Returns all outgoing email to the email in the string. String can be an email, for example 'FROM user@example.com' or just a string that may appear in the email, "FROM example"
+	'CC some_string' and/or 'BCC some_string'	Returns all messages in your email folder. Often there are size limits from imaplib. To change these use imaplib._MAXLINE = 100 , where 100 is whatever you want the limit to be.
+	'SUBJECT string','BODY string','TEXT "string with spaces"'	Returns all messages with the subject string or the string in the body of the email. If the string you are searching for has spaces in it, wrap it in double quotes.
+	'SEEN', 'UNSEEN'	Returns all messages that have been seen or unseen. (Also known as read or unread)
+	'ANSWERED', 'UNANSWERED'	Returns all messages that have been replied to or unreplied to.
+	'DELETED', 'UNDELETED'	Returns all messages that have been deleted or that have not been deleted.
+	
+import imaplib
+import getpass
+import email
+
+mail_var = imaplib.IMAP4_SSL('imap.gmail.com')
+email_addr = input('Email?')
+# provide app password here
+password = input('Password?')
+mail_var.login(email_addr, password)
+# ('OK', [b'(\\HasNoChildren) "/" "INBOX"', b'(\\HasChildren \\Noselect) "/" "[Gmail]"', b'(\\All \\HasNoChildren) "/" "[Gmail]/All Mail"', b'(\\Drafts \\HasNoChildren) "/" "[Gmail]/Drafts"', b'(\\HasNoChildren \\Important) "/" "[Gmail]/Important"', b'(\\HasNoChildren \\Sent) "/" "[Gmail]/Sent Mail"', b'(\\HasNoChildren \\Junk) "/" "[Gmail]/Spam"', b'(\\Flagged \\HasNoChildren) "/" "[Gmail]/Starred"', b'(\\HasNoChildren \\Trash) "/" "[Gmail]/Trash"'])
+print(mail_var.list())
+# ('OK', [b'50523'])
+print(mail_var.select('inbox'))
+typ, data = mail_var.search(None, 'SUBJECT "Hellow..."')
+# OK
+print(typ)
+# [b'50516']
+print(data)
+# typ, data = mail_var.fetch(data[0],"(RFC822)")
+result, email_data = mail_var.fetch(data[0], "(RFC822)")
+print(result)
+raw_email = email_data[0][1]
+raw_email_string = raw_email.decode('utf-8')
+print(raw_email_string)
+email_message = email.message_from_string(raw_email_string)
+for part in email_message.walk():
+    if part.get_content_type() == "text/plain":
+        body = part.get_payload(decode=True)
+        # Returns -> b'This is text!\r\n'
+        print(body)
+	
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ADVANCED PYTHON OBJECTS AND DATA STRUCTURES
++++++++++++++++++++++++++++++++++++++++++++
+ADVANCED NUMBERS
+
+# 0x100 -> Converts into hexadecimal representation of numbers
+print(hex(256))
+# 0b100000000 -> Converts into binary representation of numbers
+print(bin(256))
+# 16 -> Same as 2**4
+print(pow(2, 4))
+# 3 - absolute value
+print(abs(-3))
+# 4 - rounds the number to a given precision in decimal
+print(round(3.6))
+# 3.14
+print(round(3.141592, 2))
+
+ADVANCED STRINGS
+
+s = 'hello world'
+print(s.capitalize())
+print(s.upper())
+print(s.lower())
+# find the total count of O's
+print(s.count('o'))
+# find the first index of O
+print(s.find('o'))
+# Centres hello world within hyphens having total length of 20
+print(s.center(20, '-'))
+print('hello\tvijay'.expandtabs())
+# is alphanumeric
+print(s.isalnum())
+# is alphabetic
+print(s.isalpha())
+# is lowercase
+print(s.islower())
+# is whitespace
+print(s.isspace())
+# is title
+print(s.istitle())
+# is upper
+print(s.isupper())
+# is ends with d
+print(s.endswith('d'))
+# split at every occurance of character
+print('eastorwestindiaisthebest'.split('s'))
+# split at first occurance of character
+print('eastorwestindiaisthebest'.partition('s'))
+
+ADVANCED SETS
+
+s = set()
+s.add(1)
+s.add(1)
+s.add(2)
+# {1, 2}
+print(s)
+# clear elements from set
+s.clear()
+# set()
+print(s)
+s.add(2)
+s.add(3)
+s.add(3)
+# copy/clone a set
+sc = s.copy()
+s.add(4)
+# {2, 3}
+print(sc)
+# difference between 2 sets
+# {4}
+print(s.difference(sc))
+s1 = {'a', 'b', 'c', 'd', 'e'}
+s2 = {'d', 'e'}
+# returns the first set after removing all the elements found in the second one
+s1.difference_update(s2)
+# {'a', 'b', 'c'}
+print(s1)
+s = {1, 2, 3, 4}
+# discards an element if it is a member of the set, otherwise does nothing
+s.discard(3)
+# {1, 2, 4}
+print(s)
+s1 = {'a', 'b', 'c', 'd', 'e'}
+s2 = {'d', 'e'}
+# returns the common elements between 2 sets
+# {'e', 'd'}
+print(s1.intersection(s2))
+# updates the set with only the common elements, rest are discarded
+s1.intersection_update(s2)
+# {'e', 'd'}
+print(s1)
+# returns true if the elements between 2 sets have null intersection
+s1 = {1, 2, 3}
+s2 = {1, 2, 4}
+s3 = {5, 6, 7}
+# False
+print(s1.isdisjoint(s2))
+# True
+print(s1.isdisjoint(s3))
+s1 = {1, 2, 3}
+s2 = {1, 2}
+# True
+print(s2.issubset(s1))
+# True
+print(s1.issuperset(s2))
+# Returns the elements that is exactly in one of the sets
+# {3}
+print(s1.symmetric_difference(s2))
+s1 = {1, 2, 3}
+s2 = {1, 2, 4, 5}
+# returns the union of 2 sets
+# {1, 2, 3, 4, 5}
+print(s1.union(s2))
+# updates a set with a union of itself and others
+s1 = {1, 2, 3}
+s2 = {1, 2, 4, 5}
+s1.update(s2)
+# {1, 2, 3, 4, 5}
+print(s1)
+
+
+ADVANCED DICTIONARIES
+
+'''
+Similar to list comprehension, dictionary datatypes also support their own version of comprehension
+What if you want to assign keys that are not based on their values? zip can help
+'''
+# dictionary comprehension
+d = {x: x**2 for x in range(10)}
+# {0: 0, 1: 1, 2: 4, 3: 9, 4: 16, 5: 25, 6: 36, 7: 49, 8: 64, 9: 81}
+print(d)
+# dictionary comprehension with zip
+# {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7, 'i': 8, 'j': 9}
+d = {key: val for key, val in zip(
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'], range(10))}
+print(d)
+for item in d.items():
+    # ('a', 0)
+    # ('b', 1)...
+    print(item)
+for key in d.keys():
+    print(key)
+for value in d.values():
+    print(value)
+
+ADVANCED LISTS
+
+l = [1, 2, 3]
+l.append(4)
+print(l)
+# append adds the entire list to an element in itself i.e append just the entire iterable
+x = [1, 2, 3]
+y = [4, 5, 6]
+x.append(y)
+# [1, 2, 3, [4, 5, 6]]
+print(x)
+# extend will append each element in that iterable i.e. appends elements individually from that iterable
+x = [1, 2, 3]
+y = [4, 5, 6]
+x.extend(y)
+# [1, 2, 3, [4, 5, 6]]
+print(x)
+l = ['a', 'b', 'c', 'd', 'b']
+# counts how many times an object occurs in the list
+# 2
+print(l.count('b'))
+l = ['a', 'b', 'c', 'd']
+# 2nd index postion
+print(l.index('c'))
+# ValueError: 'e' is not in list
+# print(l.index('e'))
+# ['a', 'b', 'INSERTED', 'c', 'd']
+# insert takes in 2 arguments: insert(index,object) -> This method places the object at index supplied
+l.insert(2, 'INSERTED')
+print(l)
+# pops off the last element off the list. the change is permanent
+popped_elt = l.pop()
+# d
+print(popped_elt)
+# ['a', 'b', 'INSERTED', 'c']
+print(l)
+# you can also pass an index into pop
+popped_elt = l.pop(1)
+# b
+print(popped_elt)
+# ['a', 'INSERTED', 'c']
+print(l)
+l = ['a', 'b', 'c', 'd', 'b']
+# remove removes the first occurance of the value
+l.remove('b')
+# ['a', 'c', 'd', 'b']
+print(l)
+l = ['a', 'b', 'c', 'd']
+# reverses the elements in place. affects your list permanently
+l.reverse()
+# ['d', 'c', 'b', 'a']
+print(l)
+l = ['d', 'b', 'a', 'c']
+# sorts the elements in place. affects your list permanently
+l.sort()
+# ['a', 'b', 'c', 'd']
+print(l)
+
+EXERCISES
+
+# Convert 1024 to binary and hexadecimal representation
+num = 1024
+# 0x400
+print(hex(num))
+# 0b10000000000
+print(bin(num))
+# Round 5.23222 to two decimal places
+num = 5.23222
+# 5.23
+print(round(num, 2))
+# Check if every letter in the string s is lower case
+s = 'hello how are you Mary, are you feeling okay?'
+# False
+print(s.islower())
+# How many times does the letter 'w' show up in the string below
+s = 'twywywtwywbwhsjhwuwshshwuwwwjdjdid'
+# 12
+print(s.count('w'))
+# Find the elements in set1 that are not in set2
+set1 = {2, 3, 1, 5, 6, 8}
+set2 = {3, 1, 7, 5, 6, 8}
+# {2}
+print(set1.difference(set2))
+# Find all elements that are in either set
+# {1, 2, 3, 5, 6, 7, 8}
+print(set1.union(set2))
+# Create this dictionary: {0: 0, 1: 1, 2: 8, 3: 27, 4: 64} using a dictionary comprehension
+d = {num: num**3 for num in range(5)}
+# {0: 0, 1: 1, 2: 8, 3: 27, 4: 64}
+print(d)
+# Reverse the list below
+list1 = [1, 2, 3, 4]
+list1.reverse()
+# [4, 3, 2, 1]
+print(list1)
+list2 = [3, 4, 2, 5, 1]
+list2.sort()
+# [1, 2, 3, 4, 5]
+print(list2)
+	

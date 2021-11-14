@@ -12,3 +12,26 @@ https://git-scm.com/docs/git-diff
 https://www.atlassian.com/git/tutorials/saving-changes/git-diff
 https://www.freecodecamp.org/news/the-git-push-command-explained/
 https://medium.com/sourcelevel/7-git-best-practices-to-start-using-in-your-next-commit-f9dc54990e86
+
+MERGE
+FETCH / PULL
+TAGS
+DIFF
+STASH
+COLLABORATIVE WORKFLOWS
+REFLOGS
+COMMIT
+UNDO
+REBASE
+CUSTOM ALIAS
+BRANCH
+INTERACTIVE REBASING
+
++++++++++++++++++
+Free and Oper Source distributed version control system
+GIT alternatives are Subversion, Mercurial, CVS
+-> Track changes across multiple files
+-> Compare versions of a project
+-> Time 
+
+https://fb.watch/7wVuJkEihW/

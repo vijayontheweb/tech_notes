@@ -1,0 +1,194 @@
+OWASP
+INJECTION
+	select * from person where name ="vijay or 1=1" -> All rows are selected
+	Types of Injection - LDAP, Xmlpath, Log, OS command, SQL, XSS
+	SOLUTION
+	Use parameterized queries/prepared statement
+	Validate input from User against a whitelist
+	Have a safe list of characters
+
+BROKEN AUTHENTICATION AND SESSION MANAGEMENT
+	Protecting Session Management Assets like User credentials and Session Id
+	Session Id is vulnerable to sniffing
+	When you visit 3rd party site your current URL will go as referal URL in request header
+	USECASES
+    reusing session id
+	credential stuffing	- trying with known usernames and passwords
+	Automated attacks -trying with random usernames and passwords
+	Default username/passwords
+	Session Fixation Attack
+	User passwords are not stored by being properly hashed and salted
+	SOLUTIONS
+	multifactor authentication - software token/thumbprint/eyescan
+	password checking - proactively most commonly used password are checked
+	password complexity
+	limit failed logins
+	server side session id manager generate randomly
+	Session Mgt should meet Application Security Verification Standard(ASVS)
+	Append some random things to user names
+	Provide Less info on Authentication failure 
+	Autolog off on browser close
+	Use HTTPS
+	Dont use Basic authentication i.e encrypted user id and password
+	Not only set value, but also set domain on the cookies. set expiration date. set your cookies as secure. send cookies only to HTTPS websites
+
+
+INSUFFICIENT TRANSPORT LAYER SECURITY 
+	Things that can be compromised in non-secure request
+	SOLUTION
+	Make all your cookies as secure
+	Use only trusted certificates
+	When someone switches between secure and non-secure paths, terminate session and use new session ids
+
+SENSITIVE DATA EXPOSURE 
+	USECASES
+	Storing user id and passwords in plain-text
+	Though with TLS encryption, but using weak ciphers(weak algorithm, weak key generation, weak password hashing) attacker can forcibly 
+	downgrade the systems 
+	from HTTPS to HTTP
+	Rainbow table of pre-calculated hashes - known list of password crack
+	Break Crypto indirectly - steal keys, man-in-the-middle attack
+	SOLUTIONS
+	use one-way encryption. Never be able to decrypt and get the original text back
+	Use Salt - Generate some random characters(aka salt) and append to the original text and then encrypt
+	classify data
+	apply controls to data
+	encrypt data at rest or in transit
+	strong ciphers
+	password protection algorithms - bcrypt, scrypt, PBKDF2
+	possible use PFS(Perfect Forward Secrecy) and HSTS(HTTP Strict Transport Security)
+	Dont store sensitive data unless you have to absolutely have to store sensitive data
+
+XXE - XML External Entities (Injection Flaw)
+	Takes advantage of XML parsers that accidentally parses bad data
+	Asymmetric attack -> 1kb XML crunching upto 3 GB memory. Billion Laughs
+	SOLUTIONS
+	Disable XXE completely
+	Disable DTD Processing
+	Server side input validation
+	
+	SAST - Static Application System Testing aka Source code analysis tools
+	DAST - Dynamic Application System Testing
+	Web Application Firewall (WAF)
+
+BROKEN ACCESS CONTROL / MISSING FUNCTION LEVEL ACCESS CONTROL
+	Restricting users to certain functions and data
+	Authorization ex. normal user able to access 
+		webapp.com/admin_info		
+		webapp.com/acctinfo?acct=1234
+	SOLUTIONS
+	Implement proper authorization. Have well defined roles
+	Try to use something obscure rather than direct object references, so that its very difficult to predict URL of another account
+	Trusted Server side code
+	Deny privileges to normal user
+	Build access control one time and reuse them across application
+	rate limit access to privileged resources
+	provide least privilege to all by default
+
+SECURITY MISCONFIGURATION
+	Default Accounts, Unused Pages, Unpatched flaws, Unprotected files
+	Out of date software
+	Servers like apache, oracle will come with certain known vulnerabilities.
+	Security settings in servers/frameworks not set to secure values
+	SOLUTION
+	Delete all the default accounts
+	If you absolutely don't need certain features, you should turn it off, cos there could be a potential risk - minimal platform footprint
+	When building backend, make sure you don't overshare information. It could be a tipoff to attackers
+	All the latest security patches need to be applied
+	Have the same security measures across all environments - DEV/QA/Staging
+	Automatic scanning using DAST tools
+	repeatable hardening process - how do i harden a web application error handling 
+	all servers from security configuration perspective should have - same config
+	Security headers/directives - HSTS, HPXP, X-frame options
+	Process to deploy all new s/w updates and patches in a timely manner
+	
+CROSS SITE SCRIPTING(XSS)
+	Major cause is Invalid data coming from user/database/external services
+	Effects are steal your session cookies, page content rewrite, logging keystrokes
+	Client side code injection
+	Attacker infects a webapp with malicious script. when a victim accesses the webapp, the malicious script gets transmitted to victim
+	XSS flaws occur when an application updates a webpage with attacker controlled data without properly escaping that content or using
+	safe Javascript API
+	2 Types of XSS 
+		1)Stored - stored in db from ui. problem happens when info is shown to user at a later point
+		2)Reflective - take input from user and directly show it in browser 
+		Server XSS is easy. Client XSS difficult
+	SOLUTION
+	Use a modern browser that prevents XSS
+	Separate untrusted data from active browser content
+	Validate input data against a whitelist. Contextually Encode all the data i.e use &lt; instead of <
+	Prevent Server XSS -> Escaping input validation
+	Prevent Client XSS -> Avoid sending attacker controlled data to unsafe Javascript APIs
+	Auto Sanitization libraries - Antisamy / Java HTML Sanitizer project
+	Lookup Content Security Policy and XSS prevention cheatsheet
+
+CROSS SITE REQUEST FORGERY(CSRF)
+	Happens when user with an active session on a website tries to go to another website, which does some unauthorized operation
+		Reuse of an user's existing session from a banking website on a forum to fire unauthorized URL/AJAX request
+	Attackers create forged HTTP request and trick the vcitim into submitting them via. image tags, iframes,XSS. 
+		If user is authenticated, attack succeeds
+	SOLUTION
+	Detection of CSRF flaws can be done easily using Penetration testing/Code analysis. Use OWASP CSRF tester tool, CSRF Guard, CSRF Protector
+	Use "SameSite=Strict" flag on all cookies
+	#1 Generate a unpredictable unique token(called CSRF protection token) with every request, typically as a hidden form field
+		Unless you send that form field back, the next request will not be successfully executed
+	#2 Reauthenticate user when performing significant actions i.e. high volume transactions
+
+	
+INSECURE DESERIALIZATION 
+	when untrusted user input without validation is deserialized(byte stream -> object)
+	
+USING COMPONENTS WITH KNOWN VULNERABILITIES
+	Attackers identify a weak component through scanning or manual analysis
+	Known vulnerabilities such as
+		Struts for Apache Web Server
+		Java VM for Oracle DB Server
+		Heartbleed for TLS/SSL
+	SOLUTION
+	Continuous inventory of client/server. Ensure libraries are up to date
+	Download software components from trusted sources
+	Tools are available to help detect components with known vulnerabilities
+	plan, monitor, patch, config those components
+	Vulnerabilities reported to central clearing houses like 
+		CVE - Common Vulnerabilities and Exploits 	
+		NVD - National vulnerabilities database
+	Use approved list of software from your security team
+	Use Wrappers round your vulbnerable libraries
+
+INSUFFICIENT LOGGING AND MONITORING	i.e INSUFFICIENT ATTACK PROTECTION
+	i.e. Lacking ability to  detect, prevent, and respond to both manual and automated attacks
+	Attacker use tools like OWASP ZAP and SQL Map to detect vulnerabilities and possibly exploit them
+	Things to log - warnings, error messages, alert thresholds, login failures, server side validation failures
+	Store the log securely in a centralized logging system
+	SOLUTION
+	sufficient logging content - good format
+	integrity controls(checksum) to ensure that logging data is not manipulated/compromised
+	response plan - steps to take after a compromise is discovered. i.e Automatially block requests, IP addresses/range. 
+	Disable or monitor misbehaving user accounts
+	Shorten the time between a data breach and consequently discovering that data breach
+	Monitor the logs all the time(manually/auomatically)	
+	Discover patterns of multiple failed logins in a short amount of time
+	Use Technologies like WAF,RASP, OWASP AppSensor to detect and block attacks
+	Patch quickly
+
+UNVALIDATED REDIRECTS AND FORWARDS
+	URL Redirect to Hacker URL
+	SOLUTION
+	Have an internal mapping that does the redirect
+	Show message to the user that you are redirected to a particular page
+
+++++++++++++++++++++++++++++++++++++
+Useful Link	
+https://owasp.org/www-pdf-archive/OWASP_Top_10_-_2017_Release_Candidate1_English.pdf
+https://owasp.org/www-project-risk-assessment-framework/
+https://owasp.org/index.php/Threat_Risk_Modeling
+https://www.fairinstitute.org/fair-risk-management
+https://owasp.org/www-project-application-security-verification-standard/
+https://www.javadoc.io/doc/org.owasp.esapi/esapi/2.1.0.1/org/owasp/esapi/Authenticator.html
+https://wiki.owasp.org/index.php/OWASP_Guide_Project
+https://owasp.org/www-project-cheat-sheets/
+https://owasp.org/www-project-web-security-testing-guide/
+https://wiki.owasp.org/index.php/Category:OWASP_Code_Review_Project
+https://owasp.org/www-project-samm/
+
+	

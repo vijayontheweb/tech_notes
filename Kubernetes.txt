@@ -20,12 +20,17 @@ Commands
 	kubectl explain pods --recursive | grep envFrom -A3 -> Look up the different options on Pod Definition
 
 
+
+
+
 	kubectl get nodes
 	kubectl get pods
 	kubectl get pods -n kube-system
 	kubectl describe pod myapp-pod
 	kubectl get daemonset -n kube-system
 	kubectl run nginx --image nginx		-> This creates a deployment and not just a POD
+	kubectl run messaging --image=redis-alpine -l tier=msg	-> l stands for labels
+	kubectl expose pod <podname> --name <service name> --port <port number> --target-port <tgt port number> -> Expose a service on a port
 	kubectl create -f pod-definition.yml	->	
 	kubectl delete deployment nginx
 	
@@ -63,9 +68,11 @@ Commands
 	kubectl create -f pod-definition.yml
 	kubectl create -f pod-definition.yml --namespace=dev
 	
+	kubectl get nodes -o json > filename.json
     kubectl describe node centos1 | grep Taint    -> By default, Master node doesn't host any Pods and that is made possible from Taint
 	kubectl get events
 	kubectl logs <podname> --namespace=<namespace name>
+	kubectl logs -f --previous <podname>
 	
 	TAINTS & TOLERATIONS
 	Does any Taint exist on Node01? -> kubectl describe node Node01 | grep -i Taint
@@ -106,6 +113,9 @@ Commands
 	PV/PVC
 	To View Pod Logs -> kubectl exec webapp --cat /log/app.log
 	kubectl get persistentvolume --recursive | less
+
+	NAMESPACE
+	kubectl create ns <namespace name>
 
 Purpose of Kubernetes -> Host your application in the form of containers in an automated fashion so that you can easily deploy many instances 
 of your application as required and easily enable communication between different services within your application
@@ -2814,3 +2824,734 @@ systemctl daemon-reload
 systemctl restart kubelet
 ++++++++++++++++++
 Bring them under same namespace	
+
+INGRESS
+++++++++
+Using Ingress, we can perform all the loadbalancing, Authentication, SSL and URL based routing configurations
+layer 7 load balancer built-in to the kubernetes cluster that can be configured using native kubernetes primitives 
+The Ingress controllers have additional intelligence built into them to monitor the kubernetes cluster
+for new definitions or ingress resources and configure the nginx server accordingly.
+
+Current Reverse Proxy and Load balancing solutions -> NGINX, Traefik, HAProxy
+INGRESS CONTROLLER encapsulates these solutions and make them configurable using INGRESS RESOURCES
+Examples of Ingress Controllers are GCP HTTPS Loadbalancer(GCE), NGINX, Traefik, HAProxy, Contour, Istio
+ just like any other object in kubernetes.
+ 
+NGINX Ingress Controller components -> Deployment, Service, ConfigMap, Service Account with right permissions to access all of these objects 
+
+INGRESS RESOURCE -> A set of rules and configurations applied on the ingress controller.
+
+kubectl get deploy --all-namespaces
+kubectl edit ingress --namespace app-space
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2021-07-01T03:43:19Z"
+  generation: 1
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "934"
+  selfLink: /apis/extensions/v1beta1/namespaces/app-space/ingresses/ingress-wear-watch
+  uid: e4c1477e-7686-4a18-8d97-79aa61838f6a
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: wear-service
+          servicePort: 8080
+        path: /wear
+        pathType: ImplementationSpecific
+      - backend:
+          serviceName: video-service
+          servicePort: 8080
+        path: /stream
+        pathType: ImplementationSpecific
+status:
+  loadBalancer:
+    ingress:
+    - {}
+++++++++++++++++++
+SAMPLE SERVICE
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2021-07-01T04:35:25Z"
+  name: pay-service
+  namespace: critical-space
+  resourceVersion: "9284"
+  selfLink: /api/v1/namespaces/critical-space/services/pay-service
+  uid: 36056e2f-fd1e-4a7d-a364-48ef512eb7d0
+spec:
+  clusterIP: 10.99.45.241
+  ports:
+  - port: 8282
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: webapp-pay
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+++++++++++++++++++
+controlplane $ cat /var/answers/ingress-pay.yaml 
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: critical-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /pay
+        backend:
+          serviceName: pay-service
+          servicePort: 8282
++++++++++++++++++++++++++++++++++
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2021-07-01T04:30:05Z"
+  name: ingress-service
+  namespace: ingress-space
+  resourceVersion: "8342"
+  selfLink: /api/v1/namespaces/ingress-space/services/ingress-service
+  uid: aef9d6a7-6a07-4a0e-9ca5-f6b8eb300cd5
+spec:
+  clusterIP: 10.102.239.42
+  externalTrafficPolicy: Cluster
+  ports:
+  - name: http
+    nodePort: 30080
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  - name: https
+    nodePort: 32645
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  selector:
+    name: nginx-ingress
+  sessionAffinity: None
+  type: NodePort
+status:
+  loadBalancer: {}
+ +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ingress-controller.yaml
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ingress-controller
+  namespace: ingress-
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx-ingress
+  template:
+    metadata:
+      labels:
+        name: nginx-ingress
+    spec:
+      serviceAccountName: ingress-serviceaccount
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0
+          args:
+            - /nginx-ingress-controller
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --default-backend-service=app-space/default-http-backend
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+                containerPort: 80
+            - name: https
+              containerPort: 443 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NETWORKING
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Switching and Routing
+	Switching
+	Routing
+	Default Gateway
+
+DNS
+	DNS Configuration in Linux
+	CoreDNS
+	
+CNI
+Networking in Docker
+Networking configuration on Cluster Nodes
+POD networking concepts
+CNI in Kubernetes
+Service Networking
+Cluster DNS
+Network Loadbalancer
+Ingress
+
++++++++++++++++++
+ip link -> To LIST and MODIFY the INTERFACES on the host
+	[vagrant@master-node ~]$ ip link
+	2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+		link/ether 00:15:5d:37:a1:01 brd ff:ff:ff:ff:ff:ff
+
+ip addr -> To LIST IP ADDRESSES assigned to those INTERFACES
+	[vagrant@master-node ~]$ ip addr
+	2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+		link/ether 00:15:5d:37:a1:01 brd ff:ff:ff:ff:ff:ff
+		inet 172.17.153.185/28 brd 172.17.153.191 scope global noprefixroute dynamic eth0
+		   valid_lft 86137sec preferred_lft 86137sec
+ip addr add -> To SET IP ADDRESS on to that INTERFACE
+
+ip route -> To VIEW the ROUTING TABLE
+	Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+	default         192.168.2.1		0.0.0.0         UG    100    0        0 eth0
+	172.17.0.0      0.0.0.0         255.255.0.0     U     0      0        0 docker0
+
+ip route add -> To ADD entries into ROUTING TABLE
+
+cat /proc/sys/net/ipv4/ip_forward -> Command to check if IP FORWARDING is enabled on Host, if you are working with a HOST configured as ROUTE
+
+
+Machine A(192.168.1.10) eth0 <-> Switch(192.168.1.0) <-> eth0 Machine B(192.168.1.11)
+			
+			192.168.1.1 Router 192.168.2.1
+			
+Machine C(192.168.2.10) eth0 <-> Switch(192.168.2.0) <-> eth0 Machine D(192.168.2.11)
+
+Switch connects 2 hosts. Each host should have an interface(eth0) using which we connect to the switch
+Assign the systems with the ip address on the same network
+	ip addr add 192.168.1.10/24 dev eth0
+	ip addr add 192.168.1.11/24 dev eth0
+	
+How does a system in one network reach the other? Answer is ROUTER
+A Router helps to connect 2 networks together
+
+"route" command -> To see the system's routing table.It displays the kernel's routing table
+
+ip route add 192.168.2.0/24 via 192.168.1.1
+
+$ route
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+192.168.2.0		192.168.1.1		255.255.255.0	UG    0		 0      0   eth0
+
+DEFAULT GATEWAY
+	For any network that you don't know a route to use this router as the default gateway. 
+This way any request to any network outside of your existing network goes to this particular router.
+
+ip route add default via 192.168.2.1
+
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         192.168.2.1		0.0.0.0         UG    100    0        0 eth0
+This means that to access ANY(default) network, the default gateway is 192.168.2.1
+
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+172.17.0.0      0.0.0.0         255.255.0.0     U     0      0        0 docker0
+This means that to access 172.17.0.0 network, you dont need any gateway
+
+cat /proc/sys/net/ipv4/ip_forward -> Tells whether a host can forward packets from one interface to another
+default value of 0 means not possible. 1 means possible
+
+/etc/sysctl.conf
+net.ipv4.ip_forward = 1		-> This will persist the change across reboots
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+INGRESS
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+root@controlplane:~# cat ingress.yaml 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"networking.k8s.io/v1","kind":"Ingress","metadata":{"annotations":{"nginx.ingress.kubernetes.io/rewrite-target":"/","nginx.ingress.kubernetes.io/ssl-redirect":"false"},"creationTimestamp":"2021-08-11T03:28:43Z","generation":2,"managedFields":[{"apiVersion":"networking.k8s.io/v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{".":{},"f:nginx.ingress.kubernetes.io/rewrite-target":{},"f:nginx.ingress.kubernetes.io/ssl-redirect":{}}}},"manager":"kubectl-create","operation":"Update","time":"2021-08-11T03:28:43Z"},{"apiVersion":"extensions/v1beta1","fieldsType":"FieldsV1","fieldsV1":{"f:status":{"f:loadBalancer":{"f:ingress":{}}}},"manager":"nginx-ingress-controller","operation":"Update","time":"2021-08-11T03:30:03Z"},{"apiVersion":"networking.k8s.io/v1","fieldsType":"FieldsV1","fieldsV1":{"f:metadata":{"f:annotations":{"f:kubectl.kubernetes.io/last-applied-configuration":{}}},"f:spec":{"f:rules":{}}},"manager":"kubectl-client-side-apply","operation":"Update","time":"2021-08-11T03:42:03Z"}],"name":"ingress-wear-watch","namespace":"app-space","resourceVersion":"2041","uid":"180867f5-b4f4-4993-9030-415fd45b86e7"},"spec":{"rules":[{"http":{"paths":[{"backend":{"service":{"name":"wear-service","port":{"number":8080}}},"path":"/wear","pathType":"Prefix"},{"backend":{"service":{"name":"video-service","port":{"number":8080}}},"path":"/stream","pathType":"Prefix"},{"backend":{"service":{"name":"webapp-food","port":{"number":8080}}},"path":"/eat","pathType":"Prefix"}]}}]},"status":{"loadBalancer":{"ingress":[{}]}}}
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  creationTimestamp: "2021-08-11T03:28:43Z"
+  generation: 3
+  managedFields:
+  - apiVersion: networking.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          .: {}
+          f:nginx.ingress.kubernetes.io/rewrite-target: {}
+          f:nginx.ingress.kubernetes.io/ssl-redirect: {}
+    manager: kubectl-create
+    operation: Update
+    time: "2021-08-11T03:28:43Z"
+  - apiVersion: extensions/v1beta1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:status:
+        f:loadBalancer:
+          f:ingress: {}
+    manager: nginx-ingress-controller
+    operation: Update
+    time: "2021-08-11T03:30:03Z"
+  - apiVersion: networking.k8s.io/v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:metadata:
+        f:annotations:
+          f:kubectl.kubernetes.io/last-applied-configuration: {}
+      f:spec:
+        f:rules: {}
+    manager: kubectl-client-side-apply
+    operation: Update
+    time: "2021-08-11T03:42:03Z"
+  name: ingress-wear-watch
+  namespace: app-space
+  resourceVersion: "2499"
+  uid: 180867f5-b4f4-4993-9030-415fd45b86e7
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080
+        path: /wear
+        pathType: Prefix
+      - backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+        path: /stream
+        pathType: Prefix
+      - backend:
+          service:
+            name: webapp-food
+            port:
+              number: 8080
+        path: /eat
+        pathType: Prefix
+status:
+  loadBalancer:
+    ingress:
+    - {}
+	
+	
+TRIMMED VERSION
++++++++++++++++
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-resource
+  namespace: app-space
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /watch
+        pathType: Prefix
+        backend:
+          service:
+            name: video-service
+            port:
+              number: 8080
+      - path: /wear
+        pathType: Prefix
+        backend:
+          service:
+            name: wear-service
+            port:
+              number: 8080	
+	
+	
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+root@controlplane:~# cat svc.yaml 
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  name: ingress
+  namespace: ingress-space
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30080
+  selector:
+    name: nginx-ingress
+  type: NodePort
+status:
+  loadBalancer: {}	
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+root@controlplane:~# cat ingress-controller.yaml 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingress-controller
+  namespace: ingress-space
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nginx-ingress
+  template:
+    metadata:
+      labels:
+        name: nginx-ingress
+    spec:
+      serviceAccountName: ingress-serviceaccount
+      containers:
+        - name: nginx-ingress-controller
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0
+          args:
+            - /nginx-ingress-controller
+            - --configmap=$(POD_NAMESPACE)/nginx-configuration
+            - --default-backend-service=app-space/default-http-backend
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          ports:
+            - name: http
+              containerPort: 80
+            - name: https
+              containerPort: 443
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DESIGN KUBERNETES CLUSTER
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Upto 5000 nodes
+Upto 150000 pods in the cluster
+Upto 300000 total containers
+Upto 100 pods per node
+
+High Performance - SSD backed storage
+Multiple concurrent connections - Network based storage
+Persistent shared volumes for shared access across multiple pods
+Label nodes with specific disk types
+Use Node selectors to assign application to nodes with specific disk types
+
+Windows Laptop - Virtualization software like hyper-v or VMware workstation or Virtualbox
+Minikube vs Kubeadm
+
+Turnkey solutions:
+	Openshift - on-prem kubernetes platform by Redhat. Open source container application platform built on top of kubernetes
+	Cloud Foundry container runtime
+	VMware cloud PKS
+	Vagrant - provides a set of useful scripts to deploy a kubernetes cluster on different cloud service providers
+	
+Hosted Solutions:
+	Google Container Engine(GKE)
+	Openshift Online
+	Azure Kubernetes Service(AKS)
+	Amazon Elastic Container Service for Kubernetes(EKS)
+	
+Master Node - API Server, Scheduler, Controller Manager, ETCD
+Kubectl talks to API server(listening at port 6443) to get things done. How? 
+We point the kubectl utility to reach the master node at 6443 by configuring at kube-config file
+Master 1 -> https://master1:6443	
+Master 2 -> https://master2:6443
+With 2 masters, kubectl utlity points to loadbalancer instead of individual masters. i.e, https://load-balancer:6443
+We can use NGINX, HA-Proxy for this purpose
+
+Controller Manager and Scheduler will run in an active/standby mode as outlined below
+kube-controller-manager --leader-elect true
+						--leader-elect-lease-duration 15s
+						--leader-elect-renew-deadline 10s
+						--leader-elect-retry-period 2s
+						
+Stacked Control Plane Node Topology - ETCD within k8s Master
+External ETCD topology
+	cat /etc/systemd/system/kube-apiserver.service
+	[Service]
+	ExecStart=
+		--etcd-servers=https://<IP1>:2379,<IP2>:2379
+
+ETCD - Distributed Reliable kry value store that is simple, secure and fast		
+ETCD implements dostributed consensus using RAFT protocol
+Quorum = N/2+1 - Minimum number of nodes available for the cluster to function properly to make a successful write
+Fault Tolerance = Number of nodes you can afford to lose while keeping the cluster alive
+No of Instances = Quorum + Fault Tolerance
+	
+Instances	Quorum	FaultTolerance
+1			1		0
+2			2		0
+3			2		1
+4			3		1
+5			3		2
+6			4		2
+7			4		3
+
+
+ETCDCTL utility is used to store and retrieve data. v2/v3
+ etcdctl get / --prefix --keys-only
+
+Installing Kubernetes the Hard Way
+https://www.youtube.com/watch?v=uUupRagM7m0&list=PL2We04F3Y_41jYdadX55fdJplDvgNGENo	
+https://github.com/mmumshad/kubernetes-the-hard-way
+https://github.com/kodekloudhub/certified-kubernetes-administrator-course
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TROUBLESHOOTING CONTROL PLANE COMPONENTS
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+/usr/lib/systemd/system/kubelet.service.d/10-kubeadm.conf -> In MultiNodeInstaller
+
+/etc/kubernetes
+admin.conf  controller-manager.conf  kubelet.conf  manifests  pki  scheduler.conf
+/etc/kubernetes/manifests/ -> Static Pod Path default location
+etcd.yaml  kube-apiserver.yaml  kube-controller-manager.yaml  kube-scheduler.yaml
+
+Service Configuration for the kubelet service
+
+/var/lib/kubelet/config.yaml
+/etc/kubernetes/kubelet.conf
+Config Map -> kubelet-config-1.22
+
+Component responsible for managing deployments and replicaset - Kubernetes Controller Manager
+
+CHECK KUBELET Status
+service kubelet status
+sudo journalctl -u kubelet
+openssl X509 -in /var/lib/kubelet/worker-1.crt -text -> Check Certificate
+/usr/lib/systemd/system/kubelet.service
+
+FIXING A BROKEN CLUSTER
+kubectl cluster-info
+
+1.Check whether Kubelet process is running
+	ps -ef | grep -i kubelet
+2.Check the kubelet service
+	systemctl status kubelet.service
+	systemctl status kubelet.service -l -> To look for additional logs
+3.Restart kubelet service
+    systemctl daemon-reload
+	systemctl restart kubelet
+
+Network Troubleshooting
+-----------------------
+Network Plugin in kubernetes
+----------------------------
+Kubernetes uses CNI plugins to setup network. The kubelet is responsible for executing plugins using the following parameters in kubelet configuration.
+- cni-bin-dir:   Kubelet probes this directory for plugins on startup
+- network-plugin: The network plugin to use from cni-bin-dir. It must match the name reported by a plugin probed from the plugin directory.
+
+There are several plugins available and these are some.
+1. Weave Net:
+  These is the only plugin mentioned in the kubernetes documentation. To install,
+kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+You can find this in following documentation :                   https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/
+2. Flannel :
+   To install,
+  kubectl apply -f               https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+Note: As of now flannel does not support kubernetes network policies.
+3. Calico :
+   To install,
+   curl https://docs.projectcalico.org/manifests/calico.yaml -O
+  Apply the manifest using the following command.
+      kubectl apply -f calico.yaml
+   Calico is said to have most advanced cni network plugin.
+
+Note: If there are multiple CNI configuration files in the directory, the kubelet uses the configuration file that comes first by name in lexicographic order.
+
+DNS in Kubernetes
+-----------------
+Kubernetes uses CoreDNS. CoreDNS is a flexible, extensible DNS server that can serve as the Kubernetes cluster DNS.
+Memory and Pods
+In large scale Kubernetes clusters, CoreDNS's memory usage is predominantly affected by the number of Pods and Services in the cluster. Other factors include the size of the filled DNS answer cache, and the rate of queries received (QPS) per CoreDNS instance.
+Kubernetes resources for coreDNS are:   
+	a service account named coredns, cluster-roles named coredns and kube-dns, clusterrolebindings named coredns and kube-dns, a deployment named coredns, a configmap named coredns and a service named kube-dns.
+
+While analyzing the coreDNS deployment you can see that the the Corefile plugin consists of important configuration which is defined as a configmap. Port 53 is used for for DNS resolution.
+
+    kubernetes cluster.local in-addr.arpa ip6.arpa {
+       pods insecure
+       fallthrough in-addr.arpa ip6.arpa
+       ttl 30
+    }
+
+This is the backend to k8s for cluster.local and reverse domains.
+	proxy . /etc/resolv.conf
+Forward out of cluster domains directly to right authoritative DNS server.
+
+Troubleshooting issues related to coreDNS
+1. If you find CoreDNS pods in pending state first check network plugin is installed.
+2. coredns pods have CrashLoopBackOff or Error state
+If you have nodes that are running SELinux with an older version of Docker you might experience a scenario where the coredns pods are not starting. To solve that you can try one of the following options:
+	a)Upgrade to a newer version of Docker.
+	b)Disable SELinux.
+	c)Modify the coredns deployment to set allowPrivilegeEscalation to true:
+		kubectl -n kube-system get deployment coredns -o yaml | \
+		  sed 's/allowPrivilegeEscalation: false/allowPrivilegeEscalation: true/g' | \
+		  kubectl apply -f -
+	d)Another cause for CoreDNS to have CrashLoopBackOff is when a CoreDNS Pod deployed in Kubernetes detects a loop.
+
+There are many ways to work around this issue, some are listed here:
+
+Add the following to your kubelet config yaml: resolvConf: <path-to-your-real-resolv-conf-file> This flag tells kubelet to pass an alternate resolv.conf to Pods. For systems using systemd-resolved, /run/systemd/resolve/resolv.conf is typically the location of the "real" resolv.conf, although this can be different depending on your distribution.
+
+Disable the local DNS cache on host nodes, and restore /etc/resolv.conf to the original.
+
+A quick fix is to edit your Corefile, replacing forward . /etc/resolv.conf with the IP address of your upstream DNS, for example forward . 8.8.8.8. But this only fixes the issue for CoreDNS, kubelet will continue to forward the invalid resolv.conf to all default dnsPolicy Pods, leaving them unable to resolve DNS.
+
+3. If CoreDNS pods and the kube-dns service is working fine, check the kube-dns service has valid endpoints.
+              kubectl -n kube-system get ep kube-dns
+	If there are no endpoints for the service, inspect the service and make sure it uses the correct selectors and ports.
+Kube-Proxy
+---------
+kube-proxy is a network proxy that runs on each node in the cluster. kube-proxy maintains network rules on nodes. These network rules allow network communication to the Pods from network sessions inside or outside of the cluster.
+In a cluster configured with kubeadm, you can find kube-proxy as a daemonset. kubeproxy is responsible for watching services and endpoint associated with each service. When the client is going to connect to the service using the virtual IP the kubeproxy is responsible for sending traffic to actual pods.
+If you run a kubectl describe ds kube-proxy -n kube-system you can see that the kube-proxy binary runs with following command inside the kube-proxy container.
+    Command:
+      /usr/local/bin/kube-proxy
+      --config=/var/lib/kube-proxy/config.conf
+      --hostname-override=$(NODE_NAME)
+    So it fetches the configuration from a configuration file ie, /var/lib/kube-proxy/config.conf and we can override the hostname with the node name of at which the pod is running.
+In the config file we define the clusterCIDR, kubeproxy mode, ipvs, iptables, bindaddress, kube-config etc.
+Troubleshooting issues related to kube-proxy
+1. Check kube-proxy pod in the kube-system namespace is running.
+2. Check kube-proxy logs.
+3. Check configmap is correctly defined and the config file for running kube-proxy binary is correct.
+4. kube-config is defined in the config map.
+5. check kube-proxy is running inside the container
+
+	# netstat -plan | grep kube-proxy
+	tcp        0      0 0.0.0.0:30081           0.0.0.0:*               LISTEN      1/kube-proxy
+	tcp        0      0 127.0.0.1:10249         0.0.0.0:*               LISTEN      1/kube-proxy
+	tcp        0      0 172.17.0.12:33706       172.17.0.12:6443        ESTABLISHED 1/kube-proxy
+	tcp6       0      0 :::10256                :::*                    LISTEN      1/kube-proxy
+
+
+References:
+Debug Service issues:
+                     https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/
+DNS Troubleshooting:
+                     https://kubernetes.io/docs/tasks/administer-cluster/dns-debugging-resolution/
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Diagnosing a Kubernetes Control Plane Problem
+To see what is changing over time
+	kubetl get --watch
+	kubectl get -o json --watch
+
+
+HTTP 500 response from API Server -> Control Plane Issue
+All state is recorded to ETCD. ETCD tracks object history.
+ETCD compaction removes old versions
+	--etcd-compaction-interval duration	Default: 5m0s	-> The interval of compaction requests. 
+		If 0, the compaction request from API server is disabled.
+Estimating Storage Size
+	Space Used = # of Objects x Size per Object x Uncompacted revisions
+	etcd --quota-backend-bytes=<4GB default>
+	
+[zifuser@zifuatvm1 ~]$ kubectl get componentstatus
+Warning: v1 ComponentStatus is deprecated in v1.19+
+NAME                 STATUS      MESSAGE                                                                                       ERROR
+scheduler            Unhealthy   Get "http://127.0.0.1:10251/healthz": dial tcp 127.0.0.1:10251: connect: connection refused
+controller-manager   Healthy     ok
+etcd-0               Healthy     {"health":"true","reason":""}
+
+curl http://localhost:${COMPONENT_PORT}/healthz	
+
+curl http://localhost:${COMPONENT_PORT}/metrics
+
+/var/log
+					 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JSONPATH
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+$ -> Root Element of Dictionary
+$.car -> Get car details
+$.car.color -> Get car color
+$[3] -> Root element is an array. Get the fourth element
+$[0,3] -> Retrieve the first and fourth element of the list
+$[0:3] -> START:END -> Retrieve the first until fourth element(NOT INCLUDING FOURTH ELEMENT) of the list
+$[0:8:2] -> START:END:STEP -> Retrieve the first until eighth element of the list, with a step count of 2
+$[-1:0] or $[-1:] -> Get the last item in the list
+$[-3:] -> Get the last 3 items in the list
+
+$.car.wheels[1].model
+Get all numbers greater than 40
+	$[check if each item in the array > 40]
+	check if => ?()
+		$[?(each item in the array > 40)]
+	each item in the array => @
+		$[?(@ > 40)]
+
+		@ == 40
+		@ != 40
+		@ in [40,43,45]
+		@ nin [40,43,45]
+
+Get the model of the rear right wheel
+$.car.wheels[?(@.location == "rear-right")].model
+$.prizes[?(@.year == "2014" && @.category == "peace")].laureates[1]
+Note: All results of JSONPATH are encapsulated in an array
+
+WILDCARDS
+$.*.color -> Get all colors
+$[*].model -> Get all wheel's model
+
+JSONPATH IN KUBERNETES
+We can filter and format the output of kubectl command
+NOTE: $ is not mandatory. kubectl adds it
+
+kubectl get pods -o=jsonpath='{.items[0].spec.containers[0].image}'
+{"\n"} - NEW LINE
+{"\t"} - TAB
+
+kubectl get pods -o=jsonpath='{.items[*].metadata.name}{"\n"}{.items[*].status.capacity.cpu}'
+	-> This Gives
+			master	node01
+			4		4
+LOOPS USING RANGE
+	for each node
+		print node name \t print cpu count \n
+	end for
+
+	'{range .items[*]}
+		{.metadata.name}{"\t"}{.status.capacity.cpu}{"\n"}
+	  {end}'
+
+CUSTOM COLUMNS
+	kubectl get nodes -o=custom-columns=<COLUMN NAME>:<JSON PATH>
+	kubectl get nodes -o=custom-columns=NODE:.metadata.name,CPU:.status.capacity.cpu
+	
+SORT BY
+	kubectl get nodes --sort-by=.status.capacity.cpu
