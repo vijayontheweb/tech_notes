@@ -1,3 +1,6 @@
+https://github.com/dkhd/node-group-chat -> INTERESTING -> Build A Group-Chat App in 30 Lines Using Node.js
+https://ejs.co/ -> Embedded Java Script homepage
+
 Using BCrypt
 You know it’s insecure to store plain-text passwords in the database. That would make it easy for someone to find the passwords for all users. One improvement you can make over plain text is to use encryption. Encryption is still a bad way to store passwords, though, since having the key would allow you to simply decrypt the passwords. Therefore, encryption is a totally insecure way to store passwords.
 
@@ -15,3 +18,2030 @@ The 10 is the number of rounds you want it to pass over to generate the hash. Mo
 
 > require('bcrypt').compareSync('pass', '$2a$10$Jmo/n32ofSM9JvzfH0z6Me6TMyn6C/U9JhzDG8xhQC4ExHMG1jXz2')
 true
+
++++++++++++++++++++++++++++++++++++++++++
+INTRO TO NODE
++++++
+Installation
+Node REPL	
+Running Node Files
+Process
+argv
+File System Module
+
+WHAT IS NODE	->	Javascript Runtime for Server side code
+---
+ECMAScript Specification for BROWSER to follow the rules and implement the Javascript language
+Until recently we could only run Javascript code in a web browser. Node is a Javascript runtime that executes code outside of browser
+NODE is an implementation of Javascript that runs outside of the browser.So we can run Javascript code without opening a browser
+
+NODEJS vs CLIENT-SIDE JS
+	NOT INCLUDED IN NODE
+		Because Node doesn't run in a browser, we dont have access to all the browser "stuff" i.e. window, document, DOM API
+	NEW STUFF IN NODE
+		Built-in modules that help to interact with the OS and files/folders
+	IN JAVASCRIPT - GLOBAL SCOPE IS 'window'. WHEREAS IN NODE, GLOBAL SCOPE IS 'global'
+
+Use Cases of NODE
+	WEB SERVERS
+	COMMAND LINE TOOLS
+	NATIVE APPS(VSCODE)
+	VIDEO GAMES
+	DRONE SOFTWARE
+
+Unlike in the browser where the window is the global object(top level of everything, representing the browser window) where a 
+whole bunch of functions such as alerts are stored.
+In case of node, instead of WINDOW, we call the global scope as GLOBAL itself
+
+> global
+<ref *1> Object [global] {
+  global: [Circular *1],
+  clearInterval: [Function: clearInterval],
+  clearTimeout: [Function: clearTimeout],
+  setInterval: [Function: setInterval],
+  setTimeout: [Function: setTimeout] {
+    [Symbol(nodejs.util.promisify.custom)]: [Getter]
+  },
+  queueMicrotask: [Function: queueMicrotask],
+  performance: Performance {
+    nodeTiming: PerformanceNodeTiming {
+      name: 'node',
+      entryType: 'node',
+      startTime: 0,
+      duration: 679328.010100007,
+      nodeStart: 1.2558000087738037,
+      v8Start: 22.136500000953674,
+      bootstrapComplete: 69.0988000035286,
+      environment: 41.915800005197525,
+      loopStart: 121.5130999982357,
+      loopExit: -1,
+      idleTime: 679010.8446
+    },
+    timeOrigin: 1643042834169.897
+  },
+  clearImmediate: [Function: clearImmediate],
+  setImmediate: [Function: setImmediate] {
+    [Symbol(nodejs.util.promisify.custom)]: [Getter]
+  }
+}
+
+
+> setTimeout(() => {console.log('displayed after 5 seconds')}, 5000);
+Timeout {
+  _idleTimeout: 5000,
+  _idlePrev: [TimersList],
+  _idleNext: [TimersList],
+  _idleStart: 794652,
+  _onTimeout: [Function (anonymous)],
+  _timerArgs: undefined,
+  _repeat: null,
+  _destroyed: false,
+  [Symbol(refed)]: true,
+  [Symbol(kHasPrimitive)]: false,
+  [Symbol(asyncId)]: 71,
+  [Symbol(triggerId)]: 5
+}
+> displayed after 5 seconds
+
+
+NODE REPL
+---	
+REPL - Read Evaluate Print Loop
+	REPL is continuing to just listen and wait for us to type something in, so that it can evaluate it
+	
+On the command prompt, enter node, we enter into the NODE equivalent of the Javascript console in chrome
+
+PROCESS AND ARGV
+---
+NVM - NODE VERSION MANAGER	
+
+PROCESS - The process object is a "global" that provides information about, and control over, the current node.js process. As a global, it is always available to
+node.js applications without using require(). It can also be explicitly accessed using require()
+
+	const process = require('process');
+	process.cwd()	-> Current Working Directory
+	process.argv	->	The process.argv property returns an array containing the command-line arguments passed when the Node.js process was launched. 
+		process.argv.forEach((val, index) => {
+			console.log(`${index}: ${val}`);
+		});
+		
+		node argv.js one two=three four
+			0: C:\Program Files\nodejs\node.exe		->	Node Executable
+			1: C:\Users\vijayanand.s\Desktop\PLANNER2\LEARNING\WebDevelopment\Node\helloNode\argv.js	-> File that we are executing
+			2: one		->	onwards are command line arguments
+			3: two=three
+			4: four
+
+FILE SYSTEM MODULE
+---
+Unlike process, fs module is not available by default. we need to import it.
+The fs module enables interacting with the file system in a way modeled on standard POSIX functions.
+All file system operations have synchronous, callback, and promise-based forms, and are accessible using both CommonJS syntax and ES6 Modules (ESM).
+
+ASYNC vs SYNCHRONOUS VERSION
+The Synchronous version will block the entire process until they complete halting all connections
+
+const fs = require('fs');
+
+	//ASYNC
+	fs.mkdir('myDir', { recursive: true }, (err) => {
+		console.log('INSIDE MKDIR CALLBACK')
+		if (err) throw err;
+	});
+	//SYNC
+	fs.mkdirSync('myDirSync');
+	console.log('AFTER MKDIR CALLBACK')
+	
+In case of ASYNC, Output will be 
+AFTER MKDIR CALLBACK
+INSIDE MKDIR CALLBACK
+
+---
+const fs = require('fs');
+
+// Creates /tmp/a/apple, regardless of whether `/tmp` and /tmp/a exist.
+//ASYNC
+fs.mkdir('myDirAsync', { recursive: true }, (err) => {
+    console.log('INSIDE MKDIR CALLBACK')
+    if (err) throw err;
+});
+try {
+    //SYNC
+    fs.mkdirSync('myDirSync');
+    //USING ARGV
+    const folderName = process.argv[2] || 'defaultFolder';
+    fs.mkdirSync(folderName);
+    fs.writeFileSync(`${folderName}/index.html`, "Hello");
+    fs.writeFileSync(`${folderName}/app.js`, "Hello");
+    fs.writeFileSync(`${folderName}/app.css`, "Hello");
+    console.log('AFTER MKDIR CALLBACK')
+} catch (e) {
+    console.log('SOMETHING WENT WRONG');
+    console.log(e);
+}
+
++++++++++++++++++++++++++++++++++++++++++
+MODULES & NPM
++++++
+Module.Exports
+Requiring Modules
+Using NPM
+Installing Packages
+Creating Package.json files
+The Dad jokes package
+Rainbow package
+Figlet package
+Franc package
+
+MODULE.EXPORTS
+---
+Write reusable pieces that we can import and use in our own applications
+unless the reusable library is NOT EXPORTed, we cannot reuse that functionality using REQUIRE
+
+math.js
+	const add = (x, y) => x + y;
+	const PI = 3.14159;
+	const square = x => x * x;
+	module.exports = "HELLO!"
+app.js	
+	const math = require('./math');
+	console.log(math);
+
+node app.js	-> This will print "HELLO!"	
+
+math.js	-> contents of module.exports should be an object, where we are adding properties onto
+	module.exports.add = add
+	module.exports.PI = PI
+	module.exports.square = square
+	
+node app.js	-> Now we have access to entire math object
+{ add: [Function: add], PI: 3.14159, square: [Function: square] }
+
+EXPORTS -> shorter syntax
+	The exports variable is available within a module's file level scope, and is assigned the 
+	value of module.exports before the module is evaulated. It allows a shortcut, so that
+	module.exports.f = ... can be written more succintly as exports.f = ...
+	NOTE: Do not use exports as your variable name
+
+MATH.JS
+	const add = (x, y) => x + y;
+	const PI = 3.14159;
+	const square = x => x * x;
+
+	//SOLUTION #1
+	//The contents of module.exports is usually an object
+	//module.exports = "HELLO!"
+
+	//SOLUTION #2
+	//module.exports.add = add
+	//module.exports.PI = PI
+	//module.exports.square = square
+
+	//SOLUTION #3
+	//const math = {
+	//    PI: PI,
+	//    add: add,
+	//    square: square
+	//};
+	//module.exports = math
+
+	//SOLUTION #4
+	//module.exports.add = (x, y) => x + y;
+	//module.exports.PI = 3.14159;
+	//module.exports.square = x => x * x;
+
+	//SOLUTION #5
+	exports.add = (x, y) => x + y;
+	exports.PI = 3.14159;
+	exports.square = x => x * x;
+	
+APP.JS
+	const math = require('./math');
+	//we can also destructure modules as follows
+	const { PI, add, square } = require('./math');
+
+	console.log(math);
+
+	console.log(math.PI);
+	console.log(math.add(3, 2));
+	console.log(math.square(9));
+
+	//using destructured modules
+	console.log(PI);
+	console.log(add(3, 2));
+	console.log(square(9));
+	
+REQUIRING A DIRECTORY -> using index.js
+---
+We can actually require an entire directory. Whatever the file index.js exports is what we get when we require an entire directory	
+
+
+red.js
+	module.exports.red = {
+		type: 'color',
+		name: 'red'
+	}
+
+green.js
+	module.exports.green = {
+		type: 'color',
+		name: 'green'
+	}
+blue.js
+	module.exports.blue = {
+		type: 'color',
+		name: 'blue'
+	}
+index.js
+	const red = require('./red');
+	const green = require('./green');
+	const blue = require('./blue');
+
+	const allColors = [red, green, blue]
+
+	module.exports = allColors;	
+app.js	
+	const mydir = require('./mydir');
+	console.log(mydir);
+
+OUTPUT 
+[
+  { red: { type: 'color', name: 'red' } },
+  { green: { type: 'color', name: 'green' } },
+  { blue: { type: 'color', name: 'blue' } }
+]
+
+NPM(NODE PACKAGE MANAGER)	
+---
+NPM is really 2 things:
+	1) A library of thousands of packages published by other developers that we can use for free
+	2) A command line tool to easily install and manage those packages in our Node projects
+
+> npm
+npm <command>
+
+Usage:
+
+npm install        install all the dependencies in your project
+npm install <foo>  add the <foo> dependency to your project
+npm test           run this project's tests
+npm run <foo>      run the script named <foo>
+npm <command> -h   quick help on <command>
+npm -l             display usage info for all commands
+npm help <term>    search for help on <term> (in a browser)
+npm help npm       more involved overview (in a browser)
+
+All commands:
+
+    access, adduser, audit, bin, bugs, cache, ci, completion,
+    config, dedupe, deprecate, diff, dist-tag, docs, doctor,
+    edit, exec, explain, explore, find-dupes, fund, get, help,
+    hook, init, install, install-ci-test, install-test, link,
+    ll, login, logout, ls, org, outdated, owner, pack, ping,
+    pkg, prefix, profile, prune, publish, rebuild, repo,
+    restart, root, run-script, search, set, set-script,
+    shrinkwrap, star, stars, start, stop, team, test, token,
+    uninstall, unpublish, unstar, update, version, view, whoami
+
+Specify configs in the ini-formatted file:
+    C:\Users\vijayanand.s\.npmrc
+or on the command line via: npm <command> --key=value
+
+More configuration info: npm help config
+Configuration fields: npm help 7 config
+
+npm@8.1.2 C:\Program Files\nodejs\node_modules\npm
+
+INSTALLING PACKAGES - JOKES AND RAINBOW
+---
+npm install <packagename>
+npm i - alias for npm install
+node_modules - running the command will create a folder called NODE_MODULES. Under that folder we can see lot of dependencies for that one module
+package_lock.json - is a record for contents of node module
+
+ADDING GLOBAL PACKAGES	-> adds to the global node_modules directory
+---
+npm i -g cowsay		-> g is for global
+USAGE
+cowsay vijay anand
+ _____________
+< vijay anand >
+ -------------
+        \   ^__^
+         \  (oo)\_______
+            (__)\       )\/\
+                ||----w |
+                ||     ||
+
+NOTE: Generally we want to install locally using "npm install" command. In case you have installed globally and want to refer in 
+node source code, you need to additionally apply "npm link <package>" command.
+
+PACKAGE.JSON
+---
+We will put this file inside every node module that we create. It's not mandatory. But we will want it there as a best practice
+This is a very special file in NPM/NODE world that includes metadata about your project/package
+We typically keep this in the ROOT directory of our project
+If we have a package.json and if we install dependencies, those dependencies will automatically be added to the DEPENDENCY section of package.json
+This is useful for 2 reasons
+	1) Keeping a record of what we are using
+	2) For sharing this file with other people on a different machine, where we can actually go and download these dependencies
+
+npm init -> Using this creation utility command, an easy way to make package.json which will be filled out with whatever answers you enter
+		PS C:\Users\vijayanand.s\Desktop\PLANNER2\LEARNING\WebDevelopment\Node\helloPackageJson> npm init
+		This utility will walk you through creating a package.json file.
+		It only covers the most common items, and tries to guess sensible defaults.
+
+		See `npm help init` for definitive documentation on these fields
+		and exactly what they do.
+
+		Use `npm install <pkg>` afterwards to install a package and
+		save it as a dependency in the package.json file.
+
+		Press ^C at any time to quit.
+		package name: (hellopackagejson)
+		version: (1.0.0)
+		description:
+		entry point: (index.js)
+		test command:
+		git repository:
+		keywords:
+		author:
+		license: (ISC)
+		About to write to C:\Users\vijayanand.s\Desktop\WebDevelopment\Node\helloPackageJson\package.json:
+
+		{
+		  "name": "hellopackagejson",
+		  "version": "1.0.0",
+		  "description": "",
+		  "main": "index.js",
+		  "scripts": {
+			"test": "echo \"Error: no test specified\" && exit 1"
+		  },
+		  "author": "",
+		  "license": "ISC"
+		}
+
+
+		Is this OK? (yes) yes
+
+----
+NOTE: npm init -y	-> THIS WILL SKIP ALL THOSE QUESTIONS
+
+
+For Example
+package.json
+		{
+		  "name": "hellopackagejson",
+		  "version": "1.0.0",
+		  "description": "",
+		  "main": "index.js",
+		  "scripts": {
+			"test": "echo \"Error: no test specified\" && exit 1"
+		  },
+		  "author": "",
+		  "license": "ISC",
+		  "dependencies": {
+			"colors": "^1.4.0",
+			"figlet": "^1.5.2"
+		  }
+		}
+
+index.js
+		const figlet = require('figlet')
+		const colors = require('colors')
+
+		figlet('Hello World!!', function (err, data) {
+			if (err) {
+				console.log('Something went wrong...');
+				console.dir(err);
+				return;
+			}
+			console.log(data.america)
+		});		
+
+INSTALLING PROJECT DEPENDENCIES
+---	
+Dependencies could take up a lot of space
+Generally we do not share node_modules with anybody
+simply invoke the command "npm install" and it will lookup package.json and will install all dependencies 	
+
+++++++++++++++++++++++++++++++++++++++++
+CREATING SERVERS WITH EXPRESS
+++++++++++++++++
+EXPRESS IS A FRAMEWORK FOR WEB DEVELOPMENT FOR CREATING SERVERS USING NODE
+What are frameworks?
+Our first express app
+Routing Basics
+Path Parameters
+Working with Query Strings
+Nodemon
+
+EXPRESS
+---
+Express is a "Fast, unopinionated, minimalistic web framework for node js" It helps us build web apps
+Its just an NPM package which comes with a bunch of methods and optional plugins that we can use to build web applications and APIs
+Express helps us
+	Start up a server to listen for requests
+	Parse incoming requests
+	Match those requests to particular routes
+	Craft our HTTP response and associated content
+
+LIBRARY vs FRAMEWORK
+	When you use a library, you are in charge. You control the flow of your application code, and you decide when to use the library
+		- example Bootstrap, Axios
+With Framwork, the control is inverted. The framework is in charge, and you are merely a participant. The framework tells you where	
+to plug in the code
+
+npm install express 
+
+index.js
+	const express = require('express');
+	const app = express();
+	console.dir(app);
+	
+node index.js
+	<ref *1> [Function: app] {
+	  _events: [Object: null prototype] { mount: [Function: onmount] },
+	  _eventsCount: 1,
+	  _maxListeners: undefined,
+	  setMaxListeners: [Function: setMaxListeners],
+	  getMaxListeners: [Function: getMaxListeners],
+	  emit: [Function: emit],
+	  addListener: [Function: addListener],
+	  on: [Function: addListener],
+	  prependListener: [Function: prependListener],
+	  once: [Function: once],
+	  prependOnceListener: [Function: prependOnceListener],
+	  removeListener: [Function: removeListener],
+	  off: [Function: removeListener],
+	  removeAllListeners: [Function: removeAllListeners],
+	  listeners: [Function: listeners],
+	  rawListeners: [Function: rawListeners],
+	  listenerCount: [Function: listenerCount],
+	  eventNames: [Function: eventNames],
+	  init: [Function: init],
+	  defaultConfiguration: [Function: defaultConfiguration],
+	  lazyrouter: [Function: lazyrouter],
+	  handle: [Function: handle],
+	  use: [Function: use],
+	  route: [Function: route],
+	  engine: [Function: engine],
+	  param: [Function: param],
+	  set: [Function: set],
+	  path: [Function: path],
+	  enabled: [Function: enabled],
+	  disabled: [Function: disabled],
+	  enable: [Function: enable],
+	  disable: [Function: disable],
+	  acl: [Function (anonymous)],
+	  bind: [Function (anonymous)],
+	  checkout: [Function (anonymous)],
+	  connect: [Function (anonymous)],
+	  copy: [Function (anonymous)],
+	  delete: [Function (anonymous)],
+	  get: [Function (anonymous)],
+	  head: [Function (anonymous)],
+	  link: [Function (anonymous)],
+	  lock: [Function (anonymous)],
+	  'm-search': [Function (anonymous)],
+	  merge: [Function (anonymous)],
+	  mkactivity: [Function (anonymous)],
+	  mkcalendar: [Function (anonymous)],
+	  mkcol: [Function (anonymous)],
+	  move: [Function (anonymous)],
+	  notify: [Function (anonymous)],
+	  options: [Function (anonymous)],
+	  patch: [Function (anonymous)],
+	  post: [Function (anonymous)],
+	  propfind: [Function (anonymous)],
+	  proppatch: [Function (anonymous)],
+	  purge: [Function (anonymous)],
+	  put: [Function (anonymous)],
+	  rebind: [Function (anonymous)],
+	  report: [Function (anonymous)],
+	  search: [Function (anonymous)],
+	  source: [Function (anonymous)],
+	  subscribe: [Function (anonymous)],
+	  trace: [Function (anonymous)],
+	  unbind: [Function (anonymous)],
+	  unlink: [Function (anonymous)],
+	  unlock: [Function (anonymous)],
+	  unsubscribe: [Function (anonymous)],
+	  all: [Function: all],
+	  del: [Function (anonymous)],
+	  render: [Function: render],
+	  listen: [Function: listen],
+	  request: IncomingMessage { app: [Circular *1] },
+	  response: ServerResponse { app: [Circular *1] },
+	  cache: {},
+	  engines: {},
+	  settings: {
+		'x-powered-by': true,
+		etag: 'weak',
+		'etag fn': [Function: generateETag],
+		env: 'development',
+		'query parser': 'extended',
+		'query parser fn': [Function: parseExtendedQueryString],
+		'subdomain offset': 2,
+		'trust proxy': false,
+		'trust proxy fn': [Function: trustNone],
+		view: [Function: View],
+		views: 'C:\\Users\\vijayanand.s\\WebDevelopment\\Node\\helloExpress\\views',
+		'jsonp callback name': 'callback'
+	  },
+	  locals: [Object: null prototype] {
+		settings: {
+		  'x-powered-by': true,
+		  etag: 'weak',
+		  'etag fn': [Function: generateETag],
+		  env: 'development',
+		  'query parser': 'extended',
+		  'query parser fn': [Function: parseExtendedQueryString],
+		  'subdomain offset': 2,
+		  'trust proxy': false,
+		  'trust proxy fn': [Function: trustNone],
+		  view: [Function: View],
+		  views: 'C:\\Users\\vijayanand.s\\WebDevelopment\\Node\\helloExpress\\views',       
+		  'jsonp callback name': 'callback'
+		}
+	  },
+	  mountpath: '/'
+	}
+---
+This app starts a server and listens on port 3000 for connections. The app responds with “Hello World!” for requests to the root URL (/) or route. 
+For every other path, it will respond with a 404 Not Found.
+
+const express = require('express');
+const app = express();
+console.dir(app);
+const port = 3000
+
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+
+REQUEST AND RESPONSE OBJECTS
+---
+On every incoming requests, we have access to 2 different parameters in this function that are automatically passed in
+REQUEST and RESPONSE
+These are objects made by Express and passed in to this callback
+The req object represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on.
+
+Request
+Properties
+	req.app
+	req.baseUrl
+	req.body
+	req.cookies
+	req.fresh
+	req.host
+	req.hostname
+	req.ip
+	req.ips
+	req.method
+	req.originalUrl
+	req.params
+	req.path
+	req.protocol
+	req.query
+	req.route
+	req.secure
+	req.signedCookies
+	req.stale
+	req.subdomains
+	req.xhr
+Methods
+	req.accepts()
+	req.acceptsCharsets()
+	req.acceptsEncodings()
+	req.acceptsLanguages()
+	req.get()
+	req.is()
+	req.param()
+	req.range()
+
+Response
+Properties
+	res.app
+	res.headersSent
+	res.locals
+Methods
+	res.append()
+	res.attachment()
+	res.cookie()
+	res.clearCookie()
+	res.download()
+	res.end()
+	res.format()
+	res.get()
+	res.json()
+	res.jsonp()
+	res.links()
+	res.location()
+	res.redirect()
+	res.render()
+	res.send()
+	res.sendFile()
+	res.sendStatus()
+	res.set()
+	res.status()
+	res.type()
+	res.vary()
+	
+res.send([body]) -> Sends the HTTP response.
+	res.send(Buffer.from('whoop'))
+	res.send({ some: 'json' })
+	res.send('<p>some html</p>')
+	res.status(404).send('Sorry, we cannot find that!')
+	res.status(500).send({ error: 'something blew up' })
+---	
+app.use((req, res) => {
+    //res.send('SENDING RESPONSE AS STRING');
+    //res.send('<h1>SENDING RESPONSE AS HTML<h1>');
+    res.send({ some: 'SENDING RESPONSE AS JAVASCRIPT OBJECT' });
+})	
+
+EXPRESS ROUTING BASICS
+---
+Routing refers to taking incoming requests and a path that is requested and matching that to some code in some response.
+
+app.get('/', (req, res) => {
+    res.send('WELCOME HOME!')
+})
+
+app.get('/dogs', (req, res) => {
+    res.send('DOGS SAY WOOF!')
+})
+
+app.get('/cats', (req, res) => {
+    res.send('CATS SAY MEOW!')
+})
+
+app.get('*', (req, res) => {
+    res.send('I DONT KNOW THAT PATH')
+})
+
+Note: this code only runs when an incoming request is exactly asking for cats and nothing else.
+
+EXPRESS PATH PARAMETERS
+---
+NOTE #1
+Rather than hardcoding each route, we define a generic pattern and the pattern would be something like the following
+	/section/:subsection	-> where subsection could be a variable or a pattern
+creating our route where inside of the path string we actually use a colon to designate something as a variable or as a path variable.	
+	app.get('/section/:subsection')
+define a pattern as /section and then Colon separate it.
+
+//subsection could be anything
+//for example, http://localhost:3000/section/whatever
+app.get('/section/:subsection', (req, res) => {
+    res.send('WELCOME TO SUBSECTION!')
+})
+
+So this will match the actual string section, but it will also match anything that follows this pattern.
+
+NOTE #2
+I may also need access to what that subsection is. Express adds a "params" property to the request object.
+We can extract that from params
+
+//for example, http://localhost:3000/section/whatever
+app.get('/section/:subsection', (req, res) => {
+    const params = req.params;
+    console.log(params);
+    res.send(`WELCOME TO ${params.subsection} SUBSECTION!`)
+})
+
+This returns -> 
+	{ subsection: 'whatever' }
+	WELCOME TO whatever SUBSECTION!
+
+app.get('/section/:subsection/x/y/z/:nestedsection', (req, res) => {
+    const params = req.params;
+    console.log(params);
+    const { subsection, nestedsection } = req.params;
+    res.send(`WELCOME TO ${nestedsection} OF ${subsection} SUBSECTION!`)
+})
+
+This returns -> 
+	{ subsection: 'whatever', nestedsection: 'deepunder' }
+	WELCOME TO deepunder OF whatever SUBSECTION!
+	
+WORKING WITH QUERY STRINGS
+---
+The request object has a particular property called Query, having key value pairs made or based upon the query string.
+
+//for example, http://localhost:3000/search?name=vijay&color=blue
+app.get('/search', (req, res) => {
+    console.dir(req.query);
+    const { name, color } = req.query;
+    res.send(`THE NAME IS ${name} AND COLOR IS ${color}`)
+})
+
+This returns ->
+THE NAME IS vijay AND COLOR IS blue	
+
+AUTO-RESTART WITH NODEMON	-> replace node with nodemon
+---
+By default, we have to restart our server any time we change our code
+However, there is a nice way of basically automatically restarting the server whenever we change our code base.
+install NODEMON globally. It is a command line tool, we basically just will run NODEMON and then our file instead of NODE
+and it will watch for changes of our files and then it'll restart the server whenever necessary, whenever it detects changes.
+
+npm i -g nodemon
+nodemon .\index.js
+
+Example app listening on port 3000
+[nodemon] restarting due to changes...
+[nodemon] starting `node .\index.js`
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CREATING DYNAMIC HTML WITH TEMPLATING
+++++++++++++++++++++++++++
+What is Templating?
+Configuring express for EJS
+Passing data to templates
+EJS loops and Conditionals
+Serving static assets
+Creating partials
+
+WHAT IS TEMPLATING?
+---
+Templating allows us to define a preset pattern for a web page, that we can dynamically modify
+For example, we could define a single "search" template that displays all the results for a given search term
+We dont know what the term is (or) how many results there are ahead of time
+The webpage is created on the fly
+
+EJS - Embedded Javascript Templating - Uses Javascript Syntax
+Handlebar
+Jade
+Pug
+Nunjucks
+
+CONFIGURING EXPRESS FOR EJS
+---
+When it's time to render ejs template, express takes our template and it's going to evaluate it in any places where it sees JavaScript.
+It will run the Javascript and will spit out HTML
+
+app.set('view engine','ejs');
+npm i ejs
+We dont need to require in this file. Instead by setting the view engine = ejs, express will require the package behind the scenes
+Also by default, when we create a new express app and we're using some view engine, Express is going to assume that our views templates 
+exist in a directory called "views".
+Instead of res.send, if you want to return a HTML, use res.render()
+
+using app.set(name, value) -> Assigns setting name to value. 
+
+VIEWS -> 
+	String or Array. 
+	A directory or an array of directories for the application's views. 
+	If an array, the views are looked up in the order they occur in the array.
+	process.cwd() + '/views'
+
+RENDER	
+	res.render(view [, locals] [, callback])
+	Renders a view and sends the rendered HTML string to the client. Optional parameters:
+		locals, an object whose properties define local variables for the view.
+		callback, a callback function. If provided, the method returns both the possible error and rendered string, but does not perform an automated response. 
+		When an error occurs, the method invokes next(err) internally.
+	NOTE:
+	The view argument is a string that is the file path of the view file to render. 
+	This can be an absolute path, or a path relative to the views setting. 
+	If the path does not contain a file extension, then the view engine setting determines the file extension. 
+	If the path does contain a file extension, then Express will load the module for the specified template engine 
+		(via require()) and render it using the loaded module’s __express function.	
+		
+SETTING THE VIEWS DIRECTORY
+---
+The default "views" directory that Express is looking for is only going to work if I am running my application 
+from within the same directory where my "views" folder is. 
+
+i.e node index.js -> will work fine for default "views"
+    node someDir/index.js -> will NOT work fine for default "views"
+	It will throw error as follows:
+	Error: Failed to lookup view "home" in views directory "C:\Users\vijayanand.s\WebDevelopment\Node\views"
+
+If we want the index.js to be run from anywhere, we need to change the "views" directory 
+	i.e the directory where index.js is located, slash views
+
+	app.set('views', path.join(__dirname, 'templateViews'));
+	WebDevelopment\Node> nodemon .\viewsDirTemplates\index.js
+
+process.cwd() -> Refers to the current working directory
+"path" module provides utilities for working with file and directory paths
+path.join - joins all given path segments together using the platform-specific separator as delimiter, then normalizesthe resulting path
+__dirname - double underscore dirname refer to the directory where the current file is located. Similar to dot(.) in linux 
+
+INDEX.JS
+	const express = require('express');
+	const path = require('path');
+	const app = express();
+	const port = 3000
+	//By default the templates will be available in views folder. Also.ejs extension not needed
+	app.set('view engine', 'ejs');
+	//If we want the index.js to be run from anywhere, we need to change the "views" directory 
+	//i.e the directory where index.js is located, slash views. It can be custom name too i.e templateViews
+	app.set('views', path.join(__dirname, 'templateViews'));
+
+	app.get('/', (req, res) => {
+		//res.render('views/home.ejs');
+		res.render('home');
+	})
+
+	app.listen(port, () => {
+		console.log("Listening on port 3000");
+	})
+	
+EJS INTERPOLATION SYNTAX
+---
+interpolating data - fill in the blanks	
+
+For example
+	<h1>Hello from <%= 2+3> home!</h1>
+
+EJS TAGS
+	<% 'Scriptlet' tag, for control-flow, no output
+	<%_ ‘Whitespace Slurping’ Scriptlet tag, strips all whitespace before it
+	<%= Outputs the value into the template (HTML escaped)
+	<%- Outputs the unescaped value into the template
+	<%# Comment tag, no execution, no output
+	<%% Outputs a literal '<%'
+	%> Plain ending tag
+	-%> Trim-mode ('newline slurp') tag, trims following newline
+	_%> ‘Whitespace Slurping’ ending tag, removes all whitespace after it
+	
+PASSING DATA TO TEMPLATES
+---
+INDEX.JS
+	app.get('/random', (req, res) => {
+		//res.render('views/random.ejs');
+		const randFromNode = Math.floor(Math.random() * 10) + 1;
+		//res.render('random', { randFromNode: randFromNode });
+		//If both key and value are same, we can combine into one 
+		res.render('random', { randFromNode });
+	})
+
+RANDOM.EJS
+	<h1>The random number from Node is <%=randFromNode%>	
+	
+SUBSECTION DATA PASSING
+---
+INDEX.JS
+	app.get('/section/:subsection/x/y/z/:nestedsection', (req, res) => {
+		const params = req.params;
+		const { subsection, nestedsection } = req.params;
+		res.render('random', { subsection, nestedsection });
+	})
+	
+RANDOM.EJS
+	<h1>WELCOME TO <%=nestedsection%> OF <%=subsection%> SUBSECTION!</h1>
+
+CONDITIONALS IN EJS
+---
+<% %> - Get rid of the equals sign that will allow us to embed Javascript without the result actually being added into the template
+
+    <h3>
+        <% if(randFromNode%2===0) {%>
+            The random number from Node is EVEN
+            <%}else{%>
+                The random number from Node is ODD
+                <%}%>
+    </h3>
+    <h3>
+        The random number from Node is <%= randFromNode%2===0?'EVEN':'ODD' %>
+    </h3>
+	
+LOOPS IN EJS
+---	
+INDEX.JS
+	const family = ['vijay', 'priya', 'gautham', 'meenu', 'nimi', 'selva'];
+	res.render('random', { family });
+RANDOM.JS
+    <h3>Family Members are:</h3>
+    <ul>
+        <%for(let member of family){%>
+            <li>
+                <%=member%>
+            </li>
+            <%}%>
+
+    </ul>
+
+EXAMPLE ON LOOPS & CONDITIONALS
+---
+INDEX.JS
+	const express = require('express');
+	const data = require('./data.json');
+	const app = express();
+	const port = 3000
+	app.set('view engine', 'ejs');
+
+	app.get('/section/:subsection', (req, res) => {
+		const { subsection } = req.params;
+		const subsectionData = data[subsection]
+		res.render('home', { ...subsectionData });//triple dots mean spread
+	})
+
+
+	app.listen(port, () => {
+		console.log("Listening on port 3000");
+	})
+HOME.JS
+	<body>
+		<p>Name:<%=name%>
+		</p>
+		<p>Subscribers:<%=subscribers%>
+		</p>
+		<p>Description:<%=description%>
+		</p>
+		<ul>
+			<%for(let post of posts){%>
+				<li><b>Title</b> : <%=post.title%> - <b>Author</b> : <%=post.author%></li>
+				<%if(post.img){%>
+					<li><img src="<%=post.img%>" alt="" height="100px" width="100px"></li>
+				 <%}%>
+			<%}%>
+		</ul>
+	</body>
+
+SERVING STATIC FILES ON EXPRESS
+---
+EXPRESS.STATIC -> MIDDLEWARE
+To serve static files such as images, CSS, Javascript, font, images and logo use the express.static built-in middleware function on express. The function signature is
+	express.static(root[,options])
+	
+app.use(express.static('public'))	
+	Middleware that executes on every single time we have any request 
+	Its not a route. Doesn't care about the path, GET or POST request
+	That runs in between requests and response
+	Pass in the argument of the folder that we want to serve our assets from i.e public directory will be in the root dir of our application
+
+NOTE: For best results, use a reverse proxy cache to improve performance of serving static assets.
+
+Now, you can load the files that are in the public directory:
+
+http://localhost:3000/images/kitten.jpg
+http://localhost:3000/css/style.css
+http://localhost:3000/js/app.js
+http://localhost:3000/images/bg.png
+http://localhost:3000/hello.html
+
+To use multiple static assets directories, call the express.static middleware function multiple times:
+
+app.use(express.static('public'))
+app.use(express.static('files'))
+Express looks up the files in the order in which you set the static directories with the express.static middleware function.
+
+NOTE: For best results, use a reverse proxy cache to improve performance of serving static assets.	
+
+INDEX.JS
+	//To serve static files such as images, CSS, Javascript, font, images and logo
+	app.use(express.static(path.join(__dirname, 'public')));
+	//directory for EJS templates. Everything inside public directory will be accessible in EJS templates
+	app.set('views', path.join(__dirname, 'views'));
+
+PARTIALS( USING INCLUDES)
+---
+Way of including sub templates in other templates
+Common code that is duplicated can be consolidated into header, footer etc
+
+Includes are relative to the template with INCLUDE call(This requires the filename option). For example, if you have
+./views/users.ejs and ./views/user/show.ejs, you would use <%- include('user/show');%>
+
+The DASH means "Outputs the unescaped value into the template. Escaping means we are basically treating it as a string"
+In Short
+	EQUALS - Wont treat it as HTML
+	DASH - Treats it as HTML
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+DEFINING RESTFUL ROUTES
+++++++++++++++++++
+
+GET vs POST requests
+Parsing request body
+Method Override
+RESTful routing
+Hnadling post requests in Express
+Forms + Express
+
+GET vs POST
+---
+GET
+used to retrieve information
+Data is sent via. Query String
+Information is plainly visible in the URL
+Limited amount of data can be sent
+
+POST
+Used to post data to the server
+Used to write/create/update
+Data is sent via request body, not a query string
+Can send any form of data(JSON)
+
+DEFINING EXPRESS POST ROUTES
+---
+INDEX.JS
+	const express = require('express');
+	const app = new express();
+
+	app.get('/tacos', (req, res) => {
+		res.send('GET request invoked')
+	});
+
+	app.post('/tacos', (req, res) => {
+		res.send('POST request invoked')
+	});
+
+	app.listen(3000, () => {
+		console.log('Listening on port 3000');
+	});
+
+PARSING THE REQUEST BODY
+---
+req.body
+	Contains key value pairs of data submitted in the request body
+	By default, it is undefined, and is populated when you use body-parsing middleware such as express.json() or express.urlencoded()
+
+Express needs to know how to treat them and understand what that information is in the body	
+
+INDEX.JS
+	const express = require('express');
+	const app = new express();
+
+	app.use(express.json())								//for parsing application/json
+	app.use(express.urlencoded({ extended: true }))		//for parsing application/x-www-form-urlencoded
+
+	app.get('/tacos', (req, res) => {
+		res.send('GET request invoked')
+	});
+
+	app.post('/tacos', (req, res) => {
+		//This will print as undefined unless you define app.use(express.json()) 
+		console.log(req.body)
+		res.send('POST request invoked')
+	});
+
+	app.listen(3000, () => {
+		console.log('Listening on port 3000');
+	});
+
+This will print
+	{ name: 'vijay', age: '40' }
+We can also destructure the JSON to extract the contents
+
+INTRO TO REST
+---
+REST - Representational State Transfer
+REST is an architectural style for distributed hypermedia systems
+Its basically a set of guidelines for how a client+server should communicate and perform CRUD operations on a given resource	
+RESTful system compiles with these rules of REST
+
+The main idea of REST is treating data on the server side as resources that can be CRUDed
+The most common way of approaching REST is in formatting the URLs and HTTP verbs in your application.
+RESOURCE - An entity that we are going to expose or provide access to via HTTP
+Every RESTful system has a uniform interface consisting of URL pattern matched with different HTTP verbs to expose full CRUD operations over HTTP
+Client Server architecture - Seperation of concerns
+Statelessness - Doesnt remember previous requests
+GET - Read
+POST - Create
+PATCH - Update
+DELETE - Delete 
+
+EXAMPLE : USING COMMMENTS AS RESOURCE
+Index - GET /comments - List all comments
+New - GET /comments/new - FORM to create a new comment
+Create - POST /comments - Create a new comment
+Show - GET /comments/:id - Get one comment(using id)
+Edit - GET /comments/:id/edit - FORM to edit specific comment(using id)
+Update - PATCH /comments/:id - Update one comment(using id)
+Destroy - DELETE /comments/:id - Delete one comment(using id)
+
+EXPRESS REDIRECTS
+---
+Problem: When we refresh a page on a post request, we get "Confirm form resubmission", which is problematic as it sends duplicate post requests
+IT RESUBMITS THE FORM AGAIN!
+
+SOLUTION: instead of rendering something from the POST route, we are going to redirect the user somewhere
+
+Redirects to the URL derived from the specified path, with specified status, a positive integer that corresponds to a HTTP Status Code. 
+If not specified, status defaults to "302 Found"
+
+NOTE: REDIRECT DEFAULT=302. ALL REDIRECT STATUS CODES STARTS WITH 3.. 
+
+res.redirect('/foo/bar')
+res.redirect('http://example.com')
+res.redirect(301,'http://example.com')
+res.redirect('../login')
+
+UUID PACKAGE
+---
+Creating a random UUID
+For creation of RFC4122 UUID
+Cryptographically strong random values
+const {v4: uuid} = require('uuid');
+uuidv4();
+
+REST UPDATE
+---
+Difference between PUT and REST
+	PUT requests completely updates an entire thing i.e. Replaces all current representation of the target resource with the request payload
+	PATCH requests is used to apply partial modification to the resource
+
+EXPRESS METHOD OVERRIDE
+---
+PROBLEM : HTML forms in our browser can only send GET/POST requests	
+			They cannot send a PUT/PATCH/DELETE request
+
+npm install method-override
+Lets us use HTTP verbs such as PUT or DELETE in places where the client doesn't support it(like a browser form)
+Even though it is a POST request from the form, express is going to treat it as a PATCH request
+
+EXAMPLE
+---
+INDEX.JS
+	const express = require('express');
+	const path = require('path');
+	const { v4: myUUID } = require('uuid');
+	var methodOverride = require('method-override');
+	const app = new express();
+	app.set('view engine', 'ejs');
+	const port = 3000
+
+
+	app.use(express.json())//for parsing application/json
+	app.use(express.urlencoded({ extended: true }))
+	app.set('views', path.join(__dirname, 'views'));
+	//Even though it is a POST request from the form, express is going to treat it as a PATCH request
+	//Override with POST having ?_method=PATCH
+	app.use(methodOverride('_method'));
+
+	let comments = [
+		{
+			id: myUUID(),
+			user: 'Vijay',
+			text: 'Hello, Howdy?'
+		},
+		{
+			id: myUUID(),
+			user: 'Priya',
+			text: 'Hi, Im fine'
+		}
+
+	];
+
+	//Index - GET /comments - List all comments
+	app.get('/comments', (req, res) => {
+		res.render('comments/index', { comments });
+	});
+
+	//New - GET /comments/new - FORM to create a new comment
+	app.get('/comments/new', (req, res) => {
+		res.render('comments/new');
+	});
+
+	//Create - POST /comments - Create a new comment
+	app.post('/comments', (req, res) => {
+		const { user, text } = req.body;
+		console.log(req.body);
+		comments.push({ user, text, id: myUUID() });
+		res.redirect('/comments');//by default, it is GET request
+	});
+
+	//Show - GET /comments/:id - Get one comment(using id)
+	app.get('/comments/:id', (req, res) => {
+		const { id } = req.params;
+		const comment = comments.find(c => c.id === id);
+		res.render(`comments/show`, { comment });
+	});
+
+	//Edit - GET /comments/:id/edit - FORM to edit specific comment(using id)
+	app.get('/comments/:id/edit', (req, res) => {
+		const { id } = req.params;
+		const comment = comments.find(c => c.id === id);
+		res.render(`comments/edit`, { comment });
+	});
+
+	//Update - PATCH /comments/:id - Update one comment(using id)
+	app.patch('/comments/:id', (req, res) => {
+		const { id } = req.params;
+		const newCommentText = req.body.text;
+		const currentComment = comments.find(c => c.id === id);
+		currentComment.text = newCommentText
+		res.render(`comments`, { comments });
+	});
+
+	//Destroy - DELETE / comments /: id - Delete one comment(using id)
+	app.delete('/comments/:id', (req, res) => {
+		const { id } = req.params;
+		const filteredComments = comments.filter(c => c.id !== id);
+		comments = filteredComments;
+		res.render(`comments`, { comments });
+	});
+
+	app.get('/tacos', (req, res) => {
+		res.send('GET request invoked')
+	});
+
+	app.post('/tacos', (req, res) => {
+		//This will print as undefined unless you define app.use(express.json()) 
+		console.log(req.body)
+		res.send('POST request invoked')
+	});
+
+	app.listen(port, () => {
+		console.log('Listening on port 3000');
+	});
+
+INDEX.EJS
+---
+	<body>
+		<h1>Comments:</h1>
+		<ul>
+			<%for(let comment of comments){%>
+				<li>
+					<b>
+						<%=comment.user%>
+					</b> - <%=comment.text%>
+						<a href="/comments/<%=comment.id%>">more</a>
+				</li>
+				<%}%>
+		</ul>
+		<br>
+		<a href="/comments/new">Create new comment</a>
+	</body>
+	
+SHOW.EJS
+---
+	<body>
+		<h1>Comment Id: <%=comment.id%>
+		</h1>
+		<article>
+			<b>
+				<%=comment.user%>
+			</b> - <%=comment.text%>
+		</article>
+		<a href="/comments">View Comments</a>
+		<a href="/comments/<%=comment.id%>/edit">Edit</a>
+		<form method="POST" action="/comments/<%=comment.id%>?_method=DELETE">
+			<button>Delete</button>
+		</form>
+	</body>
+	
+NEW.EJS
+---
+	<body>
+		<form action="/comments" method="post">
+			<section>
+				<label for="username">Name: </label>
+				<input id="username" type="text" placeholder="user name" name="user">
+			</section>
+			<br>
+			<section>
+				<label for="comment">Comment: </label>
+				<textarea id="comment" name="text" placeholder="comments" cols="30" rows="2"></textarea>
+			</section>
+			<button type="submit">Post</button>
+		</form>
+		<a href="/comments">View Comments</a>
+	</body>
+
+EDIT.EJS
+---
+	<body>
+		<!--Even though it is a POST request from the form, express is going to treat it as a DELETE request-->
+		<form action="/comments/<%=comment.id%>?_method=PATCH" method="post">
+			<section>
+				<label for="comment">Comment: </label>
+				<textarea id="comment" name="text" placeholder="comments" cols="30" rows="2"><%=comment.text%></textarea>
+			</section>
+			<button type="submit">Save</button>
+		</form>
+	</body>	
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+OUR FIRST DATABASE - MONGO DB
++++++++++++++++++++++++++
+Databases Basics
+SQL vs NOSQL
+Installation
+Mongo Shell
+Mongo Inserts
+Mongo Updates
+Mongo Deletes
+Mongo Querying/Finding
+
+DATABASE BASICS
+---
+Mongo is a document database, which we can use to store and retrieve complex data from
+It is commonly used in combination with Node
+
+SQL vs NOSQL
+---
+SQL are relational DB. We pre-define a schema of tables before we insert anything
+	MySQL, Postgres, SQLite, Oracle, Microsoft SQL server
+NOSql databases do not use SQL. There are many types of NOSql databases including document, key-value and graph stores
+	MongoDB, CouchDB, Neo4j, Cassandra, Redis
+	
+WHY MONGO?
+---
+Mongo is very commonly used with Node and Express(MERN/MEAN stack)
+It plays particularly well with Javascript	
+
+MONGO SHELL
+---
+Actually a javascript shell
+	> "hello".toUpperCase()
+	HELLO
+
+Create new databases
+change security or adminstrative permissions
+
+>show dbs	-> list all databases
+> use animalShelter			-> create a new database
+switched to db animalShelter
+
+> db						-> It says i'm inside of animalShelter db
+animalShelter
+
+> show collections			-> Lists all the collections. A collection is a container for similar data
+
+
+BSON vs JSON
+---
+JSON - Text based. Not easy to compress. Doesn't support whole lot of datatypes i.e. String, Boolean, Number, Array
+BSON - Binary JSON - More compact version of JSON. Mongo stores it as binary i.e. Supports String, Boolean, Number, Integer, Float, Long, Decimal, Array, Date, Raw Binary
+
+MONGO INSERT
+---
+A Collection is a grouping of data in database
+We insert different pieces of data into Collections
+NOTE: If we insert something into a collection that doesnt exist, that collection will be made for us
+
+db.collection.insertOne()	->	Inserts a single document into a collection
+db.collection.insertMany()	->	Inserts multiple documents into a collection. Expects an array to be passed in
+db.collection.insert()		->	Inserts a single doc or multiple docs into a collection
+
+> db.dogs.insertOne({name:"Tommy",age:2,breed:"Labrador",isVaccinated:true})
+{
+        "acknowledged" : true,
+        "insertedId" : ObjectId("6201c30636c50eca83cf8431")
+}
+
+> show collections
+dogs
+
+> db.dogs.find()			-> Display the contents of dogs collection
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "Labrador", "isVaccinated" : true }
+
+"_id" is primary key automatically created by Mongo. It needs to be unique for every single element in this collection
+
+NOTE: We dont have to enforce any sort of consistent structure into a collection. We dont have to follow any format. We dont have any constraints set up.
+
+> db.dogs.insert([{name:"Jimmy",age:1,breed:"Dalmatian",isVaccinated:false},{name:"Amy",age:3,breed:"Golden Retriever",isVaccinated:true}])
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 2,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+		
+> db.dogs.find()
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "Labrador", "isVaccinated" : true }
+{ "_id" : ObjectId("6201cb3736c50eca83cf8432"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8434"), "name" : "Amy", "age" : 3, "breed" : "Golden Retriever", "isVaccinated" : true }		
+
+MONGO FIND
+---
+db.collection.find() IS SAME AS db.collection.find({})
+
+db.collection.find(query, projection)	->	Selects document in a collection or view and returns a cursor to the selected documents
+CURSOR - Pointer or reference to the results
+
+CASE SENSITIVE
+> db.dogs.find({breed:'Dalmatian'})
+{ "_id" : ObjectId("6201cb3736c50eca83cf8432"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false }
+
+FIND vs FINDONE
+	FINDONE returns actual document whereas FIND returns a cursor
+
+> db.dogs.findOne({breed:'Dalmatian'})
+{
+        "_id" : ObjectId("6201cb3736c50eca83cf8432"),
+        "name" : "Jimmy",
+        "age" : 1,
+        "breed" : "Dalmatian",
+        "isVaccinated" : false
+}	
+
+> db.dogs.find({breed:'Dalmatian',isVaccinated:false})
+{ "_id" : ObjectId("6201cb3736c50eca83cf8432"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false }
+
+MONGO UPDATE
+---
+db.collection.updateOne(<filter>,<update>,<options>)	-> Updates only the first thing that matches
+db.collection.updateMany(<filter>,<update>,<options>)	->	Updates all
+db.collection.replaceOne(<filter>,<update>,<options>)	-> Replaces the first matching document(completely) in the collection that matches the filter, 
+															using the replacement document
+
+The $set operator replaces the value of a field with the specified value. If the set field doesn't exist, it will be newly created
+The $set operator expression has the following form:
+	{	$set: {<field1>:<value1>, ...}	}
+To specify a <field> in an embedded document or in an array, use dot notation	
+
+> db.dogs.updateOne({name:'Tommy'},{$set:{age:2,breed:'alsatian'}})
+{ "acknowledged" : true, "matchedCount" : 1, "modifiedCount" : 1 }
+
+>  db.dogs.updateMany({isVaccinated: true},{$set:{isSafeToTakeOut: true}})
+{ "acknowledged" : true, "matchedCount" : 2, "modifiedCount" : 2 }
+> db.dogs.find()
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8433"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8434"), "name" : "Amy", "age" : 3, "breed" : "Golden Retriever", "isVaccinated" : true, "isSafeToTakeOut" : true }
+
+NOTE: To add current timestamp to a particular field 'myDate'
+> db.dogs.updateMany({},{$set:{country:'India'}, $currentDate:{myDate:true}})
+{ "acknowledged" : true, "matchedCount" : 4, "modifiedCount" : 4 }
+> db.dogs.find()
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8433"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8434"), "name" : "Amy", "age" : 3, "breed" : "Golden Retriever", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+
+db.collection.replaceOne{
+	<filter>,
+	<replacement>,
+	{
+		upsert:	<boolean>,
+		writeConcern: <document>,
+		collation: <document>,
+		hint: <document|string>
+	}
+}
+
+MONGO DELETE
+---
+db.collection.deleteMany()
+db.collection.deleteOne()
+
+Delete all documents from a collection	->	Pass an empty filter document
+	db.collection.deleteMany({})
+Delete multiple documents based on condition -> You can specify	criteria or filters hat identify the documents to delete.
+	The filters use the same stntax as read operations	i.e { <field1>:<value1>,...	}
+
+db.dogs.deleteOne({breed:'Dalmatian',isVaccinated:false})
+
+db.dogs.deleteMany({isVaccinated:false})
+
+ADDITIONAL MONGO OPERATORS
+---
+QUERYING NESTED COLLECTIONS
+> db.dogs.find()
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z"), "address" : { "city" : "chennai", "country" : "india" } }
+
+> db.dogs.find({'address.city':'chennai'})
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z"), "address" : { "city" : "chennai", "country" : "india" } }
+
+QUERY AND PROJECTION OPERATORS
+COMPARISION
+	$eq, $gt, $gte, $in(matches any value in specified array), $lt, $lte, $ne, $nen(matches none of the values specified in an array)
+	
+LOGICAL
+	$and, $not, $nor, $or
+ELEMENT 
+	$exists	-> Matches documents that has specified field
+	$type
+EVALUATION
+	$expr, $jsonschema, $mod, $regex, $text, $where
+GEOSPATIAL
+ARRAY
+BITWISE	
+
+GTE
+> db.dogs.find({age:{$gte:2}})
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8434"), "name" : "Amy", "age" : 3, "breed" : "Golden Retriever", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+
+IN
+> db.dogs.find({'breed': { $in:['Dalmatian','alsatian']} })
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z"), "address" : { "city" : "chennai", "country" : "india" } }
+{ "_id" : ObjectId("6201cb3736c50eca83cf8432"), "name" : "Jimmy", "age" : 1, "breed" : "Dalmatian", "isVaccinated" : false, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z") }
+
+OR
+> db.dogs.find({$or: [{age:{$gt:1}},{isVaccinated:true}]})
+{ "_id" : ObjectId("6201c30636c50eca83cf8431"), "name" : "Tommy", "age" : 2, "breed" : "alsatian", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z"), "address" : { "city" : "chennai", "country" : "india" } }
+{ "_id" : ObjectId("6201cb5436c50eca83cf8434"), "name" : "Amy", "age" : 3, "breed" : "Golden Retriever", "isVaccinated" : true, "isSafeToTakeOut" : true, "country" : "India", "myDate" : ISODate("2022-02-08T04:58:02.896Z"), "address" : { "city" : "chennai", "country" : "india" } }
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CONNECTING TO MONGO WITH MONGOOSE
++++++++++++++++++++++++
+The role of ORM/ODMs
+Connecting Mongoose to Mongo
+Defining a model
+Mongoose CRUD
+Schema Constraints
+Model Instance and Static methods
+Mongoose Middleware
+Mongoose Virtuals
+
+WHAT IS MONGOOSE
+---
+mongoosejs.com
+ODM - Object Data Mapper / Object Document Mapper
+ODMs like Mongoose maps documents coming from a database into usable Javascript objects
+
+Mongoose provides ways for us to model out our application data and define a schema. 
+It offers easy ways to validate data and build complex queries from the comfort of JS
+
+	const mongoose = require('mongoose');
+	mongoose.connect('mongodb://localhost:27017/test');
+	const Cat = mongoose.model('Cat', { name: String });
+	const kitty = new Cat({ name: 'Zildjian' });
+	kitty.save().then(() => console.log('meow'));
+
+++++++++++
+
+	const mongoose = require('mongoose');
+	mongoose.connect('mongodb://localhost:27017/animalShelter')
+		.then(() => { console.log('CONNECTED!') })
+		.catch(() => { console.log('OOPS..ERROR!') });
+		
+MONGOOSE MODEL
+---
+MODELS are javascript classes that we make with the assistance of Mongoose that represents information in a mongo database
+Helps us interact with database for CRUD operations
+In order to make a MODEL, we need to define a SCHEMA
+Schema is a mapping of different collection keys from mongo to different types in javascript
+
+  import mongoose from 'mongoose';
+  const { Schema } = mongoose;
+
+  const blogSchema = new Schema({
+    title:  String, // String is shorthand for {type: String}
+    author: String,
+    body:   String,
+    comments: [{ body: String, date: Date }],
+    date: { type: Date, default: Date.now },
+    hidden: Boolean,
+    meta: {
+      votes: Number,
+      favs:  Number
+    }
+  });
+  
+  const Blog = mongoose.model('Blog', blogSchema);
+  const techBlog = new Blog({ title:'machine learning', author:'vijay', body:'ML is the future', })
+
+The permitted SchemaTypes are:
+
+	String
+	Number
+	Date
+	Buffer
+	Boolean
+	Mixed
+	ObjectId
+	Array
+	Decimal128
+	Map
+
+INDEX.JS
+	const mongoose = require('mongoose');
+	mongoose.connect('mongodb://localhost:27017/movies');
+
+	//Concept on javascript side of the equation
+	const movieSchema = new mongoose.Schema({
+		title: String,
+		year: Number,
+		score: Number,
+		rating: String
+	});
+
+	//Name of the Model(singular, Capitalized) and Schema are passed as arguments
+	//Save the results to a class(capitalized)
+	//Mongoose will make a collection with lowercase and pluralize the model name i.e. movies
+	const Movie = mongoose.model('Movie', movieSchema);
+
+	//Now we can make new instances of movie class and save them to mongo database
+	const dangal = new Movie({ title: 'Dangal', year: 2017, score: 9.3, rating: 'U' });
+	dangal.save().then(() => console.log('SAVED!')).catch(() => { console.log('ERROR!') });;
+
+> db.movies.find()
+{ "_id" : ObjectId("62046ef50b41118c5c0d8c08"), "title" : "Dangal", "year" : 2017, "score" : 9.3, "rating" : "U", "__v" : 0 }
+
+
+INSERTMANY
+---
+INDEX.JS
+	//Now we can make new instances of movie class and save them to mongo database
+	//Once it is saved, the promise is resolved. 
+	//Then callback ran and mongoose passed data into this callback
+	Movie.insertMany([{ title: '3 Idiots', year: 2012, score: 9.1, rating: 'U' },
+	{ title: 'Doctor', year: 2021, score: 8.7, rating: 'U' },
+	{ title: 'War', year: 2018, score: 8, rating: 'U' },
+	{ title: 'Cast Away', year: 1994, score: 9.7, rating: 'U' }])
+		.then(() => {
+			console.log('SAVED!');
+			console.log(data);
+		})
+		.catch(() => {
+			console.log('ERROR!')
+		});
+
+
+> db.movies.find()
+{ "_id" : ObjectId("62046ef50b41118c5c0d8c08"), "title" : "Dangal", "year" : 2017, "score" : 9.3, "rating" : "U", "__v" : 0 }
+{ "_id" : ObjectId("6205de6350fbd339b92746e4"), "title" : "3 Idiots", "year" : 2012, "score" : 9.1, "rating" : "U", "__v" : 0 }
+{ "_id" : ObjectId("6205de6350fbd339b92746e5"), "title" : "Doctor", "year" : 2021, "score" : 8.7, "rating" : "U", "__v" : 0 }
+{ "_id" : ObjectId("6205de6350fbd339b92746e6"), "title" : "War", "year" : 2018, "score" : 8, "rating" : "U", "__v" : 0 }
+{ "_id" : ObjectId("6205de6350fbd339b92746e7"), "title" : "Cast Away", "year" : 1994, "score" : 9.7, "rating" : "U", "__v" : 0 }
+
+FINDING DOCUMENTS
+---
+Model.find(filter[,projection][,options][,callback])
+	Mongoose casts the filter to match the model's schema before the command is sent
+
+Examples,
+   await MyModel.find({});
+	Movie.find({}).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.find({ score: { $gt: 9 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+WITH EXEC, IT GIVES BETTER STACK TRACES. IT INCLUDES THE CALLING CODE
+	Movie.find({ score: { $gt: 9 } }).exec().then((data) => console.log(data)).catch((error) => console.log(error));
+FINDS THE FIRST MATCH
+	Movie.findOne({ score: { $gt: 9 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+FINDING BY ID
+	Movie.find({ _id: '62046ef50b41118c5c0d8c08' }).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.findById('62046ef50b41118c5c0d8c08').then((data) => console.log(data)).catch((error) => console.log(error));
+
+
+UPDATING DOCUMENTS
+---
+Model.updateMany(filter[,doc][,options][,callback])
+Updates only the first document that matches the filter
+Model.updateOne(filter[,doc][,options][,callback])
+
+	Movie.updateOne({ title: 'Dangal' }, { $set: { score: 9.5 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.updateMany({ title: { $in: ['3 Idiots', 'War'] } }, { $set: { score: 10 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+
+
+Finds one, updates and gives us the object after the update was applied
+We get back the object(default is old) with the new information
+{new:true} -> returns the modified document rather than the original document
+A.findOneAndUpdate(conditions, update, options, callback);  -> executes
+A.findOneAndUpdate(conditions, update, options);  -> returns query
+A.findOneAndUpdate(conditions, update, callback);  -> executes
+A.findOneAndUpdate(conditions, update);  -> returns query
+A.findOneAndUpdate();  -> returns query
+
+Model.updateMany(filter[,doc][,options][,callback])
+Updates only the first document that matches the filter
+Model.updateOne(filter[,doc][,options][,callback])
+
+	Movie.findOneAndUpdate({ title: 'Dangal' }, { $set: { score: 9.9 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.findOneAndUpdate({ title: 'Dangal' }, { $set: { score: 9.8 } }, { new: true }).then((data) => console.log(data)).catch((error) => console.log(error));
+
+DELETING DOCUMENTS
+---	
+This method sends a remove command directly to mongodb. No documents are involved
+Removes all documents that matches condition from the collection
+To remove just the first document that matches conditions, set the single option to true
+Model.deleteOne(conditions[, options])
+Model.findOneAndDelete -> To return back the deleted item
+
+	Movie.deleteOne({ title: 'Dangal' }).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.deleteMany({}).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.deleteMany({ score: { $gt: 9 } }).then((data) => console.log(data)).catch((error) => console.log(error));
+	Movie.findOneAndDelete({ title: 'Doctor' }).then((data) => console.log(data)).catch((error) => console.log(error));
+	
+MONGOOSE SCHEMA VALIDATIONS
+---
+OPERATION BUFFERING - Mongoose lets you start using your models immediately, without waiting for mongoose to eastablish a connection with mongoDB	
+
+//This structure helps us to add built-in validations
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    price: {
+        type: Number
+    }
+});
+
+const Product = mongoose.model('Product', productSchema);
+
+const cornFlakes = new Product({ name: 'Kellogs', price: 285 });
+cornFlakes.save().then(() => console.log('SAVED!')).catch(() => { console.log('ERROR!') });
+//Below will throw validation error
+//Error: Product validation failed: name: Path `name` is required.
+const unnamed = new Product({ price: 10 });
+unnamed.save().then(() => console.log('SAVED!')).catch((err) => { console.log('ERROR!'); console.log(err) });
+//Below will throw validation error
+//Error: Product validation failed: price: Cast to Number failed for value "twenty" (type string) at path "price"
+const noodles = new Product({ name: 'Maggi', price: 'twenty' });
+noodles.save().then(() => console.log('SAVED!')).catch((err) => { console.log('ERROR!'); console.log(err) });
+//color: 'green' will not be saved since it was not part of the schema.
+//price: '140' will be saved, since the value is still a number 
+const shampoo = new Product({ name: 'Patanjali', price: '140', color: 'green' });
+shampoo.save().then(() => console.log('SAVED!')).catch((err) => { console.log('ERROR!'); console.log(err) });
+
+Error is as follows:
+Error: Product validation failed: name: Path `name` is required.
+ errors: {
+    name: ValidatorError: Path `name` is required.        
+      properties: [Object],
+      kind: 'required',
+      path: 'name',
+      value: undefined,
+      reason: undefined,
+      [Symbol(mongoose:validatorError)]: true
+    }
+  },
+  _message: 'Product validation failed'
+}
+
+ADDITIONAL SCHEMA CONSTRAINTS
+---
+SchemaTypes options:
+	required
+	default
+	select
+	validate
+	get
+	set
+	alias
+	immutable
+	transform
+
+String:
+	lowercase
+	uppercase
+	trim
+	match	-> RegExp, creates a validator that checks if the value matches the given regular expression
+	enum	-> Allows us to provide an array of potential string values and it's a validation to make sure that the value is in that array
+	minlength
+	maxlength
+
+Number:
+	min
+	max
+	enum
+
+VALIDATING MONGOOSE UPDATES
+---
+
+NOTE:In case of create, validations are automatically applied. Whereas in case of update, it needs to be mentioned explicitly
+UNDER options -> runValidators:true
+
+//Example of UPSERT where validation errors are ignored by default
+const cycle1 = new Product({ name: 'BTWIN', price: 12500, competitors: ['Hercules', 'Atlas'] });
+cycle1.save()
+    .then((data) => {
+        console.log('SAVED!');
+        console.log(data);
+        //Bu default, only create will handle validation errors and NOT update. 
+        //In below example, negative price validation will be ignored
+        Product.findOneAndUpdate({ name: 'BTWIN' }, { $set: { price: -90 } }, { new: true })
+            .then((data) => {
+                console.log('SAVED!');
+                console.log(data);
+            })
+            .catch((err) => {
+                console.log('ERROR!');
+                console.log(err)
+            });
+    })
+    .catch((err) => {
+        console.log('ERROR!');
+        console.log(err)
+    });
+
+//Example of UPSERT where validation errors are handled using runValidators:true
+const cycle2 = new Product({ name: 'Hero', price: 3500, competitors: ['Hercules', 'Atlas'] });
+cycle2.save()
+    .then((data) => {
+        console.log('SAVED!');
+        console.log(data);
+        //Bu default, only create will handle validation errors and NOT update.
+        //In below example, negative price validation will be considered using runValidators:true
+        //Error: Validation failed: price: Path `price` (-100) is less than minimum allowed value (0).
+        Product.findOneAndUpdate({ name: 'Hero' }, { $set: { price: -100 } }, { new: true, runValidators: true })
+            .then((data) => {
+                console.log('SAVED!');
+                console.log(data);
+            })
+            .catch((err) => {
+                console.log('ERROR!');
+                console.log(err)
+            });
+    })
+    .catch((err) => {
+        console.log('ERROR!');
+        console.log(err)
+    });    	
+	
+MONGOOSE VALIDATION ERRORS
+---
+Custom validation Error Messages. For example,
+	min: [0, 'Price must be positive.My Custom Message!']
+	
+MODEL INSTANCE METHODS VS STATICS
+---
+INSTANCE METHODS
+Adding custom functionality to the model in addition to whatever mongoose already provides
+Instance method is available on every single instance. Instances of Models are documents. 
+Documents have many of their own built-in instance methods.We may also define our own custom document instance methods	
+
+//define a schema
+var animalSchema = new Schema({name:String, type:String});
+
+//assign a function i.e.findSimilarTypes to the 'methods' object of our animalSchema
+animalSchema.methods.findSimilarTypes = function(cb){
+	return mongoose.model('Animal'.find({type:this.type},cb);
+}
+
+//now all of our animal instances have a findSimilarTypes method available to them
+var Animal = mongoose.model('Animal',animalSchema);
+var dog = new Animal({name:'Tommy', type:'Dog'});
+
+dog.findSimilarTypes(function(err,dogs){
+	console.log(dogs);
+});
+
+STATICS
+There are 2 equivalent ways to add a Static
+	1)Add a function property to schema.statics
+	2)Call the Schema#static() function
+
+	//assign a function to the "statics" object of our animal schema
+	animalSchema.statics.findByName = function(name){
+		return this.find({ name: new RegExp(name, 'i')});
+	}
+	
+	//or equivalently, you can call animalSchema.static
+	animalSchema.static('findByBreed',function(breed){
+		return this.find({ breed });
+	}
+	
+	const Animal = mongoose.model('Animal',animalSchema);
+	let animals = await Animal.findByName('fido');
+	animals = animals.concat(await Animal.findByBreed('poodle'));
+
+NOTE: Do not declare statics using ES6 arrow functions(=>), as Arrow functions explicitly prevents binding this
+Static methods on the model often have usecases such as CRUDing things. They are usually built on top of existing model 
+methods like findProducts, updateProducts
+Instance methods operate on individual instances of the model i.e toggleOnSale on an (THIS)individual instance of product
+Static methods - THIS refers to the entire MODEL
+
+MONGOOSE VIRUTALS
+---
+Virtuals are document properties that you can get and set, but that do not get persisted to MongoDB. 
+The getters are useful for formatting or combining fields, while setters are useful for decomposing 
+a single value into multiple values for storage.
+
+In Mongoose, a virtual is a property that is not stored in MongoDB. Virtuals are typically used for computed properties on documents.
+They give us the ability to add property to schema that doesnt exist in the database itself
+
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/personsApp');
+//define a schema
+var personSchema = new mongoose.Schema({
+    name: {
+        first: String,
+        last: String
+    }
+});
+
+personSchema.virtual('fullName').get(function () {
+    return `${this.name.first} ${this.name.last}`;
+}).set(function (value) {
+    this.name.first = value.substr(0, value.indexOf(' '));
+    this.name.last = value.substr(value.indexOf(' ') + 1, value.length);
+});
+
+//compile our model
+const Person = mongoose.model('Person', personSchema);
+
+//create a document
+const person1 = new Person({
+    name: {
+        first: "Vijay",
+        last: "Anand"
+    }
+});
+
+console.log(person1.name.first + " " + person1.name.last);
+console.log('+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++');
+//Alternatively a virtual property getter lets you define a fullname property
+//that won't persisted to MongoDB
+console.log(person1.fullName);
+//Saving into Mongo
+person1.save();
+
+const person2 = new Person({
+    name: {
+        first: 'Priyanka',
+        last: 'KV'
+    }
+});
+console.log(person2.fullName);
+person2.fullName = 'Priyanka Vijay'
+person2.save();
+
+
+//If you use JSON.stringify i.e toJSON(), mongoose wil not include virtuals by default
+	console.log(JSON.stringify(person2));
+THIS WILL PRINT
+	{"name":{"first":"Priyanka","last":"Vijay"},"_id":"6210e46f3fc3e5dbb57e79eb"}
+
+//Pass {virtuals:true} to include virtuals
+	console.log(person2.toJSON({ virtuals: true }));
+THIS WILL PRINT
+	{
+	  name: { first: 'Priyanka', last: 'Vijay' },
+	  _id: new ObjectId("6210e46f3fc3e5dbb57e79eb"),
+	  fullName: 'Priyanka Vijay',
+	  id: '6210e46f3fc3e5dbb57e79eb'
+	}
+
+DEFINING MONGOOSE MIDDLEWARE
+---
+Mongoose gives us the ability to run code before and after certain things are executed
+
+Middleware(also called pre and post hooks) are functions which are passed control during execution of asynchronous functions
+Middleware is specified on the schema level and is useful for writing plugins
+
+personSchema.pre('save', function () {
+    this.fullName = 'Jim Carrey'
+    console.log('BEFORE SAVE!')
+});
+personSchema.post('save', function () {
+    console.log('AFTER SAVE!')
+});
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MONGOOSE WITH EXPRESS
+++++++++
+INTEGRATING MONGOOSE WITH EXPRESS
+DEFINING OUR MODEL
+PRODUCTS INDEX
+PRODUCT DETAILS
+CREATING PRODUCTS
+UPDATING PRODUCTS
+DELETING PRODUCTS
+FILTERING BY CATEGORY
+
+EXPRESS + MONGOOSE
+---
+EXAMPLE : USING PRODUCTS AS RESOURCE
+Index - GET /products - List all products
+New - GET /products/new - FORM to create a new product
+Create - POST /products - Create a new product
+Show - GET /products/:id - Get one product(using id)
+Edit - GET /products/:id/edit - FORM to edit specific product(using id)
+Update - PATCH /products/:id - Update one product(using id)
+Destroy - DELETE /products/:id - Delete one product(using id)

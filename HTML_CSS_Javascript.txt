@@ -1,5 +1,6 @@
 unsplash.com -> Free images
 fontawesome -> Free+Paid Icon Libraries
+https://codepen.io/ste-vg/pen/GRooLza	->	Airplanes
 https://meyerweb.com/eric/tools/css/reset/
 Developer Tools -> Toggle Device Toolbar
 Interesting Google Fonts -> h1,h2,h3 - Roboto, Nunito  body - Montserrat
@@ -441,7 +442,7 @@ border
 	border-width -> controls the thickness of elements border
 	border-color -> controls the color of the border
 	border-style -> controls the line style - none, hidden, dashed, solid, dotted, inset, outset, groove, ridge, dashed solid[V-H], double etc.
-	border radius
+	border-radius
 
 		div {
 			background-color: #e8e8e4;
@@ -769,8 +770,9 @@ GOOGLE FONTS -> fonts.google.com
 	<link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Lato&family=Raleway:wght@800&display=swap" rel="stylesheet">
 
-FLEXBOX -> creating flexible layouts
-	MediaQueries
+FLEXBOX -> creating flexible layouts(How do we distribute space inside of a container)
+
+	MediaQueries	<IMPORTANT>
 	Flex-basis, Grow and Shrink
 	Flex-direction
 	Flex Shorthand
@@ -805,3 +807,14 @@ FLEXBOX -> creating flexible layouts
 		wrap
 		nowrap
 		wrap-reverse
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++	
+BULMA
++++++
+Bulma is a CSS library.
+https://bulma.io/extensions/
+https://bulma.io/videos/
+https://octoshrimpy.github.io/bulma-o-steps/
+bulma steps progress bar example
+https://dev.to/sm0ke/bulma-css-open-source-components-1ahm
+https://dribbble.com/shots/12354115-Web-Onboarding

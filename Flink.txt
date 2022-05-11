@@ -126,3 +126,13 @@ public void setup() throws Exception{
 	testHarness = new KeyedOneInputStreamOperatorTestHarness<>{}
 
 }
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+FLINK SQL
+++++++++++
+Operator Types
+	Stateless Operator - Filter and Projection
+	Materializing Operators - Aggregation and Joins
+	Temporal Operators - Window Aggregation(GROUP BY,OVER), Time Based Joins(interval join, temporal table join), Pattern Matching(MATCH_RECOGNIZE)
+
+TEMPORAL OPERATORS
+	Temporal operators associate records with each other based on temporal conditions

@@ -1,0 +1,33 @@
+SOLID design principle
+Make the code more maintainable
+To make it easy to extend the system with new functionality without breaking the existing one
+To make the code easier to read and understand, thus spending less time in what it does and more time in actually developing a solution
+Introduced by Robert Martin(Uncle Bob) and named by Michael Feathers	
+
+SINGLE RESPONSIBILITY Principle - A class should have one, and only one reason to change
+	example, main responsibility of controller is getting the input and returning the output 
+
+OPEN/CLOSED principle - Example Car components
+	An entity should be open for extension, but closed for modification
+	Extend functionality by adding new code instead of changing existing code
+	Seperate the behaviors, so the  system can easily be extended but never broken
+	Goal: Get to a point so that you can never break the core of the system
+	Use Factory pattern - Behavior pattern that allows us to create different class instances at runtime
+	
+LISKOV SUBSTITUTION principle - Example Rubber Duck, Strategy pattern
+	Let f(x) be a property provable about objects x of type T. Then f(y) should be true for objects y of type S, 
+	where S is a subtype of T
+	
+	Any derived class should be able to substitute its parent class without the consumer knowing it
+	Every class that implements an interface, must be able to substitute any reference throughout the code that implements the same interface
+	Every part of the code should get the expected result, no matter what instance of a class you send to it, given it implements the same interface
+	
+INTERFACE SEGREAGATION principle - Example Car components
+	No client should be forced to depend on methods it does not use
+	A client should never depend on anything more than the method it's calling
+	Changing one method in a class shouldn't affect classes that don't depend on it
+	Replace fat interface with many smaller, specific interfaces 
+	
+DEPENDENCY INVERSION principle - 
+	High level modules should not depend on Low level modules. i.e. Never depend on anything concrete. Both should depend on abstractions.
+	Able to change the implementation easily without altering the high level code

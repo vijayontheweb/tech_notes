@@ -1,0 +1,3596 @@
+http://latentflip.com/loupe/ -> Callstack Visualisation
+
+LIVING(VERB) AN AWESOME(ADJECTIVE) LIFE(NOUN)
+HTML - Noun
+CSS - Adjectives
+Javascript - Verbs
+++++++++++++++++++++++++++++++++++++
+PRIMITIVE TYPES
+++++++++++++++++
+Basic building blocks
+NUMBER
+STRING
+BOOLEAN
+NULL
+UNDEFINED
+---
+(less commonly used)
+SYMBOL
+BIGINT
+
+Developer Tools -> ctrl + shift + I
+Google Chrome Console
+	- Quickly and interactively play around with code	
+	- REPL - Read Evaluate Print Loop
+clear() -> clears the display on console i.e ctrl+L on chrome
+	Console was cleared
+>  1 + 2
+<. 3
+//	-> Creates a comment. This line is ignored
+Up/Down Arrow -> Recalls previous lines from the console
+	
+NUMBER
+	JS has one Number type
+	Positive Numbers	->	50
+	Negative Numbers	->	-45
+	Whole Numbers(integers)	->	100
+	Decimal Numbers	-> 4.567
+
+numbers are permitted to take a certain amount of space in memory and NOT an infinite amount
+For example
+>  1.9999999999999999
+<. 2
+
+MATH OPERATIONS
+
+addition			->	1+2
+subtraction			->	3-2
+mutiplication		-> 4*4
+division			->	4/2
+modulo(remainder)	->	27%2
+exponentiation		->	3**2
+NaN - Not a Number - Comes under Number type. Numeric value that represents something that is not a number i.e 0/0, 1+NaN, NaN + NaN
+	typeof 4
+	'number'
+
+	typeof NaN
+	'number'
+Note: You cannot do math with something that is not a number and expect a number outcome
+	
+Order of Operations -> Left to Right - PEMDAS - Parenthesis>Exponentiation>Multiplication>Division>Addition>Subtraction
+
+(13%5)**2	->	9
+200 + 0/0	-> NaN
+
+VARIABLES -> are like labels for values
+
+LET
+
+let someName = value;
+let a = 10
+let b = 20
+c = a + b
+25
+
+Unlike java, javascript doesn't intriniscally link variable to a value. For example
+let original = 10
+let clone = original
+clone			-> 10
+original = 5	-> Reassign
+clone			-> Is still 10
+
+counter = 5
+counter += 2	-> 7
+counter -= 3	-> 4
+counter ++		-> 5
+counter --		-> 4
+
+variables can change types
+let numPuppies = 23; // Number
+numPuppies = false; // Now a boolean
+numPuppies = 100; // Back to Number
+
+CONST & VAR
+
+usage
+const pi = 3.14157;
+const daysInWeek = 7;
+
+const works just like let except you cannot change the value.
+const name = 'vijay'
+name = 'anand'	-> ERROR Uncaught TypeError: Assignment to constant variable.
+
+VAR(old variable keyword) 	
+	Before LET and CONST, VAR was the only way of declaring variables. Nowadays there is'nt really a reason to use it
+
+var age = 10;	
+age += 10;	-> 20
+
+BOOLEANS (true/false)
+
+let isLoggedIn = true;
+let gameOver = false;
+const isWaterWet = true;
+
+VARIABLE NAMING CONVENTIONS
+let isLoggedIn = true
+identifiers are case-sensitive and can contain unicode characters, $, underscore and digits(0-9), but may not start with a digit
+cannot start off with a digit
+javascript identifiers preferably should be camelcased(though snakecase is technically feasible)
+
+STRINGS
+	String Basics
+	Indices and Length
+	Undefined and Null
+	String Methods
+	String Template Literals
+	Ramdom Numbers and Math Object
+	
+Strings are another primitive type in Javascript. They represent text, and must be wrapped in single/double quotes
+	let name = "vijay";
+
+Strings are indexed
+	Each character has a corresponding index(a positional number)
+let animal = 'lion'
+animal[3]	->	n
+animal[9]	->	undefined
+animal.length	->	4
+"lol"[0]		->	l
+'vijay'+'anand'	->	'vijayanand'	concatenation
+you cannot change a string
+1 + 'hi'	->	'ihi'	typeof = string
+
+STRING METHODS
+	Methods are built-in actions we can perform with individual strings
+	They help us do things like
+	- Searching within a string
+	- Replacing part of a string
+	- Changing the casing of a string
+	
+	thing.method()	-> SYNTAX
+	
+	msg = 'upper'
+	TOUPPERCASE	->	msg.toUpperCase()	->	UPPER. Makes a new copy leaving the original message unchanged
+	TOLOWERCASE	->	msg.toLowerCase()
+	TRIM	->	msg.trim()			->	Trims of any leading and trailing whitespaces
+	chanining methods	->	greeting.trim().toUpperCase()
+
+STRING METHOD WITH ARGUMENTS
+	thing.method(args)	->	SYNTAX
+	INDEXOF
+	"vijay".indexOf('j')	->	2
+	SLICE ->	extract/slice a portion of the string and returns it	->	str.slice(beginIndex[,endIndex])
+		"The world is flat".slice(4)	->	world is flat
+		"The world is flat".slice(4,12)	->	world is
+		"The world is flat".slice(-4)	->	flat i.e NEGATIVE means length of string + beginning index
+	REPLACE	-> we can also use a regular expression to match patterns and replace a pattern instead of a specific string
+		let quote = "The world is flat"
+		quote.replace('flat','round')	->	"The world is round"	-> It is only going to replace the first matching instance
+	REPEAT -> Number of times you want to repeat
+		"vijay".repeat(2)	->	"vijayvijay"
+
+TEMPLATE LITERALS	-> USE BACK-TICKS, NOT SINGLE QUOTES
+	Strings that allow embedded expressions, which will be evaluated and then turned into a resulting string.
+	Anything inside curly braces will be treated as expression and evaluated
+	`I counted ${3+4} sheeps`;	->	I counted 7 sheeps			-> Only backticks are evaluated. Rest all are treated as string itself
+	"I counted ${3+4} sheeps!"	->	'I counted ${3+4} sheeps!'
+	'I counted ${3+4} sheeps!'	->	'I counted ${3+4} sheeps!'
+
+	let qty = 5;
+	let product = 'kitkat';
+	let price = 10;
+	`The total price of ${product} is $${qty * price}`;		->	'The total price of kitkat is $50'
+
+NULL & UNDEFINED
+	null -> Intentional absence of any value. 
+			Must be assigned
+			Cleary indicates explicitly that there is nothing here
+		i.e. let loggedInUser = null;	
+	undefined	->	Variables that do not have an assigned value. Not being there. Not being defined. I DONT KNOW	
+		i.e. 'hello'[99]	->	undefined
+			 let x;			-> undefined
+
+MATH OBJECT
+	Contains properties and methods for mathematical constants and functions
+	Math.PI	->	3.14159
+	Math.round(4.9)			->	5
+	Math.abs(-456)			->	456
+	Math.pow(2,5)			->	32
+	Math.floor(3.999999)	->	3
+	RANDOM NUMBER	->	Math.random() -> Gives a random number between 0 and 1 (non-inclusive)
+		For example, Math.floor(Math.random() * 5) + 1 -> Gives a number between 1 and 5
+					 Math.floor(Math.random() * 3) + 20 -> Gives a number between 20,21,22
+
+++++++++++++++++++++++++++++++++++++
+MAKING DECISIONS WITH JAVASCRIPT
+++++++++++++++++++++++++++++++++
+Comparision Operators
+Running Javascript from a file
+Conditionals: If, Else-If and Else
+Truth-y and False-y values
+Logical AND/OR/NOT
+
+COMPARISON OPERATORS
+>	->	Greater than
+<	->	Less than
+>=	->	Greater than or equal to
+<=	->	Less than or equal to
+==	->	Equal to
+!=	->	Not equal to
+===	->	Strict equality
+!==	->	Strict Non-equality
+
+1 > 3 -> false
+-1 <= -1 -> true
+let age = 10
+age >= 18	-> false
+
+You can compare String too(though uncommon)
+'a' < 'b'	-> true (since the unicode of 'a' is less than the unicode of 'b')
+'a' == 'a'	-> true
+
+==(double equals)
+	Checks for equality of value, but not equality of type
+	It coerces both values to the same type and then compares them
+	This can lead to some unexpected results, when we work with different types
+	
+	1 == 1		-> true
+	1 == '1'	-> true	(doesn't care about type)
+	0 == ''		-> true
+	0 == false	-> true
+	null == undefined	-> true
+
+===(triple equals)
+	Strict equality operator of value and type
+	
+	1 === '1'	-> false (DOES care about type)
+	0 === false	-> false
+
+!=(not equals)
+	1 != '1'	-> false
+
+!==(strict not equals)
+	1 !== '1'	-> true
+
+RECOMENDED : ALWAYS USE TRIPLE EQUALS AND STRICT NOT EQUALS	
+
+CONSOLE.LOG	
+	console.log() -> prints arguments to console
+	We need this if you are going to start working with files
+console.log('hello')				->	hello
+console.log(1+6, 'hello', 'there')	->	7 'hello' 'there'	
+
+console.error("Ouch .. That hurts")	-> prints 'Ouch .. That hurts' with a RED error symbol
+console.warn('Oops .. You did it again')	-> prints 'Oops .. You did it again' with a ORANGE warning symbol
+console.clear()
+console.time()
+
+ALERT
+	Prints out something to the user, but not in the console, insead in a dialog box
+	alert('Hi!')	-> Opens up a dialog box and displays 'Hi!' with an OK button
+
+PROMPT
+	Similar to alert, but it accepts an argument
+	prompt('Please enter a number')	-> Opens up a dialog box and displays 'Please enter a number' with a text box and an OK button
+	Useful to collecting userinput
+	let age = prompt('Please enter your age')
+	age	-> "40"
+
+PARSEINT	
+	To do some math operations on age ypu need to convert it into a number
+	ageNum = parseInt(age)
+	ageNum + 1 = 41
+	parseInt('12asd')	-> 12 -> Extracts and gets the number value alone
+	parseInt('12asd456')	-> 12 -> Extracts and gets the number value alone
+
+RUNNING CODE FROM A FILE
+	1)Write your code in a JS file	-> app.js
+		alert('Hello from JS!');
+		"hi".toUpperCase();
+		console.log("hi".toUpperCase());
+	2)Include your script in a .html file -> demo.html
+		<!DOCTYPE html>
+		<html>
+			<head>
+				<title>JS Demo</title>
+				<script src="app.js"></script>
+			</head>
+			<body>
+			</body>
+		</html>
+		
+IF/ELSE STATEMENTS
+
+//SIMPLE CONDITION WITH NUMBER
+let age = prompt('Enter your age');
+if (age < 5) {
+    alert('You are a toddler!')
+} else if (age < 18) {
+    alert('You are a child!')
+} else if (age < 60) {
+    alert('You are an adult!')
+} else {
+    alert('You are a senior citizen!')
+}
+----
+//SIMPLE CONDITION WITH STRING
+function getColor(phrase){
+   if(phrase === 'stop'){
+       console.log('red')
+   }else if(phrase === 'slow'){
+       console.log('yellow')
+   }else if(phrase === 'go'){
+       console.log('green')
+   }else{
+       console.log('purple')
+   }
+ }
+----
+//WITH MATH
+let randomValue = Math.random();
+console.log(randomValue);
+let roundValue = Math.round(randomValue);
+console.log(roundValue);
+if (roundValue == 1) {
+    console.log('You got a tail!')
+} else {
+    console.log('You got a head!')
+}
+----
+//IS EVEN OR ODD WITH FUNCTION
+function isEven(num){
+    if(num%2 === 0){
+        console.log("even");
+    } 
+}
+----
+NESTED CONDITIONALS
+const num = 102;
+
+if(num <= 100) {
+    if(num >= 50) {
+        console.log("HEY!");
+    }
+} else {
+    if (num < 103) {
+        if(num % 2 === 0){
+            console.log("YOU GOT ME!");
+        }
+    }
+}
+----
+TRUTHY AND FALSEY VALUES
+
+All JS values have an INHERENT truthyness or falseyness about them
+Falsey values are:
+	false
+	0 - zero
+	''	- Empty String
+	null
+	undefined
+	NaN
+
+Everything else is Truthy
+
+//TRUTH/FALSE
+let value = prompt('Truth/False Test. Enter Something:');
+if (value) {
+    console.log('TRUTHY!')
+} else {
+    console.log('FALSEY!')
+}
+----
+if(0){console.log('TRUTHY')}else{console.log('FALSEY')} -> FALSEY
+
+----
+LOGICAL OPERATORS - &&(AND) ||(OR) !(NOT)	
+Combining expressions
+
+AND OPERATOR
+true && true 			-> true
+1 <= 4 && 'a' === 'a';	-> true
+9 > 10 && 9 >= 9;		-> false
+'abc'.length === 3 && 1+1 === 4;	-> false
+
+Short-circuiting - If the first part is false, it won't even bother to evaluate the second part
+
+const mystery = 'Poetry7'; 
+if(mystery[0] === 'P' && mystery.length > 5 && mystery.indexOf('7') !== -1){
+    console.log("YOU GOT IT!!!");
+}
+
+OR OPERATOR
+1 !== 1 || 10 === 10	-> true
+10/2 === 5 || null 		-> true
+0 || undefined 			-> false
+
+NOT OPERATOR
+!false	-> true
+!null	-> true
+!(0 === 0)	-> false
+!(3 <= 4)	->	false
+
+const name = prompt('enter your name')
+if(!name){
+	console.log('You dint enter name. please try again')
+}
+
+SWITCH STATEMENT
+Another control-flow statement that can replace multiple if statements
+NOTE: Whenever it hits a match, from there onwards it keeps executing every line below it until it hits a break
+
+const day = 2;
+switch(day){
+	case 1:
+		console.log('MONDAY');
+		break;
+	case 2:
+		console.log('TUESDAY');
+		break;	
+	case 3:
+		console.log('WEDNESDAY');
+		break;
+	case 4:
+		console.log('THURSDAY');
+		break;
+	case 5:
+		console.log('FRIDAY');
+		break;
+	case 6:
+	case 7:
+		console.log('WEEKEND');
+		break;	
+	default:
+		console.log('INVALID DAY');
+}
+
++++++++++++++++++++++++++++++++++++
+JAVASCRIPT ARRAYS
+++++++++++++++++++++++++++++++++
+ARRAY BASICS - CREATING AND UPDATING
+PUSH & POP
+SHIFT & UNSHIFT
+CONCAT, INDEXOF
+SLICE, SPLICE
+MULTI-DIMENSIONAL ARRAYS
+
+Datastructures allow us to group data together
+BASICS
+----
+Arrays are ordered collection of values
+For example, list of comments on a post
+	Collection of levels in a game
+	Songs in a playlist
+	
+let students = []	-> make an empty array
+let colors = ['red', 'orange', 'yellow']	-> array of strings
+let lottoNums = [1922,56,72,81]				-> array of numbers
+let stuff = [true, 68, 'cat', null]			-> mixed array
+
+colors.length = 3
+colors[100] -> undefined. There is NO error
+[].length = 0
+
+IMPORTANT: With ARRAY you can REASSIGN, but NOT possible with STRING
+	let colors = ['red', 'orange', 'yellow']
+	colors[0] = 'black'
+	console.log(colors)	->	['black','orange', 'yellow']	-> ARRAYS ARE REASSIGNED
+	let name = 'vijay'
+	name[0] = 'b'
+	console.log(name)	-> Will print 'vijay' and not 'bijay'	-> STRING NOT REASSIGNED
+IMPORTANT: What if you add an element at an index, MUCH HIGHER than the ARRAY LENGTH. You will get EMPTY SLOTS(undefined) in between	
+	colors[10] = 'indigo'
+	console.log(colors)	->	['black', 'orange', 'yellow', empty × 7, 'indigo']
+	
+ARRAY METHODS
+----
+PUSH - add to end
+POP - remove from end
+SHIFT - remove from start
+UNSHIFT - add to start
+
+CONCAT - merge arrays into a new array. Doesn't modify the original.
+INCLUDES - look for existence of a value. Determines whether an array includes a certain value among its entries returning true or false.
+INDEXOF - Similar to string.indexOf
+JOIN - creates a string from an array
+REVERSE - reverses an array
+SLICE - Getting a copy of a portion of the array
+SPLICE - changes contents of array by removes/replaces elements
+SORT - sorts an array
+
+let someQueue = ['vijay','priya']
+someQueue.push('meenu')
+console.log(someQueue)	-> ['vijay', 'priya', 'meenu']
+someQueue.push('gautham','nimi')	-> WE CAN ALSO PUSH MULTIPLE ELEMENTS
+console.log(someQueue)	-> ['vijay', 'priya', 'meenu', 'gautham', 'nimi']
+let person = someQueue.pop()
+console.log(person) -> 'nimi'
+person = someQueue.shift()
+console.log(person) -> 'vijay'
+console.log(someQueue)	-> ['priya', 'meenu', 'gautham']
+someQueue.unshift('selva')
+console.log(someQueue)	-> ['selva', 'priya', 'meenu', 'gautham']
+
+IMPORTANT -> ARRAY METHODS WILL CHANGE EXISTING ARRAY(see above). Whereas STRING METHODS WILL NOT CHANGE EXISTING STRING(see below)
+let name = 'vijay'
+name.toUpperCase()
+console.log(name)	-> 'vijay' and NOT 'VIJAY'
+
+const array1 = ['a','b','c'];
+const array2 = ['d','e','f'];
+const array3 = array1.concat(array2);	->	THIS MAKES A NEW ARRAY
+console.log(array3)		->	['a', 'b', 'c', 'd', 'e', 'f']
+
+let names = ['vijay','priya','selva']
+console.log(names.includes('selva'))	->	true
+
+let names = ['vijay','priya','selva'];
+console.log(names.indexOf('selva'));	->	2
+console.log(names.indexOf('meenu'));	->	-1
+IMPORTANT: If there are duplicate elements, it only returns the first match
+
+let names = ['vijay','priya','selva'];
+names.reverse();	-> IMPORTANT: DOES THIS INPLACE
+console.log(names);	->	['selva','priya','vijay']
+
+let names = ['vijay','priya','selva','meenu','gautham','nimi'];
+console.log(names.slice())	->	['vijay','priya','selva', 'meenu', 'gautham', 'nimi']	->	takes a full copy
+console.log(names.slice(2))	->	['selva', 'meenu', 'gautham', 'nimi']	-> takes a portion from index till the end
+console.log(names.slice(3,5)) -> ['meenu', 'gautham']
+console.log(names.slice(-3))	->	['meenu','gautham','nimi']	->	returns the last 3 elements
+
+SPLICE - You can use it to insert/delete/replace multiple elements
+let arrDeltedItems = array.splice(start[, deleteCount[, item1[, item2[, ...]]]])
+	start - from which index are we starting
+	deleteCount(optional) - How many things to delete
+	item(s)(optional) - What items to insert
+const months = ['Jan', 'Mar', 'Apr', 'Jun']
+months.splice(1,0,'Feb')
+console.log(months)			->	['Jan', 'Feb', 'Mar', 'Apr', 'Jun']
+months.splice(4,1,'May')	-> Removes 1 element on index #4, and inserts 1 element 'May'
+console.log(months)			->	['Jan', 'Feb', 'Mar', 'Apr', 'May']
+months.splice(4,0,'April-w1','April-w2','April-w3','April-w4')
+console.log(months)			-> ['Jan', 'Feb', 'Mar', 'Apr', 'April-w1', 'April-w2', 'April-w3', 'April-w4', 'May']
+
+SORT (CAUTION) - Sorts like a dictionary
+Sorts the elements of an array in place and returns the sorted array. The default sort order is ascending, built upon converting the elements into strings
+then comparing their sequences of UTF-16 code unit values. The time and space complexity of the sort cannot be guaranteed as it depends on the implementation
+
+const months = ['March', 'Jan', 'Feb', 'Dec']
+months.sort()
+console.log(months)	->	['Dec', 'Feb', 'Jan', 'March']
+
+const array1 = [1,30,4,21,10,100,300]
+array1.sort()
+console.log(array1)	->	[1, 10, 100, 21, 30, 300, 4]
+
+REFERENCE TYPES & EQUALITY TESTING
+----
+'hi' === 'hi'					-> true
+['hi','bye'] === ['hi','bye']	-> false	-> SINCE BOTH ARRAYS ARE NOT REFERRING TO SAME MEMORY ADDRESS 
+[1] === [1]						-> false	-> WE ARE NOT COMPARING THE CONTENTS
+[1]	== [1]						-> false	-> EACH ARRAY HAS A DIFFERENT REFERENCE EVEN IF IT HAS THE SAME CONTENTS 
+[]	==	[]						-> false	-> EACH ARRAY IS DISTINCT AND NOT REFERRING TO THE SAME MEMORY ADDRESS
+
+IMPORTANT: ARRAYS TEST FOR EQUALITY USING REFERENCES AND NOT CONTENTS
+let reference1 = [1,2,3,4]
+let reference2 = reference1		-> BOTH REFERENCES POINT TO THE SAME MEMORY ADDRESS OF THE ARRAY
+reference1.push(5)				->	[1, 2, 3, 4, 5]
+reference1 === reference2		->	true	->	COMPARING ARRAYS ACTUALLY COMPARES BY REFERENCE AND NOT BY THEIR CONTENTS
+
+CONST AND ARRAYS	(WHEN USING ARRAYS WE CAN USE CONST. THE VALUES CAN CHANGE. AS LONG AS THE REFERENCE REMAINS THE SAME)
+----
+const PI = 3.14		-> CONST WITH PRIMITIVES generally doesn't allow for reassignment. 
+const names = ['vijay','priya','selva','meenu','gautham','nimi']; -> That's not the case with ARRAYS or OBJECTS. 
+
+IMPORTANT: CONST JUST CARES ABOUT REFERENCE BEING INTACT I.E VARIABLE NOT BEING REASSIGNED
+
+const balls = ['blue','black']
+balls.push('purple')
+console.log(balls)	->	['blue', 'black', 'purple']	->	NO ERROR
+balls = ['red','yellow']	->	ERROR. Uncaught TypeError: Assignment to constant variable.
+
+MULTI-DIMENSIONAL ARRAYS/ NESTED ARRAYS
+----
+We can store arrays inside other arrays
+const colors = [
+	['red','crimson'],
+	['gree','olive']
+]
+
+const gameBoard = [
+	['O',null,'X'],
+	[null,'X','O'],
+	['X','O',null]
+]
+
+gameBoard[1][1]	->	'X'
+
+const airplaneSeats = [
+    ['Ruth', 'Anthony', 'Stevie'],
+    ['Amelia', 'Pedro', 'Maya'],
+    ['Xavier', 'Ananya', 'Luis'],
+    ['Luke', null, 'Deniz'],
+    ['Rin', 'Sakura', 'Francisco']
+];
+
+airplaneSeats[3][1] = 'Hugo'
+
+airplaneSeats = [
+    ['Ruth', 'Anthony', 'Stevie'],
+    ['Amelia', 'Pedro', 'Maya'],
+    ['Xavier', 'Ananya', 'Luis'],
+    ['Luke', 'Hugo', 'Deniz'],
+    ['Rin', 'Sakura', 'Francisco']
+]
+
++++++++++++++++++++++++++++++++++++
+JAVASCRIPT OBJECT LITERALS
+++++++++++++++++++++++++++
+JS Objects - Store multiple pieces of data together in some sort of structure
+Data structure similar to array that stores information and can combine multiple datatypes together
+Unlike ordered elements in an array, data is stored as key value pairs
+
+Objects are collection of properties
+Properties are a KEY VALUE pair
+Rather than accessing data using an index, we use custom keys
+
+const empData = {
+	name: 'Vijay',
+	age: 40,
+	occupation: 'Programmer'
+	children: ['Meenakshi','Gautham']
+}
+
+const product = {
+    name:"Gummy Bears",
+    inStock:true,
+    price:1.99,
+    flavors:["grape","apple","cherry"]
+}
+
+ACCESSING OBJECTS
+2 ways of accessing objects
+	empData.occupation
+	empData ["occupation"]
+	
+Valid Keys - All keys such as boolean, numbers etc are converted into strings(except for Symbols)	
+i.e.empData ["occupation"]	-> THIS WORKS
+	empData [occupation]	-> THIS WONT WORK SINCE IT EXPECTS OCCUPATION TO BE A VARIABLE NAME AND WILL NOT CONVERT THE KEY INTO STRING AND LOOKUP
+		throws -> VM511:1 Uncaught ReferenceError: occupation is not defined
+	empData ['occu'+'pation']	-> THIS WORKS SINCE IT IS EVALUATING THE EXPRESSION AND USING THE RESULT AS A KEY
+	let varName = 'name'
+	empData[varName]	->	'Vijay'	-> THIS WORKS SINCE VARIABLE NAMES CAN BE USED INSIDE SQUARE BRACKETS
+	 
+Another Example
+	const dumb = {true: "dat", null:'xyz', 40: 'hola'}
+All below options will work	
+dumb.true
+dumb.null
+dumb["true"]
+dumb[null]
+dumb[40]	
+
+const restaurant = {
+    name: 'Ichiran Ramen',
+    address: `${Math.floor(Math.random() * 100) + 1} Johnson Ave`,
+    city: 'Brooklyn',
+    state: 'NY',
+    zipcode: '11206',
+}
+
+let fullAddress = restaurant['address']+', '+restaurant['city']+', '+restaurant['state']+', '+restaurant['zipcode']
+
+MODIFYING OBJECTS (Similar to Arrays)
+const students = { vijay:'maths', priya:'urdu', meenakshi:'cyber'}
+students.vijay = 'physics'
+students['priya'] = 'chemistry'
+
+ADDING OBJECT
+students.gautham = 'hindi'
+
+Now students become
+students -> {gautham: "hindi",meenakshi: "cyber",priya: "chemistry",vijay: "physics"}
+
+NESTED ARRAYS + OBJECTS
+Inside an array we can store objects
+Inside an object, we can store arrays
+We can mix and match
+We work with arrays and objects together
+EXAMPLE 1 -> Array consisting of objects
+	const cart = [
+		{productName: 'Boost', price: 75},
+		{productName: 'Dairy Milk', price: 20},
+		{productName: 'Pears Soap', price: 99}
+	]
+	cart[2].price	->	99
+EXAMPLE 2 -> Object consisting of arrays
+	const student = {
+		firstName:'vijay',
+		lastName:'anand',
+		hobbies:['reading','drawing'],
+		marks:{english:98, maths:100}
+	}
+	student.marks.english	->	98
+
++++++++++++++++++++++++++++++++++++
+REPEATING USING LOOPS
++++++++++++++++++++++
+FOR LOOP
+NESTED LOOP
+WHILE LOOP
+BREAK KEYWORD
+FOR ...OF LOOP
+ITERATING ARRAYS
+ITERATING OBJECTS
+
+FOR LOOP
+--------
+Loops allow us to repeat code
+Print hello 10 times
+Sum all numbers in an array
+There are multiple types: For loop, while loop, for .. of loop, for .. in loop
+
+for (
+	[Initial Expression];
+	[Condition];
+	[Increment Expression]
+)
+
+Prints all numbers from 1 to 10
+for(let i = 1;i <= 10; i++){
+	console.log(i);
+}
+
+Prints all even numbers from 0 to 10
+for(let i = 0;i <= 10; i+=2){
+	console.log(i);
+}
+
+Write a loop that prints: 25 20 15 10 5 0
+for(let i = 25;i >=0;i -= 5){
+    console.log(i)
+}
+
+INFINITE LOOP (Avoid at all times)
+for(let i = 1;i >= 0; i++){
+	console.log(i);
+}
+
+LOOPING OVER ARRAYS
+let nameArray = ['Ruth', 'Anthony', 'Stevie'];
+for(let i = 0;i < nameArray.length; i++){
+	console.log(nameArray[i]);
+}
+
+PRINTING UPPER CASE
+const people = ["Scooby", "Velma", "Dorothy", "Shaggy", "Fred"];
+for(let i=0;i < people.length;i++){
+    console.log(people[i].toUpperCase())
+}
+
+NESTED LOOP
+---
+for(let outerIndex = 0;outerIndex < 10; outerIndex++){
+	console.log('OUTER->'+outerIndex);
+	for(let innerIndex = 0;innerIndex < 10; innerIndex++){
+		console.log(' INNER->'+innerIndex);
+	}
+}
+
+WHILE LOOP
+---
+Continue running as long as the test condition is true
+
+let num =0;
+while(num<10){
+	console.log(num);
+	num++;
+}
+
+BREAK
+---
+Stop the execution of the loop
+
+let num =0;
+while(true){
+	console.log(num);
+	num++;
+	if(num==10){
+		break;
+	}
+}
+
+GUESSING GAME
+---
+let maxNumber = parseInt(prompt('Enter the max number'));
+while (!maxNumber) {
+    maxNumber = parseInt(prompt('Invalid max number.Enter again?'));
+}
+let randNumber = Math.floor(Math.random() * maxNumber) + 1;
+console.log(randNumber);
+let guessNumberStr = prompt('Enter your guess?');
+
+//loop while guess number is too low or high
+//exit if guess number matches random number or quit
+
+while (true) {
+    if (guessNumberStr == 'Q') {
+        console.log('Ok..Quitting!');
+        break;
+    }
+    while (!parseInt(guessNumberStr)) {
+        guessNumberStr = prompt('Invalid guess number.Enter again?');
+    }
+    let guessNumber = parseInt(guessNumberStr);
+    if (guessNumber == randNumber) {
+        console.log('Yeah..You got it!');
+        break;
+    } else if (guessNumber < randNumber) {
+        guessNumberStr = prompt('Too Low. Guess again?');
+    } else if (guessNumber > randNumber) {
+        guessNumberStr = prompt('Too High. Guess again?');
+    }
+}
+
+
+
+FOR..OF LOOP	[iterating over arrays/string]
+---
+Nice and easy way of iterating over arrays(or other iterable objects) where we do not care aout index. Not supported in IE
+
+for(variable of iterable){
+	statement
+}
+
+const names = ['vijay','priya','meenu','gautham'];
+for(let name of names)
+{ 
+	console.log(name); 
+}
+vijay
+priya
+meenu
+gautham
+
+const seating = [
+				 ['Row1Student1','Row1Student2','Row1Student3'],
+                 ['Row2Student4','Row2Student5','Row2Student6'],
+                 ['Row3Student7','Row3Student8','Row3Student9']					
+				];
+for(let row of seating){
+	for(let student of row){
+		console.log(student);
+	}
+}
+
+for(let char of "vijayanand"){
+	console.log(char);
+}
+
+const numbers = [1,2,3,4,5,6,7,8,9];
+for(let number of numbers){
+    console.log(number*number);
+}
+
+ITERATING OVER OBJECTS	(for .. in)
+----
+Iterating over objects is not as common as iterating over arrays
+for..of WILL NOT WORK
+for(score of scores){
+	console.log(score)
+}
+THIS WILL THROW ERROR
+Uncaught TypeError: scores is not iterable
+    at <anonymous>:1:14
+
+
+2 options to iterate over objects
+	1)for .. in
+		Gives us the key on each iteration, using which we can also access the value
+	2)Special object methods
+		Object.keys(<yourobject>)
+		Object.values(<yourobject>)
+		Object.entries(<yourobject>)
+		
+const scores = { vijay:90, priya:91, meenu:92, gauti:93	}
+for(score in scores){
+	console.log(score)
+}
+THIS WILL PRINT ONLY KEYS
+vijay
+priya
+meenu
+gauti
+TO PRINT ALSO VALUES
+for(key in scores){
+	console.log(key+" scored "+scores[key]);
+}
+vijay scored 90
+priya scored 91
+meenu scored 92
+gauti scored 93
+TO PRINT ALSO VALUES(USING TEMPLATING - BACKTICKS)
+for(key in scores){
+	console.log(`${key} scored ${scores[key]}`);
+}
+vijay scored 90
+priya scored 91
+meenu scored 92
+gauti scored 93
+
+ANOTHER OPTION
+Object.keys(scores)	-> returns an array of keys
+['vijay', 'priya', 'meenu', 'gauti']
+Object.values(scores)
+[90, 91, 92, 93]	-> returns an array of values
+Object.entries(scores)	-> 	-> returns a nested array of key value entries
+['vijay', 90]
+['priya', 91]
+['meenu', 92]
+['gauti', 93]
+
+EXAMPLE - Sum of all marks
+let total = 0;
+for(let mark of Object.values(scores)){
+	total += mark
+}
+console.log(total)	-> returns 366
+
++++++++++++++++++++++++++++++++++++
+FUNCTION INTRODUCTION
++++++++++++++++++++++
+DEFINING FUNCTIONS
+	function funcName(){	// DO SOMETHING		}
+WORKING WITH ARGUMENTS
+FUNCTION RETURN VALUES
+
+Note: Define your function before you use them
+
+Functions are reusable procedures
+Functions allow us to write reusable modular code
+We define a "chunk" of code that we can then execute at a later point
+we use them all the time
+
+function bark(){
+	console.log('Woof Woof!');
+}
+
+bark();	->	execute
+
+function printHeart(){
+    console.log('<3');
+}
+printHeart();
+
+ARGUMENTS
+---
+We can also write functions that accepts inputs, called arguments.
+
+function greet(name){
+	console.log(`Hi ${name}`);
+}
+
+greet('vijay')	-> Hi vijay
+
+function rant(message){
+    console.log(message.toUpperCase());
+    console.log(message.toUpperCase());
+    console.log(message.toUpperCase());
+}
+rant('system seri illae')
+
+function repeat(msg, count){
+	let result = '';
+	for(let index=0; index < count; index++){
+		result += msg;
+	}
+	console.log(result);
+}
+repeat('system seri illae',100);
+
+
+function isSnakeEyes(num1,num2){
+    if(num1 == 1 && num2 == 1){
+        console.log('Snake Eyes!');        
+    }else{
+        console.log('Not Snake Eyes!');
+    }
+}
+
+RETURN
+---
+Built-in methods return values when we call them. We can store those values
+
+const yell = 'oh! not again'.toUpperCase();
+yell -> OH! NOT AGAIN
+
+RETURN statement ends function execution and specifies the value to be returned by that function
+
+function multiply(x,y){
+    return x*y;
+}
+
+function isShortsWeather(temp){
+    if(temp>=75){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function lastElement(array){
+    const length = array.length;
+    if(length>0){
+      return array[length-1];
+    }else{
+        return null;
+    }
+}
+
+function capitalize(str){
+    return str[0].toUpperCase()+ str.slice(1)
+}
+
+function sumArray(arr){
+    let sum = 0;
+    for(let item of arr){
+        sum += item;
+    }
+    return sum;
+}
+
+function returnDay(day){
+    let dayOfWeek = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    if(day > 0 && day < 8){
+        return dayOfWeek[day-1];
+    }else{
+        return null;
+    }
+}
+
+function add(x,y){
+	if(typeof x !== 'number' || typeof y !== 'number'){
+		return false;
+	}
+	return x+y;
+}
+
+z = add('H',4)	-> false
+z = add(2,3)	-> false
+
++++++++++++++++++++++++++++++++++++
+MORE ON FUNCTIONS
++++++++++++++++++++++
+FUNCTION SCOPE
+BLOCK SCOPE
+LEXICAL SCOPE
+FUNCTION EXPRESSIONS
+HIGHER ORDER FUNCTIONS
+RETURNING FUNCTIONS
+"this" KEYWORD
+
+FUNCTION SCOPE
+---
+Variable visibility
+The location where a variable is defined dictates where we have access to that variable
+
+Variables defined inside of a function are scoped to that function
+Inside of a function, if there are multiple scopes available, the closest scope is chosen
+
+function collectEggs(){
+	let totalEggs = 6;		->	totalEggs  is scoped inside of collectEggs function
+}
+collectEggs();
+console.log(totalEggs);		->	Uncaught ReferenceError: totalEggs is not defined
+---
+let status = 'middle class';
+function workHard(){
+	let status = 'upper class';
+	status;		->	upper class
+}
+status;		->	middle class
+---
+const creature = "Common Sea Dragon"; 
+function scubaDive(){
+    const creature = "Spanish Dancer";
+    console.log(creature);
+} 
+scubaDive();	->	Spanish Dancer
+---
+let deadlyAnimal = "Blue-Ringed Octopus";
+function handleAnimal() {
+    let deadlyAnimal = "Scorpionfish";
+    console.log(deadlyAnimal);
+} 
+handleAnimal();
+console.log(deadlyAnimal)
+
+Scorpionfish
+Blue-Ringed Octopus
+
+BLOCK SCOPE	- include conditionals, loops
+---
+let action = 'cry baby'
+if(action == 'cry baby'){
+	console.log('feed');
+	let action = 'smile baby'
+}
+console.log(action)
+
+feed
+cry baby
+
+*****IMPORTANT******
+VAR KEYWORDS ARE SCOPED TO FUNCTIONS, NOT TO BLOCKS
+LET KEYWORDS ARE SCOPED TO FUNCTIONS AS WELL AS BLOCKS
+
+for example,
+for(var index = 0; index < 5; index++){
+	var age = 10;
+}
+console.log(index);
+console.log(age);
+
+5
+10
+---
+whereas
+for(let index = 0; index < 5; index++){
+	let age = 10;
+}
+console.log(index);		->	Uncaught ReferenceError: index is not defined
+console.log(age);		->	Uncaught ReferenceError: age is not defined
+
+LEXICAL SCOPE
+---
+An inner function nested inside some parent function 
+has access to the scope of the variables defined in the scope of the outer function
+
+function bankRobbery(){
+	const heroes = ['spider man', 'bat man', 'hollow man', 'x-men', 'dobermann']
+	function cryForHelp(){
+		for(let hero of heroes){
+			console.log(`Please help ${hero}`);
+		}		
+	}	
+	cryForHelp();
+}
+
+Please help spider man
+Please help bat man
+Please help hollow man
+Please help x-men
+Please help dobermann
+
+FUNCTION EXPRESSIONS	(involves storing a function in a variable, similar to storing an object/array/number)
+---
+FUNCTIONS ARE VALUES IN JAVASCRIPT. WE CAN STORE THEM AND PASS THEM AROUND. WE CAN PASS FUNCTIONS AS ARGUMENTS. WE CAN RETURN FUNCTIONS AS VALUES
+Conceptually a different way of defining a function
+
+const square = function (num) {
+	return num * num;
+}
+square(7);	->	49
+
+Conventionally we use this
+function square(num) {
+	return num * num;
+}
+square(7);	->	49
+
+HIGHER ORDER FUNCTIONS
+---
+functions that operate on/work with other functions. They can:
+->Accept other functions as arguments
+->Return a function
+
+function callTwoTimes(func){
+	func();
+	func();	
+}
+const rollDice = function (){
+	const roll = Math.floor(Math.random()*6)+1;
+	console.log(roll)
+}
+callTwoTimes(rollDice);
+
+4
+6
+
+RETURNING FUNCTIONS
+---
+
+function returnRandomFunc(){
+	const rand = Math.random();
+	if(rand > 0.5){
+		return function(){
+			console.log("Congrats! You're a winner :)");
+		}
+	}else{
+		return function(){
+			console.log("Alas! You're a loser :(");
+		}	
+	}
+}
+const retFunc = returnRandomFunc();
+
+invoke by calling retFunc()
+---
+FACTORY FUNCTION - A function that generates another function(as a value) based on input
+
+function makeBetweenFunc(min,max){
+	return function(num){
+		return num>=min && num<=max;
+	}	
+}
+const isChildFunc = makeBetweenFunc(0,17);
+isChildFunc(10);		-> true
+isChildFunc(20);		-> false
+
+const isAdultFunc = makeBetweenFunc(18,59);
+isAdultFunc(30);		-> true
+isAdultFunc(10);		-> false
+
+const isSeniorFunc = makeBetweenFunc(60,120);
+isSeniorFunc(70);		-> true
+isSeniorFunc(10);		-> false
+
+
+DEFINING METHODS
+---
+General method examples(using dot notation on objects)
+	"hello".toUpperCase()
+	[1,2,3].indexOf(2)
+
+
+We can add functions as properties on objects
+We call them methods
+
+const myMath = {
+	PI : 3.14159,
+	multiply : function(x,y){
+		return x*y;
+	},
+	divide : function(x,y){
+		return x/y;
+	},
+	square : function(x){
+		return x*x;
+	}
+};
+
+myMath.square(4)	->	16
+
+SHORTHAND (recent javascript addition i.e. get rid of : function keyword)
+
+const newMath = {
+	PI : 3.14159,
+	multiply(x,y){
+		return x*y;
+	},
+	divide(x,y){
+		return x/y;
+	},
+	square(x){
+		return x*x;
+	}
+};
+
+newMath.divide(9,3) -> 3
+---
+another example
+const square = {
+    area(side){
+       return side * side; 
+    },perimeter(side){
+        return side * 4;
+    }
+}
+
+'THIS' IN METHODS
+---
+Use the keyword 'this' to access other properties on the same object 
+
+const person = {
+	firstName: 'priyanka',
+	lastName: 'k.v',
+	fullName(){
+		return `${this.firstName} ${this.lastName}`
+	}
+}
+person.fullName()				->	'priyanka k.v'
+person.lastName = 'vijay'
+person.fullName()				->	'priyanka vijay'
+
+IMPORTANT -> The value of 'this' depends on the invocation context of the function it is used in
+"window" object is the default value for the keyword 'this'
+
+const fullName2 = person.fullName;
+fullName2();	->	'undefined undefined'
+---
+Another example
+const hen = {
+    name: 'Helen',
+    eggCount: 0,
+    layAnEgg(){
+        this.eggCount++;
+        return "EGG";
+    }
+}
+
+hen.eggCount -> 0
+hen.layAnEgg()	->	'EGG'
+hen.eggCount -> 1
+hen.layAnEgg()	->	'EGG'
+hen.eggCount -> 2
+
+TRY/CATCH
+---
+try{
+	hello.toUpperCase()		->	hello is an undefined variable here
+}catch{
+	console.log('ERROR!!!')
+}
+
+ERROR!!!
+
+function yell(msg){
+	console.log(msg.toUpperCase().repeat(3));
+}
+
+yell('lol');	->	LOLLOLLOL
+yell(40);		->	Uncaught TypeError: msg.toUpperCase is not a function
+
+function yellNew(msg){
+	try{
+		console.log(msg.toUpperCase().repeat(3));
+	}catch(e){
+		console.log(e);				
+		console.log('NOT A STRING!!')
+	}
+}
+
+yellNew('lol');	->	LOLLOLLOL
+yellNew(40);	->	Prints 'TypeError: msg.toUpperCase is not a function' followed by 'NOT A STRING!!'
+
++++++++++++++++++++++++++++++++++++
+CALLBACKS AND ARRAY METHODS
++++++++++++++++++++++++++++
+FOREACH
+MAP
+SOME & EVERY
+ARROW FUNCTIONS
+FILTER 
+REDUCE
+
+FOREACH
+---
+Accepts a callback function
+Calls the function once per element in the array
+
+const nums = [9,8,7,6,5,4,3,2,1];
+
+function print(n){
+	console.log(n)
+}
+
+nums.forEach(print);
+
+//anonymous function expression
+nums.forEach(function (n){
+	console.log(n*n);	->	81,64,49,36,25,16,9,4,1
+});
+
+nums.forEach(function (el){
+	if(el%2 === 0){
+		console.log(el);	->	8,6,4,2
+	}	
+});
+
+const movies = [
+	{
+		name: 'Titanic',
+		score: 96
+	},
+	{
+		name: 'Avatar',
+		score: 98
+	},
+	{
+		name: '2012',
+		score: 92
+	}
+];
+
+movies.forEach(function (movie){
+	console.log(`${movie.name} - ${movie.score}/100`);
+});
+
+Titanic - 96/100
+Avatar - 98/100
+2012 - 92/100
+
+MAP
+---
+Creates a new array with the results of calling a callback on every element in the array
+
+const texts = ['omg','rotfl','lol'];
+const caps = texts.map(function(text){
+	return text.toUpperCase();
+});
+caps	->	['OMG', 'ROTFL', 'LOL']
+
+const fullNames = [{first: 'Albus', last: 'Dumbledore'}, {first: 'Harry', last: 'Potter'}, {first: 'Hermione', last: 'Granger'}, {first: 'Ron', last: 'Weasley'}, {first: 'Rubeus', last: 'Hagrid'}, {first: 'Minerva', last: 'McGonagall'}, {first: 'Severus', last: 'Snape'}];
+const firstNames = fullNames.map(function(name){
+    return name.first;
+});
+firstNames		->	['Albus', 'Harry', 'Hermione', 'Ron', 'Rubeus', 'Minerva', 'Severus']
+
+ARROW FUNCTIONS
+---
+Newer Syntax. used to create function expressions. compact alternative syntax to regular function expressions. No IE Support
+
+const square = (x) => {
+	return x*x;
+}
+square(9)	->	81
+
+const sum = (x,y) => {
+	return x+y;
+}
+sum(8,7)	->	15
+
+const rollDie = () => {
+	return Math.floor(Math.random()*6)+1
+}
+rollDie() -> 5
+
+const greet = (name) => {
+    return `Hey ${name}!`
+}
+greet('Vijay')	->	Hey Vijay!
+
+ARROW FUNCTIONS - IMPLICIT RETURNS (Works only if there is one value i.e. single expression to be evaluated and returned)
+---
+All these functions do the same thing
+
+const isEven = function(num){	-> regular function expression
+	return num % 2 === 0;
+};
+
+const isEven = (num) => {		-> arrow function with parenthesis around params
+	return num % 2 === 0;
+};
+
+const isEven = num => {			->	No parenthesis around params
+	return num % 2 === 0;
+};
+
+const isEven = num => (		->	IMPLICIT RETURN i.e eliminate the return keyword. REPLACE CURLY BRACES WITH PARENTHESIS
+	num % 2 === 0;
+);
+
+const isEven = num => num % 2 === 0;	-> one-liner implicit return
+---
+const sum = (x,y) => (
+	x+y;
+)
+sum(8,7)	->	15
+
+const rollDie = () => (
+	let msg = 'Hi';
+	Math.floor(Math.random()*6)+1;
+)
+Uncaught SyntaxError: Unexpected identifier
+---
+const fullNames = [{first: 'Albus', last: 'Dumbledore'}, {first: 'Harry', last: 'Potter'}, {first: 'Hermione', last: 'Granger'}, {first: 'Ron', last: 'Weasley'}, {first: 'Rubeus', last: 'Hagrid'}, {first: 'Minerva', last: 'McGonagall'}, {first: 'Severus', last: 'Snape'}];
+const firstNames = fullNames.map(function(name){
+    return name.first;
+});
+
+const firstNames = fullNames.map(name => (name.first))
+firstNames	->	['Albus', 'Harry', 'Hermione', 'Ron', 'Rubeus', 'Minerva', 'Severus']
+
+SETTIMEOUT and SETINTERVAL
+---
+Delaying/Waiting/Pausing execution/Postponing execution for later dates
+
+setTimeout(handler: TimerHandler, timeout?:number, ...arguments: any[]):number
+SETTIMEOUT will execute this function after the specific timeout
+example,
+console.log('HELLOO!');
+setTimeout(() => {
+	console.log('I will print after 10 seconds');
+},10000);
+console.log('GOODBYE!');
+
+HELLOO!
+GOODBYE!
+I will print after 10 seconds
+
+SETINTERVAL will repeat executing a function after every interval
+const id = setInterval(() => {
+	console.log('I will print every 3 seconds');
+},3000);
+
+setInterval returns an id that we can use to clear it
+CLEARINTERVAL will stop the execution of the function at intervals
+clearInterval(id)
+
+FILTER
+---
+creates a new array with all elements that pass the test implemented by the provided function
+
+const nums = [1,2,3,4,5,6,7,8,9];
+const odds = nums.filter(n => {
+	return n%2 === 1;
+});
+const smallNums = nums.filter(n => n < 5);
+
+odds -> [1, 3, 5, 7, 9]
+smallNums -> [1, 2, 3, 4]
+
+we can also chain map and filter like this
+movies.filter(m => m.score > 80).map(m => m.title);
+
+const validUserNames = (arr) => arr.filter(item => item.length<10)
+validUserNames(["sdfsdfsdfsfsklsdg","sdfsdf","fdfgdfg","sifsdilfflklk3r5"])		->	 ['sdfsdf', 'fdfgdfg']
+
+SOME AND EVERY (boolean) METHODS
+---
+Unlike map/filter which returns a new array, these 2 always return a boolean true/false
+
+They check if every element in an array passes a certain test, and 
+	SOME - returns true if atleast one of the elements passes the test
+	EVERY - returns true if all the elements passes the test
+
+EVERY - If every element passed into the test returns true, then EVERY function call returns true
+
+examScores = [30, 60,65,90,86]
+const allPass = examScores.every(mark => mark >= 35)
+allPass -> false
+
+const allEvens = (arr) => arr.every(num => num%2 === 0) 
+allEvens([2,4,6,8,10])	-> true
+allEvens([2,4,5,8,10])	-> false
+
+SOME - Similar to EVERY, but returns true if ANY of the array elements, pass the test function
+
+const words = ['dog', 'jello', 'log', 'cupcake', 'bag', 'wag']
+//Are there any words longer than 4 characters?
+words.some(word => {
+	return word.length > 4;
+})	-> true
+//Do any words start with Z
+words.some(word => (word[0] === 'z'))	-> false
+//Do any words contain cake
+words.some(word => word.includes('cake'))	-> false
+
+REDUCE
+---
+Executes a reducer function on each element of the array, resulting in a single value
+Take some array and reduce it down into a single value
+
+accumulator - element that we are reducing down to
+currentValue - represents each individual element
+
+[3,5,7,9,11].reduce((accumulator,currentValue) => {
+	return accumulator+currentValue;
+});
+Result is 35
+
+NOTE: What about initial value for accumulator? For example, as 100
+[3,5,7,9,11].reduce((accumulator,currentValue) => {
+	return accumulator+currentValue;
+},100);
+Result is 135
+
+Maximum value in an array
+const max = [3,5,7,9,11,100,50,43,21].reduce((max,item) => item>max?item:max)
+Result is 100
+
+ARROW FUNCTIONS & THIS
+---
+const person = {
+	firstName: 'vijay',
+	lastName: 'anand',
+	fullName: function(){
+		return `${this.firstName} ${this.lastName}`
+	}
+}
+
+person.fullName()	-> 'vijay anand'
+
+IF WE REPLACE FUNCTION WITH ARROW FUNCTIONS
+const person = {
+	firstName: 'vijay',
+	lastName: 'anand',
+	fullName: () => {
+		return `${this.firstName} ${this.lastName}`
+	}
+}
+
+person.fullName()	-> 'undefined undefined'
+
+WHY? BECAUSE INSIDE OF ARROW FUNCTION, THE KEYWORD THIS IS GOING TO REFER TO THE SCOPE IN WHICH IT WAS CREATED IN
+IN THE ABOVE CASE, THE KEYWORD THIS IS GOING TO REFER TO THE WINDOWS OBJECT
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+NEWER JAVASCRIPT FEATURES
+++++++++++++++++++++++++++
+Default Params
+Spread in function calls
+Spread with arrays
+Spread with objects
+Rest Params
+Destructuring
+
+DEFAULT PARAMS
+---
+When no value is passed to arguments, consider using default value
+NOTE : Always place your default parameters at the end of the arguments
+
+function multiply(a, b=1){
+	return a * b;	
+}
+
+multiply(10) -> 10
+multiply(10,3) -> 30
+
+function greet(name,msg='Hey there',punc='!'){
+	console.log(`${msg}, ${name}${punc}`);
+}
+
+greet('Vijay');						->	Hey there, Vijay!
+greet('Gautham','Good Morning');	->	Good Morning, Gautham!
+greet('Priyanka','Adios',':)');		->	Adios, Priyanka:)
+
+SPREAD
+---
+Spread syntax allows an iterable such as an array to be expanded in places where zero or more arguments(for function calls)
+or elements(for array literals) are expected, or an object expression to be expanded in places where zero or more key-value
+pairs (for object literals) are expected
+
+SPREAD FOR FUNCTION CALLS
+Expands an iterable(array or string) into a list of arguments
+const nums = [9,3,2,8];
+Math.max(nums)		-> This result in NaN
+//Use spread
+Math.max(...nums); //9
+//Same as calling Math.max(9,3,2,8)
+
+console.log("my","name","is","khan")	->	my name is khan
+console.log(..."hello")					->	h e l l o	[This is same as..]
+console.log('h','e','l','l','o')		->	h e l l o
+console.log(...nums)					->	9 3 2 8
+
+SPREAD WITH ARRAY LITERALS
+Creates a new array using an existing array.Spread the elements from one array into a new array
+const cats = ['mac','rory','rusty']
+const dogs = ['roger','tomy','tiger']
+const allPets = [...cats,...dogs]		->	['mac', 'rory', 'rusty', 'roger', 'tomy', 'tiger']
+
+SPREAD WITH OBJECT LITERALS
+Copies properties from object to another object literal(rather than mutating them)
+const feline = { legs:4, family: 'felidae'}
+const canine = { family: 'Caninae', furry}: true }
+
+const dog  = {...canine, isPet: true};
+
+const lion = {...feline, genus: 'Panthera'}
+const catdog = {...feline,...canine}			->	{legs: 4, family: 'Caninae', furry: true}
+Note: When there is a conflict, the latter ones to be spread overrides the former ones
+
+QUIZ: What if we spread an array or string into an objet
+const arrAsObj = {...[9,3,2,8]}	-> {0: 9, 1: 3, 2: 2, 3: 8}
+const strAsObj = {..."gautham"}	->	{0: 'g', 1: 'a', 2: 'u', 3: 't', 4: 'h', 5: 'a', 6: 'm'}
+
+REST PARAMS	
+---
+Looks like SPREAD, but it is not. Means COLLECT THE REST OF THE VALUES
+REST PARAMS - Collects all remaining arguments into an actual array
+
+ARGUMENTS object
+	- Available inside every function
+	- It is an array-like object
+		- Has a length property
+		- Doesn't have array methods like push/pop
+	- Contains all the arguments passed to the function
+	- Not available inside of arrow functions
+	
+function sum(){
+	console.log(arguments)
+}
+
+sum() -> Arguments [callee: ƒ, Symbol(Symbol.iterator): ƒ]
+		callee: ƒ sum()
+		length: 0
+		Symbol(Symbol.iterator): ƒ values()
+		[[Prototype]]: Object
+
+sum(10,20,30)	->	Arguments(3) [10, 20, 30, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+					0: 10
+					1: 20
+					2: 30
+					callee: ƒ sum()
+					length: 3
+					Symbol(Symbol.iterator): ƒ values()
+					[[Prototype]]: Object
+					
+function sumAll(...nums){
+	let total = 0;
+	for(let n of nums)
+	{
+		total+= n;
+	}
+	return total
+}
+
+sumAll(1,2,3)			->	6
+sumAll(1,2,3,4,5,6,7,8)	->	36
+
+function raceResults(gold, silver, ...restOfThem){
+	console.log(`GOLD GOES TO : ${gold}`)
+	console.log(`SILVER GOES TO : ${silver}`)
+	console.log(`THANKS TO OTHER PARTICIPANTS : ${restOfThem}`)
+}
+
+raceResults('Gautham', 'Meenakshi', 'Vijay', 'Priya')
+
+GOLD GOES TO : Gautham
+SILVER GOES TO : Meenakshi
+THANKS TO OTHER PARTICIPANTS : Vijay,Priya
+
+DESTRUCTURING
+---
+A short clean syntax to 'unpack'
+	- values from arrays
+	- Properties from objects
+into distinct variables		
+
+ARRAY DESTRUCTURING
+---
+const raceResults = ['Gautham', 'Meenakshi', 'Vijay', 'Priya'];
+const [gold, silver, bronze] = raceResults
+gold	->	'Gautham'
+silver	->	'Meenakshi'
+bronze	->	'Vijay'
+
+const [fastest, restOfThem] = raceResults
+fastest	->	'Gautham'
+restOfThem	->	['Meenakshi', 'Vijay', 'Priya']	
+
+OBJECT DESTRUCTURING
+---
+const runner1 = {
+	first: 'vijay',
+	last: 'anand',
+	country: 'india',
+	title: 'programmer'
+}
+
+const {first,last,country} = runner
+first -> 'vijay'
+last -> 'anand'
+country -> 'india'
+
+NOTE: If you want to store in a different variable
+const {first:myFirst,last:myLast,country:myCountry} = runner
+myFirst -> 'vijay'
+myLast -> 'anand'
+myCountry -> 'india'
+
+NOTE: If you want to assign a fallback/default value
+const runner2 = {
+	first: 'priyanka',
+	last: 'k.v',
+	country: 'india'
+}
+const {first:myFirst,last:myLast,title:myTitle='N/A'} = runner2
+
+myTitle -> 'N/A'
+
+PARAMS DESTRUCTURING
+---
+Rather than passing a full object, we can destructure the values that are being passed to in the parameters section
+
+const runner = {
+	first: 'vijay',
+	last: 'anand',
+	country: 'india',
+	title: 'programmer'
+}
+#1
+Rather than this
+const fullName = (runner) => {
+	return `${runner.first} ${runner.last}`
+}
+we can destructure at params level
+const fullName = ({first,last='N/A'}) => {
+	return `${first} ${last}`
+}
+fullName(runner)	->	'vijay anand'
+#2
+Rather than this
+const students = [{first: 'Albus', last: 'Dumbledore', score: 90}, {first: 'Harry', last: 'Potter', score: 90}, {first: 'Hermione', last: 'Granger', score: 90}, {first: 'Ron', last: 'Weasley', score: 65}, {first: 'Rubeus', last: 'Hagrid', score: 20}, {first: 'Minerva', last: 'McGonagall', score: 79}, {first: 'Severus', last: 'Snape', score: 99}];
+const brightStudents1 = students.filter((student) => student.score>=90)
+We can use this
+const brightStudents2 = students.filter(({score}) => score>=90)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DOM INTRODUCTION
+++++++++++++++++
+Intro to the DOM
+getElementById
+querySelector
+innerHTML and Text
+Changing styles
+Manipulating attributes
+classList
+Traversing the DOM
+creating/removing elements
+
+DOM is a javascript representation of a web page
+It is your "JS" introduction into the contents of a web page
+It is just a bunch of objects that you can interact with via "JS"
+
+DOM - HTML & CSS go in -> JS Objects come out
+Document - Very special object(wimilar to window object) called Document
+The Document object is our entry into the world of DOM. It contains representation of all the content on a page, plus tons of useful 
+methods and properties 
+
+document	-> Just HTML representation
+console.dir(document)
+		#document
+		location: Location {ancestorOrigins: DOMStringList, href: 'chrome://new-tab-page/', origin: 'chrome://new-tab-page', protocol: 'chrome:', host: 'new-tab-page', …}
+		URL: "chrome://new-tab-page/"
+		activeElement: body
+		adoptedStyleSheets: []
+		alinkColor: ""
+		all: HTMLAllCollection(134) [html.focus-outline-visible, head, meta, title, style, custom-style, style, custom-style, style, custom-style, style, custom-style, style, style, iron-iconset-svg, svg, defs, g#domain, path, g#kite, path, g#menu, path, iron-iconset-svg, svg, defs, g#account-child-invert, path, path, circle, path, g#add, path, g#arrow-back, path, g#arrow-drop-up, path, g#arrow-drop-down, path, g#arrow-forward, path, g#arrow-right, path, g#cancel, path, g#check, path, g#check-circle, path, g#chevron-left, path, g#chevron-right, path, g#clear, path, g#close, path, g#computer, path, g#delete, path, g#domain, path, g#error, path, g#error-outline, path, g#expand-less, path, g#expand-more, path, g#extension, path, g#file-download, path, g#fullscreen, path, g#group, path, g#help-outline, path, g#info, path, g#info-outline, path, g#insert-drive-file, path, g#location-on, path, g#mic, path, g#more-vert, path, g#open-in-new, path, g#person, path, g#phonelink, path, g#print, …]
+		anchors: HTMLCollection []
+		applets: HTMLCollection []
+		baseURI: "chrome://new-tab-page/"
+		bgColor: ""
+		body: body
+		characterSet: "UTF-8"
+		charset: "UTF-8"
+		childElementCount: 1
+		childNodes: NodeList(2) [<!DOCTYPE html>, html.focus-outline-visible]
+		children: HTMLCollection [html.focus-outline-visible]
+		compatMode: "CSS1Compat"
+		contentType: "text/html"
+		cookie: ""
+		currentScript: null
+		defaultView: Window {0: Window, window: Window, self: Window, document: document, name: '', location: Location, …}
+		designMode: "off"
+		dir: "ltr"
+		doctype: <!DOCTYPE html>
+		documentElement: html.focus-outline-visible
+		documentURI: "chrome://new-tab-page/"
+		domain: "new-tab-page"
+		embeds: HTMLCollection []
+		featurePolicy: FeaturePolicy {}
+		fgColor: ""
+		firstChild: <!DOCTYPE html>
+		firstElementChild: html.focus-outline-visible
+		fonts: FontFaceSet {onloading: null, onloadingdone: null, onloadingerror: null, ready: Promise, status: 'loaded', …}
+		forms: HTMLCollection []
+		fragmentDirective: FragmentDirective {}
+		fullscreen: false
+		fullscreenElement: null
+		fullscreenEnabled: true
+		head: head
+		hidden: false
+		images: HTMLCollection []
+		implementation: DOMImplementation {}
+		inputEncoding: "UTF-8"
+		isConnected: true
+		lastChild: html.focus-outline-visible
+		lastElementChild: html.focus-outline-visible
+		lastModified: "12/11/2021 19:07:03"
+		linkColor: ""
+		links: HTMLCollection []
+		nextSibling: null
+		nodeName: "#document"
+		nodeType: 9
+		nodeValue: null
+		onabort: null
+		onanimationend: null
+		onanimationiteration: null
+		onanimationstart: null
+		onauxclick: null
+		onbeforecopy: null
+		onbeforecut: null
+		onbeforepaste: null
+		onbeforexrselect: null
+		onblur: null
+		oncancel: null
+		oncanplay: null
+		oncanplaythrough: null
+		onchange: null
+		onclick: null
+		onclose: null
+		oncontextmenu: null
+		oncopy: null
+		oncuechange: null
+		oncut: null
+		ondblclick: null
+		ondrag: null
+		ondragend: null
+		ondragenter: null
+		ondragleave: null
+		ondragover: null
+		ondragstart: null
+		ondrop: null
+		ondurationchange: null
+		onemptied: null
+		onended: null
+		onerror: null
+		onfocus: null
+		onformdata: null
+		onfreeze: null
+		onfullscreenchange: null
+		onfullscreenerror: null
+		ongotpointercapture: null
+		oninput: null
+		oninvalid: null
+		onkeydown: null
+		onkeypress: null
+		onkeyup: null
+		onload: null
+		onloadeddata: null
+		onloadedmetadata: null
+		onloadstart: null
+		onlostpointercapture: null
+		onmousedown: null
+		onmouseenter: null
+		onmouseleave: null
+		onmousemove: null
+		onmouseout: null
+		onmouseover: null
+		onmouseup: null
+		onmousewheel: null
+		onpaste: null
+		onpause: null
+		onplay: null
+		onplaying: null
+		onpointercancel: null
+		onpointerdown: null
+		onpointerenter: null
+		onpointerleave: null
+		onpointerlockchange: null
+		onpointerlockerror: null
+		onpointermove: null
+		onpointerout: null
+		onpointerover: null
+		onpointerrawupdate: null
+		onpointerup: null
+		onprogress: null
+		onratechange: null
+		onreadystatechange: null
+		onreset: null
+		onresize: null
+		onresume: null
+		onscroll: null
+		onsearch: null
+		onsecuritypolicyviolation: null
+		onseeked: null
+		onseeking: null
+		onselect: null
+		onselectionchange: null
+		onselectstart: null
+		onstalled: null
+		onsubmit: null
+		onsuspend: null
+		ontimeupdate: null
+		ontoggle: null
+		ontransitioncancel: null
+		ontransitionend: null
+		ontransitionrun: null
+		ontransitionstart: null
+		onvisibilitychange: null
+		onvolumechange: null
+		onwaiting: null
+		onwebkitanimationend: null
+		onwebkitanimationiteration: null
+		onwebkitanimationstart: null
+		onwebkitfullscreenchange: null
+		onwebkitfullscreenerror: null
+		onwebkittransitionend: null
+		onwheel: null
+		ownerDocument: null
+		parentElement: null
+		parentNode: null
+		pictureInPictureElement: null
+		pictureInPictureEnabled: true
+		plugins: HTMLCollection []
+		pointerLockElement: null
+		previousSibling: null
+		readyState: "complete"
+		referrer: ""
+		rootElement: null
+		scripts: HTMLCollection(2) [script, script]
+		scrollingElement: html.focus-outline-visible
+		styleSheets: StyleSheetList {0: CSSStyleSheet, 1: CSSStyleSheet, 2: CSSStyleSheet, 3: CSSStyleSheet, 4: CSSStyleSheet, 5: CSSStyleSheet, 6: CSSStyleSheet, 7: CSSStyleSheet, length: 8}
+		textContent: null
+		timeline: DocumentTimeline {currentTime: 159936205.915}
+		title: "New Tab"
+		visibilityState: "visible"
+		vlinkColor: ""
+		wasDiscarded: false
+		webkitCurrentFullScreenElement: null
+		webkitFullscreenElement: null
+		webkitFullscreenEnabled: true
+		webkitHidden: false
+		webkitIsFullScreen: false
+		webkitVisibilityState: "visible"
+		xmlEncoding: null
+		xmlStandalone: false
+		xmlVersion: null
+		[[Prototype]]: HTMLDocument
+		
+document.URL -> URL of the page
+document.all -> all the tags
+
+GETELEMENTBYID
+---
+SELECTING
+getElementById	->	Returns an Element object representing the element whose id property matches the specified string
+getElementsByTagName -> Returns an HTML collection of elements(Element) with the give tag name	
+getElementsByClassName
+
+document.getElementById('chicken') -> null	[if the element doesn't exist]
+document.getElementsByTagName('p') -> HTMLCollection [] Returns an empty HTML Collection
+document.getElementsByTagName('img') -> iterable collection, but not arrays
+document.getElementsByClassName('square') -> 
+const allImages = document.getElementsByTagName('img');
+for(let img of allImages){
+	console.log(img.src)
+}
+
+QUERYSELECTOR & QUERYSELECTORALL
+---
+QUERYSELECTOR - A newer, all-in-one method to select a single element
+
+//finds the first h1 (TAG) element
+document.querySelector('h1');
+
+//finds the first element with id of red
+document.querySelector('#red');
+
+//finds the first element with class of big
+document.querySelector('.big');
+
+//find an anchor element with a (ATTRIBUTE) title of "java"
+document.querySelector('a[title="java"]');
+
+QUERYSELECTORALL - Same idea, but returns a collection of matching elements
+document.querySelectorAll('p');
+document.querySelectorAll('p a'); -> Returns descendant anchor tags
+
+DOM IMPORTANT PROPERTIES 
+innerText	- represents the "rendered" text content of a node and its descendants(ignores tags, sensitive to what is currently being displayed/ stuff being ignored)
+textContent	- entire contents. doesn't care about what is being displayed or what is shown to user
+innerHTML	- represents the full contents, including the tag names of basically everything inside of an element b/w opening and closing tag	
+value
+parentElement
+children
+nextSibling
+previousSibling
+style
+classList
+
+DOM IMPORTANT METHODS
+getAttribute()
+setAttribute()
+append()
+prepend()
+appendChild()
+removeChild()
+remove()
+createElement()
+
+document.querySelector('p').innerText = all of the text content between the opening and closing tags for a paragraph
+document.querySelector('p').textContent = Similar to innerText, but shpwscontains spaces from the markup or display:none content etc.
+
+document.querySelector('h1').innerText = '<i>italicized text</i>' -> This will NOT work. You need to use INNERHTML instead
+document.querySelector('h1').innerHTML = '<i>italicized text</i>' -> This overwrites
+document.querySelector('h1').innerHTML += '<i>italicized text</i>' -> This appends
+
+ATTRIBUTES
+---
+Directly vs get/set Attribute:
+	Directly - gets the value from Javascript object 
+	getAttribute and setAttribute	-> gets the value from HTML
+	
+changing the id atribute directly
+document.querySelector('#banner').id = 'newbanner'
+
+changing the src attribute directly
+document.querySelector('#banner').src = <new src>
+
+
+const firstLink = document.querySelector('a');
+firstLink.getAttribute('href')
+firstLink.setAttribute('href',<newhref>)
+
+document.querySelector('img').src='https://devsprouthosting.com/images/chicken.jpg';
+document.querySelector('img').alt='chicken'
+
+CHANGING STYLES
+---
+const h1 = document.querySelector(h1)
+h1.style -> You can access only inline styles and NOT from CSS. However you would be able to set new style
+
+h1.style.color = 'green'
+
+changing all the link color
+const allLinks = document.querySelectorAll('a');
+for(let link of allLinks){
+	link.style.color = 'rgb(0,108,134)';
+	link.style.textDecorationColor = 'magenta';
+}
+
+window.getComputedStyle(h1).color	-> To get the current settings
+window.getComputedStyle(h1).fontSize
+
+Exercise
+const div = document.querySelector('#container');
+div.style.textAlign='center';
+const img = document.querySelector('img');
+img.style.width='150px';
+img.style.borderRadius='50%';
+
+Exercise
+const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'indigo', 'violet']; //PLEASE DON'T CHANGE THIS LINE!
+//YOU CODE GOES HERE:
+const spans = document.querySelectorAll('span');
+for(var index = 0; index < spans.length; index++){
+    const span = spans[index];
+	span.style.color = colors[index];
+}
+
+CLASSLIST
+---
+const h2 = document.querySelector(h2);
+h2.getAttribute('class');
+h2.setAttribute('class','purple');
+h2.setAttribute('class','purple');// This will override the purple class
+
+classList is an object we can interact with to control the classes on an element and also to retrieve them and to manipulate them
+h2.classList.add('purple')	-> almost similar to pushing into an array and popping out
+h2.classList.remove('purple')
+h2.classList.contains('purple')
+h2.classList.toggle('purple') -> adds/removes a class alternatively. For example, usecase ACCORDION
+
+HTML
+	</head>
+	<body>
+		<ul>
+			<li>Hello</li>
+			<li class="highlight">Hello</li>
+			<li>Hello</li>
+			<li>Hello</li>
+			<li class="highlight">Hello</li>
+			<li>Hello</li>
+		</ul>
+	</body>
+	</html>
+
+CSS
+	li {
+	  background-color: #B10DC9;
+	}
+	.highlight {
+	  background-color: #7FDBFF;
+	}
+
+JAVASCRIPT
+	const lis = document.querySelectorAll('li');
+	for(let li of lis){
+		li.classList.toggle('highlight')
+	}
+	
+TRAVERSING PARENT/CHILD/SIBLING
+---
+const firstBold = document.querySelector('b');
+const paragraph = firstBold.parentElement
+firstBold.parentElement.parentElement
+
+paragraph.children
+paragraph.children[0]	
+
+const img = document.querySelector('img');
+img.nextSibling
+img.previousSibling
+img.nextSiblingElement	(RECOMMENDED)
+img.previousSiblingElement
+
+APPEND & APPENDCHILD
+---
+2 ways of creating new elements 1)document.createElement() 2)ParentNode.append()
+
+document.createElement() method creates the HTML element specified by tag name
+
+var element = document.createElement(tagName[, options])
+
+var newImg = document.createElement('img');
+newImg.src = 'http://<IMGPATH>'
+document.body.appendChild(newImg)
+newImg.classList.add('square')
+
+const newH3 = document.createElement('h3');
+newH3.innerText = 'I am new!!'
+document.body.appendChild(newH3)
+
+ParentNode.append() method inserts a set of Node objects or DOMString objects after the last child of the parent node.
+const paragraph = document.querySelector('p');
+paragraph.appendChild('I'm new text')
+paragraph.appendChild("I'm new text","I'm another text")
+
+ParentNode.prepend() method inserts a set of Node objects or DOMString objects before the first child of the parent node.
+Element.insertAdjacentElement() method of the Element interface inserts a given element node at a given position relative to the element it is invoked upon
+beforebegin/afterbegin/beforeend/afterend
+
+const h2 = document.createElement('h2');
+h2.append('I am h2')
+
+const h1 = document.createElement('h1');
+h1.insertAdjacentElement('afterend', h2);
+
+EXERCISE
+const div = document.querySelector("#container");
+for(let i=0;i<100;i++){
+    const btn = document.createElement('button');
+    btn.textContent = 'Hey!';
+    div.appendChild(btn);
+}
+
+removeChild & remove
+---
+OLD WAY(call removeChild from parent)
+Node.removeChild() method removes the child node from the DOM and returns the removed node
+
+var oldChild = node.removeChild(child);
+For example,
+const firstLi = document.querySelector("li");
+const ul = firstLi.parentElement
+ul.removeChild(firstLi)
+
+NEW WAY(remove)
+Node.remove() method removes the object from the tree it belongs to
+
+const firstLi = document.querySelector("li");
+firstLi.remove();
+
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DOM EVENTS		- respond to user inputs and actions
+++++++++++++++++	
+Introducing Events
+addEventListener
+Forms Events
+Event Delegation
+Keyboard Events
+Input and Change Events
+Event Bubbling
+
+-how to run javascript code when a user clicks on a particular button, when they hover or drag or type something
+-to make interactive application, the code should react to what the user does
+
+INTRODUCING EVENTS
+---
+Events that we can listen for and react to
+	clicks/drags/drops/hovers/scrolls/form submission/key presses/focus/blur/mouse wheel/double click/copying/pasting/audio start/screen resize/printing
+
+3 ways to respond to user events and make use of interaction
+
+1)	NOT RECOMMENDED - Directly inline on HTML element, add an attribute called onclick
+		<button onclick="alert('Hi');alert('Bye')">Click Me!</button>
+		
+		<body>
+			<h1 onclick="console.log('boo')">Inline Events Suck...</h1>
+			<button id="btn" onclick="console.log('clicked')">Click Me</button>
+		</body>
+2) OKAYISH - Use Javascript instead of inline HTML. Set it to a function. Is more reusable unlike INLINE
+		<button id="btn2">I'm JS onmethod. Click Me!</button>
+		
+		const btn2 = document.querySelector('#btn2');
+		//btn2.onclick = function () { console.log('I am called from JS onclick - anonymous function'); }
+		btn2.onclick = () => { console.log('I am called from JS onclick - arrow function'); }
+
+		btn2.onmouseenter = yell
+		function yell() {
+			console.log("YOU'RE HOVERING OVER ME!");
+		}
+		
+2) RECOMMENDED - addEventListener	-	Specify the event type and a callback to run
+	First Argument - Type of event
+	Second Argument - Callback
+<body>
+    <h1>Click These Buttons</h1>
+    <p>And Prepare To Have Your Mind Blown</p>
+    <button id="hello">Hello</button>
+    <button id="goodbye">Goodbye</button>
+</body>
+
+const helloBtn = document.querySelector('#hello');
+const goodbyeBtn = document.querySelector('#goodbye');
+
+helloBtn.addEventListener('click', ()=>{console.log('hello')});
+goodbyeBtn.addEventListener('click', ()=>{console.log('goodbye')});
+
+NOTE: addEventListener is preferred over btn2.onclick because we can add multiple 'onclick' callbacks over the same element when using addEventListener.
+For example,
+THIS IS POSSIBLE. WE CAN ASSIGN MORE THAN ONE CALLBACK FUNCTION TO THE SAME EVENT(onclick)
+helloBtn.addEventListener('click', ()=>{console.log('first hello')});
+helloBtn.addEventListener('click', ()=>{console.log('second hello')});
+THIS IS NOT POSSIBLE.  WE CAN'T ASSIGN MORE THAN ONE CALLBACK FUNCTION TO THE SAME EVENT(onclick) PROPERTY OBJECT. THE SECOND ASSIGNMENT WOULD OVERRIDE THE FIRST
+btn2.onclick = () => { console.log('first hello')};
+btn2.onclick = () => { console.log('second hello')};
+
+EVENTS & KEYWORD THIS
+---
+The keyword THIS is going to refer to whichever ELEMENT(button) the EVENT(onclick) occured on
+When the keyword THIS is invoked by some callback
+
+INSTEAD OF  
+	for (let btn of btns) {
+		btn.addEventListener('click', () => {
+			const color = makeRandomColor();
+			btn.style.backgroundColor = color;
+		});
+	}
+
+	for (let h2 of h2s) {
+		h2.addEventListener('click', () => {
+			const color = makeRandomColor();
+			h2.style.backgroundColor = color;
+		});
+	}
+
+	const makeRandomColor = () => {
+		const r = Math.floor(Math.random() * 255);
+		const g = Math.floor(Math.random() * 255);
+		const b = Math.floor(Math.random() * 255);
+		return `rgb(${r}, ${g}, ${b})`;
+	}
+
+WE CAN MAKE IT MORE GENERIC. this WILL REFER TO EITHER h2 OR btn DEPENDING ON THE CONTEXT
+
+	for (let btn of btns) {
+		btn.addEventListener('click', applyColor);
+	}
+
+	for (let h2 of h2s) {
+		h2.addEventListener('click', applyColor);
+	}
+
+	function applyColor() {
+		const color = makeRandomColor();
+		this.style.backgroundColor = color;
+	}
+
+EVENT OBJECT AND KEYBOARD EVENTS
+---
+EVENT OBJECT is something we have access to in every EVENT HANDLER.Its passed in automatically. We are not calling this function. But when it is called for us, it's passed in
+We can add a parameter(using any name such as evt or e) in there to capture it. And it contains properties, information about the event
+EVENT OBJECT gets automatically passed in to the callback function. There is NO parameter to capture it, but it is being passed in every single time
+If in the callback function, i add a random parameter called 'evt' and if i console.log, it will display the information about the event object.
+In the below example, it is a pointer event object
+
+	const btn = document.querySelector('button');
+	btn.addEventListener('click', (evt) => {
+		alert('You clicked me!');
+		console.log(evt);
+	})	
+	
+USECASE -> We often need to rely on the event object when we are working with keyboard events
+A lot of time, we are interested in what key was pressed. For that we use EVENT OBJECT	
+
+	const ip = document.querySelector('input')
+	ip.addEventListener('keydown', (evt) => {
+		console.log('KEY DOWN')
+		console.log(evt.key)
+		console.log(evt.code)
+	})
+
+END RESULT vs CODE -> Code corresponds to an actual (physical) location in the keyboard
+
+NOTE: We can LISTEN for events both on INPUT events or on the WINDOW as a whole
+//Global way
+window.addEventListener('keydown', (evt) => {
+    console.log('WINDOW KEY DOWN')
+    console.log(evt.key)	-> p	(This is dynamic and depends upon keyboard language settings)
+    console.log(evt.code)	-> keyP	 (This is standard)
+    switch (evt.code) {
+        case 'ArrowRight':
+            console.log('ARROW KEY RIGHT');
+            break;
+        case 'ArrowLeft':
+            console.log('ARROW KEY LEFT');
+            break;
+        case 'ArrowUp':
+            console.log('ARROW KEY UP');
+            break;
+        case 'ArrowDown':
+            console.log('ARROW KEY DOWN');
+            break;
+        default:
+            console.log('IGNORE');
+    }
+})
+
+FORM EVENTS
+---
+What happens when we submit a form by default and how we can prevent that behavior
+
+	<form action="/someaction">
+	
+	</form>
+	
+By default, When this form is submitted, whatever data that is included in the form is going to be submitted to this location as HTTPRequest
+If we are trying to do something on a single page such as submitting a form, take some data out of the form and then do something
+on the same page without refreshing. we need to use event.preventDefault() to tell the form/browser 'DONT DO THAT NORMAL THING YOU DO. I'M TAKING CONTROL'	
+Stop the automatic/normal behavior for form submission i.e to send to some new URL, submit a HTTP request with the form data
+
+	<form action="/hitsomeurl" id="actionForm">
+        <input type="text" id='txt' name='inputText'>
+        <input type="submit" id='btn'>
+        <h2>The List:</h2>
+        <ul id="list"></ul>
+    </form>
+	
+    //accessing the text field using id
+    const txt = document.querySelector('#txt');
+    console.log(txt.value)
+
+	elements: HTMLFormControlsCollection(2)
+	0: input#txt
+	1: input#btn
+	btn: input#btn
+	inputText: input#txt
+	txt: input#txt
+	length: 2
+	
+    //another way of accessing the text field using name
+    console.log(actionForm.elements.inputText.value)
+
+INPUT AND CHANGE EVENTS
+---
+Rather than waiting for submit, change events happen live
+There are different ways of updating input
+
+CHANGE event -> Only fires when you actually blur the input i.e Whenever you leave that input and it is different than it was when you entered the input
+INPUT event -> This fires whenever what's in the input changes, not on blur -> Usecase live preview of comment
+
+	<body>
+		<h1>Enter Your Username</h1>
+		<input type="text" id="username">
+		<script src="appChange.js"></script>
+	</body>
+	-------
+	const userName = document.querySelector('#username');
+	const h1 = document.querySelector('h1');
+	userName.addEventListener('input', (evt) => {
+		const text = userName.value;
+		if (text == '') {
+			h1.innerText = 'Enter Your Username'
+		} else {
+			h1.innerText = 'Welcome, ' + text;
+		}
+	});
+	
+EVENT BUBBLING
+---
+Event will get triggered on the nested element, after handling that event and bubble up gradually to outer elements
+
+    <section onclick="alert('Section Clicked!')">
+        <p onclick="alert('Paragraph Clicked!')">
+            <button onclick="alert('Button Clicked!')"></button>
+        </p>
+    </section>
+	
+	Output of the above example is
+	
+	Button Clicked!
+	Paragraph Clicked!
+	Section Clicked!
+	
+Sometimes we want this default functionality and most of the times we don't want
+STOP PROPAGATION is the solution
+We click on the button, the event handler runs for the button, but then it bubbles up.
+In order to stop bubbling up after we click the button to change color, use evt.stopPropagation()
+
+	<style>
+        .hide {
+            display: none;
+        }
+    </style>	
+	
+	<div id="container">
+        Click to hide!
+        <button id="change">Change Color!</button>
+    </div>
+	---
+	const btn = document.querySelector('#change');
+	const container = document.querySelector('#container');
+
+	btn.addEventListener('click', (e) => {
+		const color = makeRandomColor();
+		container.style.backgroundColor = color;
+		e.stopPropagation();						-> WE CAN STOP EVENT BUBBLING USING STOP PROPAGATION
+	});
+
+	container.addEventListener('click', () => {
+		container.classList.toggle('hide');
+	});
+	
+EVENT DELEGATION
+---
+Strategy for writing code and working with events
+It is useful in situations where we have elements that may not be on the page at the time our event listeners are added, 
+SOLUTION -> add eventlisteners to PARENT elements
+
+    <form action="/nowhere">
+        <label for="item">Enter A Product</label>
+        <input type="text" id="product" name="product">
+        <label for="item">Enter A Quantity</label>
+        <input type="number" id="qty" name="qty">
+        <button>Submit</button>
+    </form>
+	
+	// Leave the next line, the form must be assigned to a variable named 'form' in order for the exercise test to pass
+	const form = document.querySelector('form');
+	const ulList = document.querySelector('#list');
+
+	//event listener is added to the parent instead of actual element
+	//since the LI element was not on the page at the time our event listeners are added
+	ulList.addEventListener('click', (evt) => {
+		if (evt.target.nodeName === 'LI') {
+			evt.target.remove();
+		}
+	})
+
+	form.addEventListener('submit', (evt) => {
+		evt.preventDefault();
+		const qty = document.querySelector('#qty');
+		const prod = document.querySelector('#product');
+		const desc = `${qty.value} ${prod.value}`;
+		const liElement = document.createElement('li');
+		liElement.innerText = desc;
+		const ulList = document.querySelector('#list');
+		//ulList.append(liElement);
+		console.log(liElement.innerHTML);
+		//ulList.innerHTML += liElement.innerHTML
+		ulList.innerHTML += `<li>${qty.value} ${prod.value}</li>`;
+		qty.value = '';
+		prod.value = '';
+	});
+	
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ASYNCHRONOUS JAVASCRIPT
+++++++++++++++++
+
+The Call Stack
+Understanding Web APIs
+Callback Hell
+Working with Promises
+Creating our own promises
+Async functions
+
+THE CALL STACK - How javascript manages function calls
+---
+Feature that Javacript used behind the scenes
+A Mehanism the JS interpreter uses to keep track of its place in a script that calls multiple functions
+How JS knows what function is currently being run and what functions are called? 
+When a script calls a function, the interpreter adds it to the call stack and then starts carrying out the function
+Any functions that are called by that function are added to the call stack further up, and runs where their calls are 
+reached. When the current function is finished, the interpreter takes it off the stack and resumes execution where it
+left off in the last code listing
+
+WEBAPIs AND SINGLE THREADED
+---
+JAVASCRIPT -> HEAP & STACK
+WEBAPIS -> DOM(document),ajax(XMLHttpRequest),setTimeout
+EVENT LOOP
+CALLBACK QUEUE
+CALL STACK	-> ONE THREAD === ONE CALL STACK === ONE THING AT A TIME
+
+NOTE: BLOWING CALL STACK	-> RangeError: Maximum call stack size exceeded
+	function foo(){
+		return foo();
+	}
+
+	foo();
+
+BLOCKING -> What happens when things(on the stack) are slow?
+CONCURRENCY AND EVENT LOOP -> one thing at a time, except not really
+EVENT LOOP -> Event loop's job is to look at the stack and look at the task queue(returned by web APIs). If the stack is empty, 
+it takes the first thing on the queue and pushes it on to the stack
+
+At any given point in time, that single JS thread is running atmost one line of JS code
+
+console.log('sending request to server');
+setTimeout(()=>{console.log('Data coming back from server');},3000);
+console.log('Last line execution');
+
+Output will be ->
+	sending request to server
+	Last line execution
+		... after 3 seconds
+	Data coming back from server
+	
+Unlike the sequence of execution, the browser does the work
+	Browsers come with webAPIs that are able to handle certain tasks in the background(like making requests or setTimeout)	
+	The JS call stack recognizes these webAPI functions and passes them off to the browser to take care of
+	Once the browser finishes those tasks, they return and are pushed onto the stack as a callback 
+	Then javascript takes over again and executes the appropriate code
+Note: setTimeout is an API provided by the browser.It doesn't live in the Javascript V8 runtime source
+
+	
+Callback - Passing a function in that is not executed right away	
+
+CALLBACK HELL
+---
+For Color transition, raw logic
+
+setTimeout(() => {
+    body.style.backgroundColor = 'red';
+}, 1000);
+setTimeout(() => {
+    body.style.backgroundColor = 'orange';
+}, 2000);
+setTimeout(() => {
+    body.style.backgroundColor = 'pink';
+}, 3000);
+
+Another way of applying same logic is through nesting
+
+setTimeout(() => {
+    document.body.style.backgroundColor = 'red';
+    setTimeout(() => {
+        document.body.style.backgroundColor = 'orange';
+        setTimeout(() => {
+            document.body.style.backgroundColor = 'pink';
+        }, 1000);
+    }, 1000);
+}, 1000);
+
+Further refactoring for code reuse
+
+const transitionColor = (newColor, delay, nextFunction) => {
+    setTimeout(() => {
+        document.body.style.backgroundColor = newColor;
+        nextFunction();
+    }, delay);
+};
+
+transitionColor('red', 1000, () => {
+    transitionColor('orange', 1000, () => {
+        transitionColor('yellow', 1000, () => {
+        });
+    });
+});
+
+This seems weird.
+OFTEN WE HAVE 2 CALLBACKS THAT WE PASS INTO A FUNCTION - SUCCESS, FAILURE
+CALLBACK HELL - We end up passing a whole bunch of callbacks very nested very deep
+SOLUTION - PROMISES and ASYNC FUNCTIONS
+
+PROMISES	-	eventual guarantee of either a value or error
+---
+A promise is an object representing the eventual completion or failure of an asynchronous operation
+Common Pattern is to have 2 callbacks per request i.e. success/failure
+makeRequest(()=>{},()=>{})
+
+W/O PROMISE
+	const fakeRequestCallback = (url, success, failure) => {
+		const delay = Math.floor(Math.random()*4500)+500;
+		setTimeout(()=>{
+			if(delay>4000){
+				failure(`Connection Timeout`);
+			}else{
+				success(`Here is your fake data from ${url}`);
+			}
+		}, delay);
+	};
+
+	fakeRequestCallback('books.com', (successMsg)=>{
+		console.log(`Success! parameterized  message`);
+		console.log(successMsg);
+	}, (failureMsg)=>{
+		console.log(`Error! parameterized  message`);
+		console.log(failureMsg);	
+	});
+
+Let's make another request only if the first request is successful
+
+	fakeRequestCallback('books.com/page1', (successMsg)=>{
+		console.log(`Success! parameterized  message #1`);
+		console.log(successMsg);
+			fakeRequestCallback('books.com/page2', (successMsg)=>{
+				console.log(`Success! parameterized  message #2`);
+				console.log(successMsg);
+			}, (failureMsg)=>{
+				console.log(`Error! parameterized  message #2`);
+				console.log(failureMsg);	
+			});
+	}, (failureMsg)=>{
+		console.log(`Error! parameterized  message #1`);
+		console.log(failureMsg);	
+	});
+
+output will be 
+	Success! parameterized  message #1
+	Here is your fake data from books.com/page1
+	Error! parameterized  message #2
+	Connection Timeout
+
+In order for us to wait to only make that second request after the first one got finished(and was successful),
+we have to nest it inside of this success callback. This is VERY ANNOYING and it is referred as CALLBACK HELL
+
+WITH PROMISE
+	const fakeRequestPromise = (url) => {
+		return new Promise((resolve,reject)	=>	{
+			const delay = Math.floor(Math.random()*4500)+500;
+			setTimeout(()=>{
+				if(delay>4000){
+					reject(`Connection Timeout`);
+				}else{
+					resolve(`Here is your fake data from ${url}`);
+				}
+			}, delay);
+		});
+		
+	}
+	
+	let response = fakeRequestPromise('books.com');
+	response.then((successMsg) => {
+			console.log(`Success! parameterized  message`);
+			console.log(successMsg);
+		}
+	).catch((failureMsg) => {
+			console.log(`Error! parameterized  message`);
+			console.log(failureMsg);
+		}		
+	);
+	
+	console.log(response);	->	Promise {<fulfilled>: 'Here is your fake data from books.com'}
+	
+Let's make another request only if the first request is successful	(NESTED)
+
+	fakeRequestPromise('books.com/page1')
+		.then((successMsg) => {
+			console.log(`Success! parameterized  message #1`);
+			console.log(successMsg);
+			fakeRequestPromise('books.com/page2')
+				.then((successMsg) => {
+					console.log(`Success! parameterized  message #2`);
+					console.log(successMsg);
+					fakeRequestPromise('books.com/page3')
+						.then((successMsg) => {
+							console.log(`Success! parameterized  message #3`);
+							console.log(successMsg);
+						})
+						.catch((failureMsg) => {
+							console.log(`Error! parameterized  message #3`);
+							console.log(failureMsg);
+						});
+				})
+				.catch((failureMsg) => {
+					console.log(`Error! parameterized  message #2`);
+					console.log(failureMsg);
+				});
+		})
+		.catch((failureMsg) => {
+			console.log(`Error! parameterized  message #1`);
+			console.log(failureMsg);
+		});
+		
+output will be 
+	Success! parameterized  message #1
+	Here is your fake data from books.com/page1
+	Success! parameterized  message #2
+	Here is your fake data from books.com/page2
+	Success! parameterized  message #3
+	Here is your fake data from books.com/page3
+
+NICER WAY -> Return the promise from within the callback. That allows us to CHAIN things on instead of NESTING
+	
+	fakeRequestPromise('books.com/page1')
+    .then((successMsg) => {
+        console.log(`Success! parameterized  message #1`);
+        console.log(successMsg);
+        return fakeRequestPromise('books.com/page2');
+    })
+    .then((successMsg) => {
+        console.log(`Success! parameterized  message #2`);
+        console.log(successMsg);
+        return fakeRequestPromise('books.com/page3');
+    })
+    .then((successMsg) => {
+        console.log(`Success! parameterized  message #3`);
+        console.log(successMsg);
+    })
+    .catch((failureMsg) => {
+        console.log(`Error! parameterized  message <GENERIC>`);
+        console.log(failureMsg);
+    });    
+
+CREATING OUR OWN PROMISE
+---
+resolve - function to be executed on succcess
+reject -  function to be executed on failure
+
+new Promise((resolve,reject)	=>	{
+	resolve();
+});
+
+
+	const fakeRequestPromise = (url) => {
+		return new Promise((resolve,reject)	=>	{
+			const delay = Math.floor(Math.random()*4500)+500;
+			setTimeout(()=>{
+				if(delay>4000){
+					reject(`Connection Timeout`);
+				}else{
+					resolve(`Here is your fake data from ${url}`);
+				}
+			}, delay);
+		});
+	
+	fakeRequestPromise('books.com/page1')
+    .then((successMsg) => {
+        console.log(`Success! parameterized  message #1`);
+        console.log(successMsg);
+        return fakeRequestPromise('books.com/page2');
+    })
+    .catch((failureMsg) => {
+        console.log(`Error! parameterized  message <GENERIC>`);
+        console.log(failureMsg);
+    });
+	
+Color Transition with Promises
+	const changeColor = (color, delay) => {
+		return new Promise((resolve, reject) => {
+			setTimeout(() => {
+				document.body.style.backgroundColor = color;
+				resolve();
+			}, delay);
+		});
+	}
+
+	changeColor(`violet`, 1000).
+		then(() => changeColor(`indigo`, 1000)).
+		then(() => changeColor(`blue`, 1000)).
+		then(() => changeColor(`green`, 1000)).
+		then(() => changeColor(`yellow`, 1000)).
+		then(() => changeColor(`orange`, 1000)).
+		then(() => changeColor(`red`, 1000));
+
+ASYNC FUNCTIONS		syntactic sugar, built on top of promises
+---
+ASYNC & AWAIT - A newer and cleaner syntax for working with ASYNC code. Syntactic sugar for PROMISES
+
+ASYNC functions
+ASYNC is keyword we use to declare a function as an ASYNC function
+Async functions always returns a PROMISE
+If the function returns a value, the promise will be resolved with that value
+If the function throws an exception, the promise will be rejected
+
+A promise is resolved after we return a value
+	async function hello(){
+		return 'Hey Guy!'
+	}
+	hello();
+
+Promise {<fulfilled>: 'Hey Guy!'}
+
+We reject a promise by throwing an error inside of an asynchronous function
+	async function uhoh(){
+		throw new Error('Oh No!');
+	}
+	uhoh();
+
+Promise {<rejected>: Error: Oh No!	
+
+	const sing = () => { 
+		return 'LA LA LA LA'
+	}
+
+sing()	->	'LA LA LA LA'
+
+	const sing = async() => { 		
+	}
+	
+sing() -> Promise {<fulfilled>: undefined}
+
+	const sing = async() => {
+		//throw new Error('Oops!')
+		return 'LA LA LA LA'
+	}
+	
+sing()	->	Promise {<fulfilled>: 'LA LA LA LA'}
+
+	sing().then(data => {
+		console.log('promise resolved with '+data)
+	}).catch(err => {
+		console.log('promise rejected with '+err)
+	})
+
+promise resolved with LA LA LA LA
+promise rejected with Error: Oops!	
+
+	const login = async (username, password) => {
+		if (!username || !password) {
+			throw new Error('Missing Credentials!');
+		} else if (username == "vijay" && password == "anand") {
+			return "Welcome vijay. Have a nice day!";
+		} else {
+			throw new Error('Invalid Credentials!');
+		}
+	}
+
+	login('vijay', 'anand');
+Promise {<fulfilled>: 'Welcome vijay. Have a nice day!'}
+
+	login('vijay');
+Promise {<rejected>: Error: Missing Credentials!
+
+	login('priya', 'kv');
+Promise {<rejected>: Error: Invalid Credentials!
+
+	login('vijay', 'anand').
+		then((message) => { 
+			console.log('Login Sucessful! '+ message);
+	}).catch((error) => { 
+		console.log('Login Failed! '+ error);
+	});
+Login Sucessful! Welcome vijay. Have a nice day!	
+
+AWAIT keyword
+We can only use the await keyword inside of functions declared with async.
+AWAIT will pause the execution of the function, waiting for a promise to be resolved
+
+const changeBodyColor = async (color, delay) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            document.body.style.backgroundColor = color;
+            resolve();
+        }, delay);
+    });
+}
+
+//No transition observed
+const rainbowWithoutAwait = () => {
+    changeBodyColor('red', 1000);
+    changeBodyColor('orange', 1000);
+    changeBodyColor('yellow', 1000);
+    changeBodyColor('green', 1000);
+    changeBodyColor('blue', 1000);
+    changeBodyColor('indigo', 1000);
+    changeBodyColor('violet', 1000);
+}
+
+//Transition observed since await will wait
+const rainbowWithAwait = async () => {
+    await changeBodyColor('red', 1000);
+    await changeBodyColor('orange', 1000);
+    await changeBodyColor('yellow', 1000);
+    await changeBodyColor('green', 1000);
+    await changeBodyColor('blue', 1000);
+    await changeBodyColor('indigo', 1000);
+    await changeBodyColor('violet', 1000);
+    return "All done!"
+}
+
+// Asyn Await can be mixed with promises and can be chained
+rainbowWithAwait().then((message) => { 
+    console.log("Rainbow Status - "+ message)
+});	
+
+HANDLING ERRORS IN ASYNC FUNCTIONS	- What happens if promises in Async function is rejected that we are awaiting?
+---
+if promises in Async function is resolved, it would return a value that we store in some variable
+For rejection in Async fucntion, use TRY/CATCH
+
+	const fakeAsyncRequest = (url) => {
+		return new Promise((resolve, reject) => {
+			const delay = Math.floor(Math.random() * 4000);
+			setTimeout(() => {
+				if (delay > 1000) {
+					resolve(`Success..${url}`);
+				} else {
+					reject("Connection timeout!");
+				}
+			}, delay);
+		});
+	}
+
+
+	const makeAsyncRequests = async () => {
+		try {
+			let message = await fakeAsyncRequest('books.com/page1');
+			console.log(message);
+			message = await fakeAsyncRequest('books.com/page2');
+			console.log(message);
+			message = await fakeAsyncRequest('books.com/page3');
+			console.log(message);
+		} catch (e) {
+			console.log('Error -> ' + e)
+		}
+	}
+
+	makeAsyncRequests();
+
+Promise {<pending>}
+Success..books.com/page1
+Success..books.com/page2
+Error -> Connection timeout!
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+AJAX AND APIs
+++++++++++++++++
+Working With APIs
+Intro to JSON
+Postman
+Making XHRs
+The Fetch API
+Working with Axios
+
+AJAX & API INTRODUCTION
+---
+XHR - XML HTTP Requests
+REQUESTS - XMLHTTP, FETCH, AXIOS
+AJAX - Asynchronous Javascript And Xml
+API - Application Programming Interface	-> It's an interface not for humans, but for my application
+Web APIs - Interfaces that are web based, HTTP based
+	Web APIs are like a portal into another application or database
+Endpoints - Making requests to particular URLs
+JSON - Javascript Object Notation
+	json.org/json-en.html
+	
+	JSON.parse(jsonString) -> Parse the string text as JSON
+	JSON.stringify(jsonObject)	->	Return a JSON string corresponding to the specified JSON value. By default, all instances of undefined replaced with null
+	
+Examples
+https://www.cryptonator.com/api
+	Example Request -> https://api.cryptonator.com/api/ticker/btc-usd
+	Response -> {"ticker":{"base":"BTC","target":"USD","price":"443.7807865468","volume":"31720.1493969300","change":"0.3766203596"},"timestamp":1399490941,"success":true,"error":""}
+	
+	https://openweathermap.org/api
+	twitter API
+	facebook for Developers
+	Twilio
+
+POSTMAN
+---
+Headers, Body, Status Code, HTTP verbs, Params
+
+
+Status Code - Numerical code. Quick way of indicating from the server whether the response is OK or not
+	200 OK, 404 Not Found
+	200 series - success
+	300 series - redirection
+	400 series - client error response
+	500 series - server error response
+	
+Params - For entering query string i.e. key value pairs that we can passing into any URL
+	
+QUERY STRING AND HEADERS
+---
+https://www.tvmaze.com/api
+
+URL: /search/shows?q=:query
+Example: https://api.tvmaze.com/search/shows?q=girls	
+
+Headers - key value pairs. Metadata for request/response
+	Content-type : application/json
+	Accept : application/json
+
+XHR - XML HTTP REQUESTS
+---
+The original way of sending requests via Javascript
+Does NOT support promises. So lots of callbacks
+Clunky syntax that is difficult to remember
+
+const myReq = new XMLHttpRequest();
+
+myReq.onload = function() {
+	const data = JSON.parse(this.responseText);
+	console.log(data);
+};
+
+myReq.onerror = function(err){
+	console.log('ERROR!', err);
+};
+
+myReq.open('get', 'https://icanhazdadjoke.com',true);
+myReq.setRequestHeader('Accept','application/json');
+myReq.send();
+
+
+XMLHttpRequest {
+	onreadystatechange: null, 
+	readyState: 4, 
+	timeout: 0, 
+	withCredentials: false, 
+	upload: XMLHttpRequestUpload, …}
+	onabort: null
+	onerror: ƒ (err)
+	onload: ƒ ()
+	onloadend: null
+	onloadstart: null
+	onprogress: null
+	onreadystatechange: null
+	ontimeout: null
+	readyState: 4
+	response: "{
+				  "ticker": {
+					"base": "BTC",
+					"target": "USD",
+					"price": "42319.22727614",
+					"volume": "21294.87886135",
+					"change": "-213.21465721"
+				  },
+				  "timestamp": 1642550822,
+				  "success": true,
+				  "error": ""
+				}",
+	responseText: "{
+				  "ticker": {
+					"base": "BTC",
+					"target": "USD",
+					"price": "42319.22727614",
+					"volume": "21294.87886135",
+					"change": "-213.21465721"
+				  },
+				  "timestamp": 1642550822,
+				  "success": true,
+				  "error": ""
+				}"			
+	responseType: ""
+	responseURL: "https://api.cryptonator.com/api/ticker/btc-usd"
+	responseXML: null
+	status: 200
+	statusText: ""
+	timeout: 0
+	upload: XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}
+	withCredentials: false
+	[[Prototype]]: XMLHttpRequest
+	
+DISADVANTAGE WITH XHR - Horrible Ugly Callbacks	
+
+FETCH API
+---
+Newer way of making HTTP Request with Javascript
+Supports PROMISES
+Not supported in Internet Explorer
+
+	fetch('https://api.cryptonator.com/api/ticker/btc-usd').
+		then((res) => {
+			console.log('RESPONSE.. WAITING TO PARSE');
+			return res.json();
+		}).
+		then((data) => {
+			console.log(`DATA PARSED`);
+			console.log(data);
+		}).
+		catch(() => {
+			console.log("ERROR!", e)
+		})
+
+//USING ASYNC AND PROMISES
+	const fetchBitcoinPrice = async () => {
+		try {
+			const res = await fetch('https://api.cryptonator.com/api/ticker/btc-usd');
+			const data = await res.json();
+			console.log(data);
+		} catch (e) {
+			console.log("ERROR!", e)
+		}
+	}
+
+fetchBitcoinPrice();
+
+AXIOS	- library for making HTTP requests
+---
+https://github.com/axios/axios
+Need this script before our actual app.js script 
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+Built on top of Fetch API and improves upon it so that we dont have to do these multiple steps
+AXIOS can be used in Node JS or in Client side with the exact same syntax
+
+Unlike Fetch, the 2 steps are combined into one. i.e WITH FETCH CALL, IT RETURNS A PROMISE WHICH IS INCOMPLETE RESPONSE OBJECT. DATA IS COMING IN WHICH IS NOT PARSED
+THEN WE HAVE TO CALL RES.JSON() WHICH RETURNS ANOTHER PROMISE AS AN EXTRA STEP. IN AXIOS, THE DATA IS ALREADY PARSED IN ONE STEP
+
+axios.get('https://api.cryptonator.com/api/ticker/btc-usd').
+    then((res) => {
+        console.log('RESPONSE.. NO WAIT... DATA ALREADY PARSED');
+        console.log(res.data);
+    }).
+    catch(() => {
+        console.log("ERROR!", e)
+    })
+
+//USING ASYNC AND PROMISES
+
+const fetchBitcoinPrice = async () => {
+    try {
+        const res = await axios.get('https://api.cryptonator.com/api/ticker/btc-usd');
+        console.log(res.data);
+    } catch (e) {
+        console.log("ERROR!", e)
+    }
+
+}
+
+fetchBitcoinPrice();
+
+AXIOS HEADERS
+---
+const list = document.querySelector('#list');
+const btn = document.querySelector('#btn');
+
+const addNewJoke = async () => {
+    const liElement = document.createElement('li');
+    liElement.innerText = await getDadJoke();
+    list.append(liElement);
+};
+
+const getDadJoke = async () => {
+    try {
+        const headers = { headers: { Accept: 'application/json' } };
+        const res = await axios.get('https://icanhazdadjoke.com', headers);
+        return res.data.joke;
+    } catch (e) {
+        return "ERROR! No Jokes available";
+    }
+}
+
+btn.addEventListener('click', addNewJoke);
+
+AXIOS PARAMS
+---
+const form = document.querySelector('#form');
+const query = document.querySelector('#query');
+const images = document.querySelector('#images');
+const btn = document.querySelector('#btn');
+
+const searchImages = async (evt) => {
+    evt.preventDefault()
+    images.innerHTML = ""
+    console.log('Inside searchImages')
+    console.log(form.elements.query.value)
+    const imgElement = document.createElement('img');
+    await getImages(form.elements.query.value);
+};
+
+const getImages = async (query) => {
+    try {
+        //const headers = { headers: { Accept: 'application/json' } };
+        //const res = await axios.get(`https://api.tvmaze.com/search/shows?q=${query}`, headers);
+        //Instead of embedding query string in URL, a neat way of constructing similar to headers
+        const config = { headers: { Accept: 'application/json' }, params: { q: query } };
+        const res = await axios.get(`https://api.tvmaze.com/search/shows`, config);
+        console.log(res.data.length)
+        for (let record of res.data) {
+            if (record.show.image) {
+                const imgElement = document.createElement('img');
+                imgElement.src = record.show.image.medium;
+                images.append(imgElement);
+            }
+        }
+    } catch (e) {
+        console.log("ERROR! No Images available");
+    }
+}
+
+form.addEventListener('submit', searchImages);
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+PROTOTYPES, CLASSES AND OOPS
+++++++++++++++++
+Object Prototype(the concept)
+The "new" keyword. The 4 things it does
+Defining constructor functions( the old way)
+Defining classes
+Extends and Super
+Converting Colors and Associated crazy math
+
+PROTOYPES	-> Template Objects which can be extended or overridden
+---
+Javascript is often described as Prototype based language
+Prototypes are the mechanism by which javascript objects inherit features from one another 
+
+Every object in JavaScript has a built-in property, which is called its prototype. 
+The prototype is itself an object, so the prototype will have its own prototype, making what's called a prototype chain. 
+The chain ends when we reach a prototype that has null for its own prototype.
+
+For Array [] -> [[Prototype]]: Array(0)	-> It's a property that references Array prototype
+Array by default has some default methods such as Array.prototype.concat(), Array.prototype.push()
+We can add new methods or even override these default methods, such as follows
+
+const arr = [1,2,3]
+arr.push(9)
+	arr	->	[1,2,3,9]	 
+arr.sing = () => {console.log("LA LA")}
+	arr.sing() -> LA LA
+	
+arr
+(3) [1, 2, 3, sing: ƒ]
+0: 1
+1: 2
+2: 3
+sing: () => {console.log("LA LA")}
+length: 3
+__proto__					-> Prototype is a Template Object for Array(in this case) having default array methods
+											Each array has a reference to Array prototype with this special property	
+											
+Array.prototype	-> Lists everything on that Array prototype
+
+	[constructor: ƒ, concat: ƒ, copyWithin: ƒ, fill: ƒ, find: ƒ, …]
+		at: ƒ at()
+		concat: ƒ concat()
+		constructor: ƒ Array()
+		copyWithin: ƒ copyWithin()
+		entries: ƒ entries()
+		every: ƒ every()
+		fill: ƒ fill()
+		filter: ƒ filter()
+		find: ƒ find()
+		findIndex: ƒ findIndex()
+		findLast: ƒ findLast()
+		findLastIndex: ƒ findLastIndex()
+		flat: ƒ flat()
+		flatMap: ƒ flatMap()
+		forEach: ƒ forEach()
+		includes: ƒ includes()
+		indexOf: ƒ indexOf()
+		join: ƒ join()
+		keys: ƒ keys()
+		lastIndexOf: ƒ lastIndexOf()
+		length: 0
+		map: ƒ map()
+		pop: ƒ pop()
+		push: ƒ push()
+		reduce: ƒ reduce()
+		reduceRight: ƒ reduceRight()
+		reverse: ƒ reverse()
+		shift: ƒ shift()
+		slice: ƒ slice()
+		some: ƒ some()
+		sort: ƒ sort()
+		splice: ƒ splice()
+		toLocaleString: ƒ toLocaleString()
+		toString: ƒ toString()
+		unshift: ƒ unshift()
+		values: ƒ values()
+		Symbol(Symbol.iterator): ƒ values()
+		Symbol(Symbol.unscopables): {copyWithin: true, entries: true, fill: true, find: true, findIndex: true, …}
+		[[Prototype]]: Object
+		
+EXTENDING PROTOTYPE
+	String.prototype.myCustomMethod = () => {alert("belongs to vijay")}
+	"hello".myCustomMethod()	-> This method will now display alert for any string value
+
+OVERRIDDING PROTOTYPE
+	Array.prototype.pop = () => {alert("SORRY!CANT DO")}
+	[1,2,3].pop(2)				->	This method will now display alert for any array pop	
+
+DISTINCTION B/W __proto__ AND Array.prototype	
+Array.prototype is the ACTUAL TEMPLATE OBJECT where we add the methods/properties to
+__proto__ is the propery name on an Array instance with reference to the TEMPLATE ObJECT i.e Array.prototype
+
+[1,2,3].__proto__	->	[constructor: ƒ, concat: ƒ, copyWithin: ƒ, fill: ƒ, find: ƒ, …]
+
+INTRO - OBJECT ORIENTED PROGRAMMING
+---
+Organizing our code, designing and structuring our applications by breaking down into distinct patterns of objects
+
+Factory Functions
+Constructor Functions
+class keyword
+Constructor in class
+New Keyword
+Super inheritance
+
+example, const navColor = new Color('carrot', [230,126,34])
+
+FACTORY FUNCTIONS	-> not commonly used
+----
+
+const makeColor = (r, g, b) => {
+    const color = {};
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.getHexValue = function () {
+        console.log(this);
+        const { r, g, b } = this;
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    color.getRGBValue = function () {
+        console.log(this);
+        const { r, g, b } = this;
+        return `rgb(${r},${g},${b})`;
+    }
+    return color;
+}
+
+NOTE: ARROW FUNCTIONS BEHAVE DIFFERENTLY WITH THE KEYWORD THIS. USE TRADITIONAL FUNCTIONS INSTEAD
+
+const whiteColor = makeColor(255,255,255)
+whiteColor.getHexValue()	->	'#ffffff'
+whiteColor.getRGBValue()	->	'rgb(255,255,255)'
+
+FACTORY FUNCTION -> Crude way of making objects based off on a pattern/recipe
+The "makeColor" function makes use of an object i.e. color
+It starts empty, then we add some properties based on arguments provided
+Then we add some methods and then we return that object
+
+CONSTRUCTOR FUNCTIONS
+---
+Downside of Factory function is that for each object, functions are recreated and their own unique copy is added to each object
+Generally a single function can be reused across multiple calls. But that is not happening in Factory functions
+
+Remember PROTOTYPE where every Array get its built-in array methods from one PROTOTYPE array object?
+
+NEW OPERATOR -> lets developers create an instance of a user-defined object type or of one of the built-in object types that has a constructor function
+The NEW keyword does the following things
+	-> Creates a blank plain Javascript object
+	-> Links(sets the constructor of) this object to another object
+	-> Passes the newly created object from step 1 as the "THIS" context
+	-> Return "THIS" if the function doesn't return its own object
+	
+function Car(make, model, year){
+	this.make = make;
+	this.model = model;
+	this.year = year;
+}
+var carInstance = new Car('Tata','Nexon','2019');
+console.log(carInstance.make);	-> Tata
+
+Another example
+
+//Constructor function for Color
+function Color(r, g, b) {
+    this.r = r;
+    this.g = g;
+    this.b = b;
+    console.log(this);
+}
+
+//Adding functions using prototype
+Color.prototype.getRGBValue = function () {
+    console.log(this);
+    const { r, g, b } = this;
+    return `rgb(${r},${g},${b})`;
+}
+
+/* Unless using 'new' operator, this is going to refer to the global scope, 
+the nearest object is the window object */
+Color(1, 1, 1)
+/* With the 'new' operator, this is going to refer to the actual object itself
+instead of the window object*/
+new Color(1, 1, 1);
+
+Color {r: 1, g: 1, b: 1}
+	b: 1
+	g: 1
+	r: 1
+	[[Prototype]]: Object
+		getRGBValue: ƒ ()
+		constructor: ƒ Color(r, g, b)
+		[[Prototype]]: Object
+
+/* Unless using 'new' operator, this is going to refer to the global scope, 
+the nearest object is the window object */
+Color(1, 1, 1)
+/* With the 'new' operator, this is going to refer to the actual object itself
+instead of the window object*/
+new Color(1, 1, 1);
+
+const color1 = new Color(100, 100, 100);
+const color2 = new Color(200, 200, 200);
+//returns true as they are on the shared prototype object
+console.log(color1.getRGBValue === color2.getRGBValue);
+
+color1.getHexValue();    //'#646464'
+color2.getHexValue();    //'#c8c8c8'
+
+JAVASCRIPT CLASSES
+---
+Syntactic Sugar for the above case
+Main benefit is that we dont have to add methods to the prototype manually i.e we dont have to 
+break up the constructor function and seperately add methods
+
+	//Define a class with class keyword
+	class MyColor {
+
+		//This function will run automatically whenever you instantiate a new instance of the class
+		//keyword 'this' will refer to individual object
+		constructor(r, g, b, name) {
+			this.r = r;
+			this.g = g;
+			this.b = b;
+			this.name = name;
+			console.log(this);
+		}
+
+		//These methods are added to the prototype automatically unlike MyColor.prototype.greet
+		greet() {
+			console.log(`Hello from color! ${this.name}`);
+		}
+
+		innerRGB() {
+			const { r, g, b } = this;
+			return `${r},${g},${b}`;
+		}
+
+		getRGBValue() {
+			return `rgb(${this.innerRGB()})`;
+		}
+
+		getRGBAValue(a = 1.0) {
+			return `rgba(${this.innerRGB()},${a})`;
+		}
+
+		getHexValue() {
+			const { r, g, b } = this;
+			return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+		}
+	}
+
+	const c1 = new MyColor(10, 20, 30, 'tomato');
+	c1.greet(); //Hello from color! tomato
+	console.log(c1.getRGBValue());
+	console.log(c1.getRGBAValue(0.8));
+	
+JAVASCRIPT CLASSES - EXTEND
+---
+class Animal {
+    constructor(name) {
+        this.name = name
+    }
+
+    eat() {
+        console.log(`${this.name} is eating!`)
+    }
+}
+
+class Cat extends Animal {
+    constructor(name) {
+        super(name)
+    }
+
+    makeSound() {
+        console.log(`MEOWW!`)
+    }
+}
+
+class Dog extends Animal {
+
+    constructor(name, isHunter) {
+        super(name);
+        this.isHunter = isHunter;
+    }
+
+    makeSound() {
+        console.log(`WOOF!`);
+    }
+
+}
+
+const cat1 = new Cat('Amy')
+console.dir(cat1)
+cat1.eat()
+cat1.makeSound()
+const dog1 = new Dog('Tommy', true)
+console.dir(dog1)
+dog1.eat()
+dog1.makeSound()	

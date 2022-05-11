@@ -1,6 +1,8 @@
 https://cloudacademy.com/course/red-hat-enterprise-linux-technical-overview
 
-Shell is a Command Line Interpreter. It translates commands entered by user and converts them into a language that is understood by kernel
+TERMINAL - Text-based interface to your computer. Originally a physical object. But now we use software terminals
+SHELL - Program running on the terminal.It is a Command Line Interpreter. It translates commands entered by user and converts them into a language that is understood by kernel
+BASH - One of the most popular shells
 
 Bourne Shell - Bourne Shell, Korn Shell, Bourne-Again Shell(BASH), POSIX shell
 C Shell - C Shell, TENEX/TOPS C-Shell, Z Shell
@@ -100,7 +102,22 @@ SHELL FUNCTIONS
 	
 LINUX COMMANDS
 ++++++++++++++
-MAN PAGE
+TOUCH	- change file access and modification times. If any file doesn't exists, it is created with default permissions
+	touch app.js app.css index.html		-> create 3 files in a shot
+LS
+	Lists the files in current directory
+~(TILDE)
+	Refers to the home directory i.e /home/vagrant
+PWD	(present working directory)
+CD(change directory)
+CLEAR clear contents
+MKDIR make directory
+	mkdir first_folder/second_folder third_folder
+RM removes file
+RMDIR removes directory
+	
+MAN PAGE - manual
+	man touch
 	man + help
 GETTING USER INPUT
 	read USERINPUT
