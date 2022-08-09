@@ -1,0 +1,79 @@
+TREATING STRUCTURED AND SEMI STRUCTURED DATA (AVOID REGEX)
+Avoid Regular Expressions. Pretty expensive to evaluate
+Use proper parsers in place of split text processor/regex
+
+BLURRING THE LINE BETWEEN FLOW FILE CONTENT AND FLOW FILE ATTRIBUTES
+Keep flow file contents and flow file attribute separate
+Creating bunch of big attributes becomes expensive
+
+AVOID SPLIT AND REMERGE
+Dont use Split text processor. Instead use Query Record Processors which are extremely powerful
+Take in a stream of records in  a single flow file and operate on each of those records independently instead of breaking them apart
+Query Record - Record Reader(CSVReader), Record Writer(JSONRecordSetWriter), 
+Filter Criteria/Data Enrichment(SELECT *, '${now():format("MM/dd/yyyy HH:mm:ss")}') AS process_time FROM FLOWFILE)
+
+splitting a flow file(with 10k lines of text) and break that into 10000 different flow files
+we have multiplied the work that nifi has to do by 10k. This also increase the storage file
+to store the provenance data is multiplied by a factor of 10k.
+It also makes the lineage much harder to follow
+Check for lineage duration under provenance event details and also the actual lineage(it should be narrow flow)
+
+FLOW LAYOUT
+Keep it clean, simple and easy to understand
+Main path going straight down, while the divergent path also going straight down but offset to the left or right
+Give proper naming to talk about the purpose of the flow. Also add comments. 
+For example, 
+	Route on priority field rather than route on attribute
+	Put to MyDetination topic rather than Publish Kafka
+Provide more context and documentation by dragging the labels
+
+LOAD BALANCING DATA ACROSS CLUSTERS
+By default, Nifi automatically doesn't distribute the data
+Decide whether you should distribute the load across the cluster or just process them on the node already
+Make that decision on case by case basis
+Efficiency gained by parallelizing the data vs cost of pushing the data to another node by loadbalancing
+Taking that data from one node and spreading that across the entire cluster	
+Configure Connection > Settings > Load balance strategy ? Do Not Loadbalance | Round Robin | Partition by Attribute | Single Node
+DONT DO LOADBALANCE COMPRESSION
+DONT LOADBALANCE CONSTANTLY THROUGHOUT THE FLOW FOR ALL THE CONNECTIONS EXCEPT FOR THE FIRST ONE 
+Once the data has already been evenly distributed from the first connection across the cluster, there is really no need to start pushing
+the data between the nodes again
+Kafka already has queueing Semantics where we will get that data distributed across the cluster for free
+Generally any source that doesn't offer queueing semantics is often a good source for load balancing the data
+WHERE TO CONFIGURE LOADBALANCING SO THAT WE CAN MINIMIZE THE DATA THAT WE ARE ACTUALLY PUSHING ACROSS THE CLUSTER
+For example, fetch that data from Mongo(by default on primary node) and then use round robin where we can evenly distribute that data across cluster
+Check for Configure > Scheduling execution can only be on primary node
+Do not load balance in the connection after fetch. Rather Load balance in the connection after pulling data from Mongo 
+and distribute listing across cluster instead of distributing data across cluster
+Put out a flowfile for every object that it finds in that mongo bucket  
+
+SCHEDULING
+THREAD POOLS > Hamburger > Controller Settings
+Event Driven Thread Pools(Not required. Deprecated)
+Timer Driven Thread Pools - How many different processes do you want Nifi to run at any point in time
+More threads lead to lock contention
+Ideal number is between 2-4 times the number of CPU cores in the system [PER NODE SETTING]
+PROCESSOR SCHEDULING
+Configure Processors > Scheduling > Concurrent tasks
+Configure Processors > Scheduling > Run Duration [MICROBATCHING - Use this if you have a large volume of flow files. Use Run Duration larger than 0ms]
+Continue to increase the number of threads so that this processor can keep up with the dataflow
+THREAD POOL TUNING
+Hamburger > Summary > System Diagnostics > System
+	Available Cores - 12
+	Core Load Average(for last 1 minute) - 6.13 means out of 12 cores we utlized 6.13 cores
+Ideally keep the "Core Load Average" around 70% of the number of available cores
+Increase the size of thread pools slowly (say 20-30%)
+OTHER RESOURCE LIMITS
+Garbage Collection, Backpressure from Provenance Repository, Swapping, lock contention are important considerations
+Design of the flow is far more important the hardware that we run on
+Prefer larger flow files having many records that using a large number of smaller flow files
+Keep seperate disks for content and provenance repository if you have spinning disks and have high volume of data
+Ideally use SSD or NVMe
+Check Nifi Admin Guide
+Huge number of small flow files - Large GC
+If back pressure is not configured correctly we get lot of swapping i.e writing flow files to disk, deserializing over and over again
+Provenance repository getting too many provenance events not being able to keep up	
+
+PRIMARY NODE ONLY
+Only want the source processor run on a single node in the cluster
+Primary node can shift from one node to another

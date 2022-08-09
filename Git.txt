@@ -35,3 +35,24 @@ GIT alternatives are Subversion, Mercurial, CVS
 -> Time 
 
 https://fb.watch/7wVuJkEihW/
+
+GIT REVERT EXAMPLE
+  449  git log --oneline
+  450  git revert --no-commit a4a9ad8
+  451  git revert --no-commit 0f21e9d
+  452  git revert --no-commit 17f0f38
+  453  git revert --no-commit 2f7523f
+  454  git revert --no-commit b9759ee
+  455  git revert --no-commit 48f42fe
+  456  git revert --no-commit 1ab6d8f
+  457  git revert --no-commit d34e32f
+  458  git revert --no-commit 68f8b92
+  459  git revert --no-commit c20b771
+  460  git revert --no-commit 468f5b3
+  461  git revert --no-commit a1e8e18
+  462  git revert --no-commit 3ecdb57
+  463  git revert --no-commit f285f77
+  464  git revert --no-commit 2f7333b
+  465  git status
+  466  git log --oneline
+  467  git commit -m "reverted the log4j fixes"

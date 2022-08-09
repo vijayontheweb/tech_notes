@@ -1,0 +1,17 @@
+DOT(.) is a special character in regular expressions
+If you want to use the real DOT, then you need to escape it i.e \.
+In short, Metacharacters need to be escaped -> .[{()\^$|?*+
+
+. - Any character except new line
+\d - Digit(0-9)
+\D - Not a Digit(0-9)
+\w - Word Character (a-z, A-Z, 0-9, _)
+\W - Not a word character
+\s - Whitespace (Space, Tab, Newline)
+\S - Not a Whitespace
+\b - Word boundary
+\B - Not a Word boundary
+^  - Beginning of String
+$  - End of String
+[] - Matches characters in brackets	
+

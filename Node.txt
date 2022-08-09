@@ -2045,3 +2045,1125 @@ Show - GET /products/:id - Get one product(using id)
 Edit - GET /products/:id/edit - FORM to edit specific product(using id)
 Update - PATCH /products/:id - Update one product(using id)
 Destroy - DELETE /products/:id - Delete one product(using id)
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EXPRESS MIDDLEWARE
+++++++++++++++++++
+MIDDLEWARE CONCEPTS
+MORGAN LOGGING MIDDLEWARE
+WRITING CUSTOM MIDDLEWARE
+
+INTRO TO EXPRESS MIDDLEWARE
+---
+Express Middelware are functions that run during the request/response lifecycle.
+
+Middleware are just FUNCTIONS which can execute any code
+Each Middleware has access to the Request and Response objects
+Middleware can end a HTTP Request by sending back a response with methods like res.send()
+OR Middleware can be chained together, one after another by calling next()
+
+MORGAN LOGGING MIDDLEWARE
+---
+HTTP request Logger middleware for Node.js
+
+var morgan = require('morgan')
+
+morgan(format,options) -> Create a new morgan logger middleware function using the given format and options
+
+morgan('tiny') - Using a predefined format string
+morgan(':method :url :status :res[content-length] - :response-time ms') -> Using format string of predefined tokens
+
+NOTE: In order to use Morgan as middleware, you need to tell your application to "USE" morgan
+i.e. APP.USE is a way of just getting some code to run on every single request
+
+app.use(morgan('tiny')); //On every single request, use morgan middleware function
+	GET / 304 - - 4.321 ms
+app.use(morgan('dev')); //For developer users. Colorizes response code
+	GET /dogs 304 5.409 ms - -
+app.use(morgan('common'))
+	::1 - - [23/Jun/2022:09:26:08 +0000] "GET /dogs HTTP/1.1" 304 -
+	
+DEFINING OUR OWN MIDDLEWARE
+----
+The third parameter next is just a function. Just executing next is going to invoke whatever the next matching middleware or route handler is
+
+app.use((req, res, next) => {
+    console.log('THIS IS MY FIRST MIDDLEWARE!!');
+    next();
+    console.log('THIS IS MY FIRST MIDDLEWARE - AFTER CALLING NEXT !!');
+});
+
+app.use((req, res, next) => {
+    console.log('THIS IS MY SECOND MIDDLEWARE!!');
+    next();
+});
+
+App is running on localhost 3000
+THIS IS MY FIRST MIDDLEWARE!!
+THIS IS MY SECOND MIDDLEWARE!!
+THIS IS MY FIRST MIDDLEWARE - AFTER CALLING NEXT !!
+::1 - - [24/Jun/2022:08:07:05 +0000] "GET /dogs HTTP/1.1" 304 -
+
+SETTING UP A 404 ROUTE
+---
+Sometimes we may want to use a middleware on a particular route
+
+app.use('/dogs', (req, res, next) => {
+    console.log('THIS IS MY DOG EXCLUSIVE MIDDLEWARE!!');
+    next();
+});
+
+PASSWORD MIDDLEWARE DEMO
+---
+app.use((req, res, next) => {
+    const { password } = req.query;
+    if (password === 'secret') {
+        next();
+    }
+    res.send('NOT AUTHENTICATED!');
+});
+
+http://localhost:3000/dogs?password=secret
+
+PROTECTING SPECIFIC ROUTES
+---
+const verifyPassword = (req, res, next) => {
+    const { password } = req.query;
+    if (password === 'secret') {
+        next();
+    }
+    res.send('NOT AUTHENTICATED!');
+}
+
+app.use('/secureroute', verifyPassword, (req, res, next) => {
+    console.log('THIS IS MY SECURE ROUTE!!');
+    res.send('SECURE PAGE');
+});
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+EJS MATE
+++++++++
+Express 4.x layout, partial and block template function for the EJS template engine
+
+npm install ejs-mate --save
+
+Given a template, index.ejs:
+	<% layout('boilerplate') -%>
+	<h1>I am the <%= what %> template</h1>
+
+And a layout, boilerplate.ejs:
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>It's <%= who %></title>
+	  </head>
+	  <body>
+		<section>
+		  <%- body -%>
+		</section>
+	  </body>
+	</html>	
+
+When rendered by an Express 4.0 app:
+	var express = require('express'),
+	engine = require('ejs-mate'),
+	app = express();
+
+	// use ejs-locals for all ejs templates:
+	app.engine('ejs', engine);
+
+	app.set('views', __dirname + '/views');
+	app.set('view engine', 'ejs'); // so you can render('index')
+
+	// render 'index' into 'boilerplate':
+	app.get('/',function(req,res,next){
+	  res.render('index', { what: 'best', who: 'me' });
+	});
+
+	app.listen(3000);
+
+You get the following result:
+	<!DOCTYPE html>
+	<html>
+	  <head>
+		<title>It's me</title>
+	  </head>
+	  <body>
+		<section>
+		  <h1>I am the best template</h1>
+		</section>
+	  </body>
+	</html>
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+HANDLING ERRORS IN EXPRESS APP
+++++++++++++++++++++++++++++++	
+EXPRESS BUILT-IN ERROR HANDLER
+DEFINING CUSTOM ERROR HANDLERS
+HANDLING ASYNC ERRORS
+WORKING WITH MONGOOSE ERRORS
+DEFINING CUSTOM ERROR CLASS
+
+
+EXPRESS BUILT-IN ERROR HANDLERS
+---
+How do we handle errors in an express application?
+How express catches and processes error that occurs both synchronously and asynchronously
+Express comes with a default error handler, so you don't need to write your own to get started
+It responds with a default 500 status error code. It makes a little HTML page with a stack trace
+
+app.get('/error',(req,res)=>{
+	throw new Error("My Error");
+})
+
+Error: My Error
+    at C:\Users\vijayanand.s\WebDevelopment\Node\morganMiddleware_21\index.js:22:11
+
+app.get('/error2', (req, res) => {
+    chicken.fly();
+});
+ReferenceError: chicken is not defined
+    at C:\Users\vijayanand.s\WebDevelopment\Node\morganMiddleware_21\index.js:26:5
+
+
+WRITING ERROR HANDLERS
+---
+Define error handling middleware functions in the same way as other middleware functions, except error handling 
+requires four arguments instead of three: (err, req, res, next)
+
+//THIS ERROR HANDLING MIDDLEWARE WILL RUN IF ANY ERROR IS THROWN
+app.use(function (err, req, res, next) {
+    console.error(err.stack);
+    res.status(500).send('Something broke!');
+});
+
+When an error is written, the following information is added to the response
+	-> The res.statusCode is set from err.status(or err.statusCode). If this value is outside the 4xx or 5xx range, it will be set to 500
+	-> The res.statusMessage is set according to the status code
+	-> The body will be the HTML of the status code message when in production environment, otherwise will be err.stack
+	-> Any headers specified in an err.headers object
+	
+OUR CUSTOM ERROR CLASS
+---
+Generally when express throws an error, we respond with a particular status code and a message
+Set up a generic custom error
+
+class AppError extends Error {
+    constructor(message, status) {
+        super();
+        this.message = message;
+        this.status = status;
+    }
+}
+
+module.exports = AppError;
+---
+
+app.get('/error2', (req, res) => {
+    chicken.fly();
+});
+
+app.use(function (err, req, res, next) {
+    const { status } = err;
+    console.error(err.stack);
+    res.status(status).send('Something broke!');   
+});
+
+RangeError [ERR_HTTP_INVALID_STATUS_CODE]: Invalid status code: undefined
+
+To avoid this error, we default the status code
+app.use(function (err, req, res, next) {
+    const { status = 500 } = err;
+    console.error(err.stack);
+    res.status(status).send('Something broke!');
+});
+
+HANDLING ASYNC ERRORS
+---
+Errors that occur in SYNCHRONOUS code inside route handlers and middleware require no extra work. 
+If synchronous code throws an error, then Express will catch and process it. For example
+	app.get('/products/new', (req, res) => {
+		throw new AppError('product not found', '401');
+		res.render('products/new');
+	});
+	
+	Returns
+	product not found
+	GET http://localhost:3000/products/new 401 (Unauthorized)
+
+For errors returned from ASYNCHRONOUS functions, invoked by route handlers and middleware, 
+you MUST pass them to the NEXT function, where express will catch and process them
+
+	app.get('/products/:id', async (req, res, next) => {
+		const { id } = req.params;
+		const product = await Product.findById(id);
+		if (!product) {
+			next(new AppError('product not found', '401'));
+		}
+		res.render(`products/show`, { product });
+	});
+
+
+But in the console, it returns error "Cannot read properties of null (reading 'name')" 
+This is because res.render is going to run anyway with null entries
+Solution is to RETURN the next or use an ELSE
+	
+	app.get('/products/:id', async (req, res, next) => {
+		const { id } = req.params;
+		const product = await Product.findById(id);
+		if (!product) {
+			return next(new AppError('product not found', '401'));
+		}
+		res.render(`products/show`, { product });
+	});
+	
+The custom error works fine when no product is found.But what about other errors 
+such as the one from mongoose or validation errors
+i.e. ValidationError: Product validation failed: name: Path `name` is required.
+Solution is to WRAP IT WITH A TRY CATCH so that it will try all of those 
+statements and if anything goes wrong, it will catch the error
+
+	app.post('/products', async (req, res, next) => {
+		try {
+			console.log(req.body);
+			const newProduct = new Product(req.body);
+			await newProduct.save();
+			const products = await Product.find({});
+			console.log('+++++++++++++++++++++++++++++++++');
+			console.log(products);
+			res.render('products/index', { products });
+		} catch (e) {
+			next(e);
+		}
+	});
+
+Then we will get the following error -> Product validation failed: name: Path `name` is required.
+
+Rather than wrapping every async method with try/catch, we can create a reusable async utility
+SOLUTION -> If an error is thrown in a function and if it's not caught, we can catch it in parent function
+The Wrapping function needs to return another function(req,res,next) by chaining on a catch function and
+if there is an error,pass it to the next function
+
+
+	function wrapAsync(fn) {
+		return function (req, res, next) {
+			fn(req, res, next).catch((e) => { next(e) });
+		}
+	};
+
+	app.post('/products', wrapAsync(async (req, res, next) => {
+		console.log(req.body);
+		const newProduct = new Product(req.body);
+		await newProduct.save();
+		const products = await Product.find({});
+		console.log('+++++++++++++++++++++++++++++++++');
+		console.log(products);
+		res.render('products/index', { products });
+	}));
+
+NOTE: Express 5 will be able to handle asynchronous functions that throw errors automatically
+
+DIFFERENTIATING MONGOOSE ERRORS
+---
+
+db.processMetrics.count({$expr:{$gt:[ { $toInt: "$pi_PercentProcessorTime" }, 70 ]},tool_name:'Monitoring',group_name:'Prod',machine_name:'W10ZDIP0010',iso_timestamp:{$gte:ISODate("2022-06-30T14:37:57Z"),$lt:ISODate("2022-06-30T14:57:57Z")}})
+db.processMetrics.count({tool_name:'Monitoring',group_name:'Prod',machine_name:'200411LTP0984',iso_timestamp:{$gte:ISODate("2022-07-04T10:24:51Z"),$lt:ISODate("2022-07-04T10:44:51Z")}})
+
+We can intercept particular error types and modify them or build new errors based upon them
+
+
+app.use((err, req, res, next) => {
+    console.log(err.name);
+    next(err);
+});
+
+ValidationError
+	Product validation failed: name: Path `name` is required.
+
+CastError
+	http://localhost:3000/products/fsdfsdjfdfsdfsjifogjiogdgsdgsdg
+	Cast to ObjectId failed for value "fsdfsdjfdfsdfsjifogjiogdgsdgsdg" (type string) at path "_id" for model "Product"
+	
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'name cannot be blank']	-> WE CAN SET CUSTOM MESSAGES HERE
+    },
+    price: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    category: {
+        type: String,
+        lowercase: true,
+        enum: ['fruit', 'vegetable', 'dairy']
+    }
+});
+
+ValidationError: Product validation failed: name: name cannot be blank	-> CUSTOM MESSAGES DISPLAYED HERE
+
+const handleValidationError = err => {
+    console.dir(err);
+    return new AppError(`VALIDATION FAILED CUSTOM MESSAGE .. ${err.message}`, 400);
+}
+
+app.use((err, req, res, next) => {
+    console.log(err.name);
+    if (err.name === "ValidationError") {
+        err = handleValidationError(err);
+    }
+    next(err);
+});
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+YELPCAMP - ERRORS AND VALIDATING DATA
+++++++++++++++++++++++++++++++	
+CLIENT-SIDE VALIDATION
+SERVER-SIDE VALIDATION
+ERROR HANDLING
+ERROR TEMPLATE
+JOI
+
+CLIENT SIDE FORM VALIDATIONS
+----
+Native HTML5 "REQUIRED" Attribute. Downside is that the implementation is not standardized across all browsers
+SOLUTION: 
+	Bootstrap comes with its own validation helpers
+	HTML Form validation is applied via CSS's two pseudo classes, :invalid and :valid
+	It applies to <input>, <select> and <textarea> elements
+HOW IT WORKS:
+	Use Native HTML5 "required" Attribute on the form elements i.e. <input>, <select> and <textarea>
+	Then tell browser, not to validate the form using "novalidate" -> Bootstrap will take over instead of native browser validation
+	"novalidate" will prevent all "required" stuff from actually requiring anything
+	
+	JAVASCRIPT
+		We also need to add some javascript -> This will prevent us from submitting the form when things are invalid
+    <script>
+        // Example starter JavaScript for disabling form submissions if there are invalid fields
+        (function () {
+            'use strict'
+
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.querySelectorAll('.needs-validation')
+
+            // Loop over them and prevent submission
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+
+	FEEDBACK
+		<div class="valid-feedback">Looks good!</div> -> Add at the bottom of every form element
+
+BASIC ERROR HANDLER
+---
+CastError: Cast to Number failed for value "qweq" (type string) at path "price"
+
+SOLUTION -> Try/Catch or wrap the Async function with error handler
+
+	utils/ExpressError.js
+	---
+	class ExpressError extends Error {
+		constructor(message, status) {
+			super();
+			this.message = message;
+			this.status = status;
+		}
+	}
+
+	module.exports = ExpressError;
+
+	utils/CatchAsync.js
+	---
+	module.exports = func => {
+		return (req, res, next) => {
+			func(req, res, next).catch(next);
+		}
+	};
+
+	app.js
+	---
+	const ExpressError = require('./utils/ExpressError');
+	const catchAsync = require('./utils/CatchAsync');
+
+	app.all('*', (req, res, next) => {
+		next(new ExpressError('Page Not Found', 404));
+	})
+
+	const handleError = err => {
+		console.dir(err);
+		return new ExpressError(`FAILED CUSTOM MESSAGE .. ${err.message}`, 400);
+	}
+
+	const handleValidationError = err => {
+		console.dir(err);
+		return new ExpressError(`VALIDATION FAILED CUSTOM MESSAGE .. ${err.message}`, 400);
+	}
+
+	const handleCastError = err => {
+		console.dir(err);
+		return new ExpressError(`CAST FAILED CUSTOM MESSAGE .. ${err.message}`, 400);
+	}
+
+	app.use((err, req, res, next) => {
+		console.log(err.name);
+		if (err.name === "Error") {
+			err = handleError(err);
+		} else if (err.name === "ValidationError") {
+			err = handleValidationError(err);
+		} else if (err.name === "CastError") {
+			err = handleCastError(err);
+		}
+		next(err);
+	});
+
+	app.use((err, req, res, next) => {
+		const { status = '500', message = 'Something went wrong!' } = err;
+		res.status(status).send(message);
+	});
+
+BACKEND VALIDATION USING POSTMAN
+---
+app.post('/campgrounds', catchAsync(async (req, res) => {
+    if (!req.body.campground) {
+        throw new ExpressError("Campground Body Is Empty", 400);
+    }
+    const campground = new Campground(req.body.campground);
+    await campground.save();
+    //res.redirect(`campgrounds/` + campground._id);
+    res.redirect(`campgrounds/${campground._id}`);
+}));
+
+Then if we pass
+	curl --location --request POST 'http://localhost:3000/campgrounds' \
+	--header 'Content-Type: application/x-www-form-urlencoded' \
+	--data-urlencode 'campground=hello'
+We get an error
+	Parameter "obj" to Document() must be an object, got hello
+	
+ERROR TEMPLATE - error.ejs
+	<% layout('layouts/boilerplate') %>
+    <div class="row">
+        <div class="col-6 offset-3">
+            <div class="alert alert-danger" role="alert">
+                <h4 class="alert-heading">Error!</h4>
+                <p>
+                    <%= err.message%>
+                </p>
+                <hr>
+                <p class="mb-0">
+                    <%= err.stack%>
+                </p>
+            </div>
+        </div>
+    </div>
+
+INVOKING FROM app.js
+	app.use((err, req, res, next) => {
+		const { status = '500', message = 'Something went wrong!' } = err;
+		//res.status(status).send(message);
+		res.status(status).render('error', { err });
+	});
+
+JOI SCHEMA VALIDATIONS
+---
+JOI - Javascript Validator Tool
+joi lets you describe your data using a simple, intuitive, and readable language.	
+Basically we define a schema for some data in javascript
+
+const Joi = require('joi');
+
+const schema = Joi.object({
+    username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(30)
+        .required(),
+
+    password: Joi.string()
+        .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
+
+    repeat_password: Joi.ref('password'),
+
+    access_token: [
+        Joi.string(),
+        Joi.number()
+    ],
+
+    birth_year: Joi.number()
+        .integer()
+        .min(1900)
+        .max(2013),
+
+    email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+})
+    .with('username', 'birth_year')
+    .xor('password', 'access_token')
+    .with('password', 'repeat_password');
+
+
+schema.validate({ username: 'abc', birth_year: 1994 });
+// -> { value: { username: 'abc', birth_year: 1994 } }
+
+schema.validate({});
+// -> { value: {}, error: '"username" is required' }
+
+// Also -
+
+try {
+    const value = await schema.validateAsync({ username: 'abc', birth_year: 1994 });
+}
+catch (err) { }
+
+------------------------------
+
+app.post('/campgrounds', catchAsync(async (req, res) => {
+    /*
+    if (!req.body.campground) {
+        throw new ExpressError("Campground Body Is Empty", 400);
+    }
+    */
+    const campgroundSchema = Joi.object({
+        campground: Joi.object({
+            title: Joi.string().required(),
+            price: Joi.number().required().min(0),
+            image: Joi.string().required(),
+            location: Joi.string().required(),
+            description: Joi.string().required()
+        })
+    }).required();
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map(el => el.message).join(',');
+        throw new ExpressError(msg, 400);
+    }
+    console.log(result);
+
+    const campground = new Campground(req.body.campground);
+    await campground.save();
+    //res.redirect(`campgrounds/` + campground._id);
+    res.redirect(`campgrounds/${campground._id}`);
+}));
+
+curl --location --request POST 'http://localhost:3000/campgrounds' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'campground[title]=hello' \
+--data-urlencode 'campground[price]=-5' \
+--data-urlencode 'campground[image]=fsfssf' \
+--data-urlencode 'campground[location]=sffs' \
+--data-urlencode 'campground[description]=sddsdff'
+
+Error
+ExpressError: "campground.price" must be greater than or equal to 0
+
+JOI VALIDATION MIDDLEWARE
+----
+We will build a reusable middleware by name validateCampground and we will use it anywhere we would need to validate req.body.campground
+
+schemas.js
+
+	const Joi = require('joi');
+
+	module.exports.campgroundSchema = Joi.object({
+		campground: Joi.object({
+			title: Joi.string().required(),
+			price: Joi.number().required().min(0),
+			image: Joi.string().required(),
+			location: Joi.string().required(),
+			description: Joi.string().required()
+		}).required()
+	});
+	
+app.js
+
+	const validateCampground = (req, res, next) => {
+		const { error } = campgroundSchema.validate(req.body);
+		if (error) {
+			const msg = error.details.map(el => el.message).join(',');
+			throw new ExpressError(msg, 400);
+		} else {
+			next();
+		}
+	}
+	
+	app.put('/campgrounds/:id', validateCampground, catchAsync(async (req, res) => {
+		const campground = await Campground.findByIdAndUpdate(req.params.id, req.body.campground, { new: true });
+		res.render('campgrounds/show', { campground });
+	}));
+	
+	
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+DATA RELATIONSHIPS WITH MONGO
+++++++++++++++++++++++++++++++	
+SQL RELATIONSHIPS OVERVIEW
+ONE TO FEW
+ONE TO MANY
+ONE TO BAJILLIONS
+POPULATE
+MONGO SCHEMA DESIGN
+
+ONE TO FEW
+---
+EMBED THE DATA DIRECTLY IN THE DOCUMENT
+
+Example -> User with one or more addresses
+
+user.js
+
+		const mongoose = require('mongoose');
+		mongoose.connect('mongodb://localhost:27017/relationshipDemo', { useNewUrlParser: true })
+			.then(() => {
+				console.log('MONGO CONNECTION OPEN!');
+			})
+			.catch(() => {
+				console.log('OOPS..MONGO CONNECTION ERROR!');
+				console.log(err);
+			});
+		const userSchema = new mongoose.Schema({
+			first: {
+				type: String,
+				required: true
+			},
+			last: {
+				type: String,
+				required: true
+			},
+			addresses: [
+				{
+					street: String,
+					area: String,
+					city: String,
+					country: String
+				}
+			]
+		});
+		const User = mongoose.model('User', userSchema);
+		const makeUser = async () => {
+			const newUser = new User({
+				first: 'vijay',
+				last: 'anand'
+			});
+			newUser.addresses.push({
+				street: 'Nookampalayam Main Road',
+				area: 'Perumbakkam',
+				city: 'Chennai',
+				country: 'India'
+			})
+			const result = await newUser.save();
+			console.log(result);
+		}
+
+		makeUser();
+
+RESULT
+		{
+		  first: 'vijay',
+		  last: 'anand',
+		  _id: new ObjectId("62ce2fdf9207d1ddc78f1382"),
+		  addresses: [
+			{
+			  street: 'Nookampalayam Main Road',
+			  area: 'Perumbakkam',
+			  city: 'Chennai',
+			  country: 'India',
+			  _id: new ObjectId("62ce2fdf9207d1ddc78f1383")
+			}
+		  ],
+		  __v: 0
+		}
+		
+NOTE: The address also have an _id. Mongo generally adds an _id for each document. Mongo is going to treat behind the scenes
+as its own embedded schema. It is a way of reusing i.e breaking up document schemas into smaller pieces
+You can turn off the  embedded id using 
+
+	_id: { id: false }		
+
+Then the result becomes
+	
+	{
+	  first: 'vijay',
+	  last: 'anand',
+	  _id: new ObjectId("62ce326c403d3f9a0fe24930"),
+	  addresses: [
+		{
+		  street: 'Nookampalayam Main Road',
+		  area: 'Perumbakkam',
+		  city: 'Chennai',
+		  country: 'India'
+		}
+	  ],
+	  __v: 0
+	}
+
+Adding address to an existing user
+
+	const addAddress = async () => {
+		const existingUser = await User.findById('62ce2fdf9207d1ddc78f1382');
+		existingUser.addresses.push({
+			street: 'Mambakkam Main Road',
+			area: 'Medavakkam',
+			city: 'Chennai',
+			country: 'India'
+		})
+		const result = await existingUser.save();
+		console.log(result);
+	}
+
+	//makeUser();
+	addAddress();
+
+
+Result becomes
+	{
+	  _id: new ObjectId("62ce2fdf9207d1ddc78f1382"),    
+	  first: 'vijay',
+	  last: 'anand',
+	  addresses: [
+		{
+		  _id: new ObjectId("62ce2fdf9207d1ddc78f1383"),
+		  street: 'Nookampalayam Main Road',
+		  area: 'Perumbakkam',
+		  city: 'Chennai',
+		  country: 'India'
+		},
+		{
+		  street: 'Mambakkam Main Road',
+		  area: 'Medavakkam',
+		  city: 'Chennai',
+		  country: 'India'
+		}
+	  ],
+	  __v: 1
+	}
+
+ONE TO MANY
+---
+STORE YOUR DATA SEPERATELY, BUT THEN STORE REFERENCES TO DOCUMENT IDS SOMEWHERE INSIDE THE PARENT
+
+Usually we do this using object id, and we can store an array of ids
+https://www.geeksforgeeks.org/mongoose-populate-method/
+https://mongoosejs.com/docs/populate.html
+
+MongoDB has the join-like $lookup aggregation operator in versions >= 3.2. 
+Mongoose has a more powerful alternative called populate(), which lets you reference documents in other collections.
+
+Population is the process of automatically replacing the specified paths in the document with document(s) from other collection(s). 
+We may populate a single document, multiple documents, a plain object, multiple plain objects, or all objects returned from a query.
+
+The "ref" option is what tells mongoose, which "model" to use during population
+
+	const mongoose = require('mongoose');
+	const { Schema } = mongoose;
+
+	const personSchema = Schema({
+	  _id: Schema.Types.ObjectId,
+	  name: String,
+	  age: Number,
+	  stories: [{ type: Schema.Types.ObjectId, ref: 'Story' }]
+	});
+
+	const storySchema = Schema({
+	  author: { type: Schema.Types.ObjectId, ref: 'Person' },
+	  title: String,
+	  fans: [{ type: Schema.Types.ObjectId, ref: 'Person' }]
+	});
+
+	const Story = mongoose.model('Story', storySchema);
+	const Person = mongoose.model('Person', personSchema);
+
+ANOTHER EXAMPLE
+	const mongoose = require('mongoose');
+
+	mongoose.connect('mongodb://localhost:27017/relationshipDemo', { useNewUrlParser: true })
+		.then(() => {
+			console.log('MONGO CONNECTION OPEN!');
+		})
+		.catch(() => {
+			console.log('OOPS..MONGO CONNECTION ERROR!');
+			console.log(err);
+		});
+
+	const productSchema = new mongoose.Schema({
+		name: {
+			type: String,
+			required: true
+		},
+		price: {
+			type: Number,
+			required: true
+		},
+		season: {
+			type: String,
+			enum: ['Spring', 'Summer', 'Fall', 'Winter'],
+			required: true
+		}
+	});
+
+	const Product = mongoose.model('Product', productSchema);
+
+	const farmSchema = new mongoose.Schema({
+		name: String,
+		city: String,
+		products: [
+			{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }
+		]
+	});
+
+	const Farm = mongoose.model('Farm', farmSchema);
+
+	/*
+	Product.insertMany(
+		[
+			{ name: 'Goddess Melon', price: 3.5, season: 'Summer' },
+			{ name: 'Sugar baby watermelon', price: 4, season: 'Fall' },
+			{ name: 'Asparagus', price: 9.25, season: 'Spring' }
+		]
+	);
+	*/
+
+	const addProduct = async (farm, productName) => {
+		const product = await Product.findOne({ name: `${productName}` });
+		farm.products.push(product);
+	};
+
+	const makeFarm = async () => {
+		const farm = new Farm({
+			name: 'Full Belly Farm',
+			city: 'Guinda, CA'
+		});
+		/*
+		const melon = await Product.findOne({ name: 'Goddess Melon' });
+		console.log('MELON\n' + melon);
+		farm.products.push(melon);
+		*/
+		await addProduct(farm, 'Goddess Melon');
+		await addProduct(farm, 'Sugar baby watermelon');
+		await addProduct(farm, 'Asparagus');
+		console.log('FARM\n' + farm);
+	}
+
+	makeFarm();
+
+IN MONGOOSE SHOWS FULL DOCUMENT(BEFORE SAVE)
+	FARM
+	{
+	  name: 'Full Belly Farm',
+	  city: 'Guinda, CA',
+	  products: [
+		{
+		  name: 'Goddess Melon',
+		  price: 3.5,
+		  season: 'Summer',
+		  _id: new ObjectId("62cf819abd9538db57f4c4bf"),
+		  __v: 0
+		},
+		{
+		  name: 'Sugar baby watermelon',
+		  price: 4,
+		  season: 'Fall',
+		  _id: new ObjectId("62cf819abd9538db57f4c4c0"),
+		  __v: 0
+		},
+		{
+		  name: 'Asparagus',
+		  price: 9.25,
+		  season: 'Spring',
+		  _id: new ObjectId("62cf819abd9538db57f4c4c1"),
+		  __v: 0
+		}
+	  ],
+	  _id: new ObjectId("62cf88ae735ceca0faca0c6c")
+	}
+
+WHEREAS IN DATABASE, STORES OBJECT IDS ALONE(AFTER SAVE)
+	db.farms.find({})
+	{ 	
+		"_id" : ObjectId("62cf88ae735ceca0faca0c6c"), 
+		"name" : "Full Belly Farm", 
+		"city" : "Guinda, CA", 
+		"products" : [ ObjectId("62cf819abd9538db57f4c4bf"), ObjectId("62cf819abd9538db57f4c4c0"), ObjectId("62cf819abd9538db57f4c4c1") ], 
+		"__v" : 0 
+	}
+
+POPULATION -> Populated paths are no longer set to their original "_id", their value is replaced with the mongoose document returned from the database 
+
+    Farm.findOne({ name: 'Full Belly Farm' }).then((farm) => { console.log('FARM_WO_POPULATE\n' + farm) });
+	
+		FARM_WO_POPULATE
+		{
+		  _id: new ObjectId("62cf88ae735ceca0faca0c6c"),
+		  name: 'Full Belly Farm',
+		  city: 'Guinda, CA',
+		  products: [
+			new ObjectId("62cf819abd9538db57f4c4bf"),
+			new ObjectId("62cf819abd9538db57f4c4c0"),
+			new ObjectId("62cf819abd9538db57f4c4c1")
+		  ],
+		  __v: 0
+		}
+	
+    Farm.findOne({ name: 'Full Belly Farm' }).populate('products').then((farm) => { console.log('FARM_WITH_POPULATE\n' + farm) });
+
+		FARM_WITH_POPULATE
+		{
+		  _id: new ObjectId("62cf88ae735ceca0faca0c6c"),
+		  name: 'Full Belly Farm',
+		  city: 'Guinda, CA',
+		  products: [
+			{
+			  _id: new ObjectId("62cf819abd9538db57f4c4bf"),
+			  name: 'Goddess Melon',
+			  price: 3.5,
+			  season: 'Summer',
+			  __v: 0
+			},
+			{
+			  _id: new ObjectId("62cf819abd9538db57f4c4c0"),
+			  name: 'Sugar baby watermelon',
+			  price: 4,
+			  season: 'Fall',
+			  __v: 0
+			},
+			{
+			  _id: new ObjectId("62cf819abd9538db57f4c4c1"),
+			  name: 'Asparagus',
+			  price: 9.25,
+			  season: 'Spring',
+			  __v: 0
+			}
+		  ],
+		  __v: 0
+		}
+
+ONE TO BAJILLIONS
+---
+WITH THOUSANDS OR MORE DOCUMENTS, IT'S MORE EFFICIENT TO STORE A REFERENCE TO THE PARENT ON THE CHILD DOCUMENT	
+
+When we have a large volume of data, it is often more efficient to actually store a reference to the parent on the child,
+rather than storing a reference to the child on a parent like a list of IDs
+For example. we can store a reference to the user on an individual tweet
+
+	const mongoose = require('mongoose');
+
+	mongoose.connect('mongodb://localhost:27017/relationshipDemo', { useNewUrlParser: true })
+		.then(() => {
+			console.log('MONGO CONNECTION OPEN!');
+		})
+		.catch(() => {
+			console.log('OOPS..MONGO CONNECTION ERROR!');
+			console.log(err);
+		});
+
+	const userSchema = new mongoose.Schema({
+		name: String,
+		age: Number
+	});
+
+	const tweetSchema = new mongoose.Schema({
+		text: String,
+		likes: Number,
+		user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+	});
+
+	const User = mongoose.model('User', userSchema);
+	const Tweet = mongoose.model('Tweet', tweetSchema);
+
+	const makeTweets = async () => {
+		//const user = new User({ name: 'Vijay', age: 40 });
+		const user = await User.findOne({ name: 'Vijay', age: 40 });
+		const tweet1 = new Tweet({ text: 'Work is also essential!', likes: 12341 });
+		tweet1.user = user;
+		//user.save();
+		tweet1.save();
+	}
+
+	const findTweets = async () => {
+		const tweet = await Tweet.findOne({ text: 'Sleep is essential!' }).populate('user');
+		console.log(tweet);
+	}
+
+	findTweets();
+	//makeTweets();
+
+	OUTPUT
+	------
+	{
+	  _id: new ObjectId("62d0e16058591ca16b6a843a"),
+	  text: 'Sleep is essential!',
+	  likes: 2,
+	  user: {
+		_id: new ObjectId("62d0e16058591ca16b6a8439"),
+		name: 'Vijay',
+		age: 40,
+		__v: 0
+	  },
+	  __v: 0
+	}
+
+FIELD SELECTION
+	What if we want a few specific fields returned from the populated documents? This can be acheived by passing the 
+	usual field name syntax as the second argument to the populate method
+	
+	const findTweets = async () => {
+		const tweet = await Tweet.findOne({ text: 'Sleep is essential!' }).populate('user', 'name');
+		console.log(tweet);
+	}
+	
+	OUTPUT:
+	{
+	  _id: new ObjectId("62d0e16058591ca16b6a843a"),
+	  text: 'Sleep is essential!',
+	  likes: 2,
+	  user: { _id: new ObjectId("62d0e16058591ca16b6a8439"), name: 'Vijay' },
+	  __v: 0
+	}
+
+MONGO SCHEMA DESIGN
+---
+https://www.mongodb.com/blog/post/6-rules-of-thumb-for-mongodb-schema-design-part-3
+
+Denormalize - Have some duplicate information so that we could store some data on both sides if it makes sense in our application
+
+Rules of Thumb:
+
+One: favor embedding unless there is a compelling reason not to
+
+Two: needing to access an object on its own is a compelling reason not to embed it
+
+Three: Arrays should not grow without bound. If there are more than a couple of hundred documents on the “many” side, don’t embed them; 
+if there are more than a few thousand documents on the “many” side, don’t use an array of ObjectID references. 
+High-cardinality arrays are a compelling reason not to embed.
+
+Four: Don’t be afraid of application-level joins: if you index correctly and use the projection specifier (as shown in part 2) 
+then application-level joins are barely more expensive than server-side joins in a relational database.
+
+Five: Consider the write/read ratio when denormalizing. A field that will mostly be read and only seldom updated is a good candidate for denormalization: 
+if you denormalize a field that is updated frequently then the extra work of finding and updating all the instances is likely to overwhelm the savings 
+that you get from denormalizing.
+
+Six: As always with MongoDB, how you model your data depends – entirely – on your particular application’s data access patterns. 
+You want to structure your data to match the ways that your application queries and updates it.
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MONGO RELATIONSHIPS WITH EXPRESS
+++++++++++++++++++++++++++++++	
+DEFINING FARM AND PRODUCT MODELS
+CREATING FARMS
+FARMS SHOW PAGE
+DELETING WITH MONGO MIDDLEWARE
+
+NESTED ROUTING
+---
+More than one dynamic variable in the path that you may want to draw from instead of the route callbacks, the route handlers
+i.e. instead of /products/:product_id use the /farms/:farm_id/products/:product_id
