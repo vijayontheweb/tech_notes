@@ -1,0 +1,131 @@
+TERRAFORM
+
+Configuration Management vs Infrastructure Orchestration
+
+Configuration Management - Ansible, Chef, Puppet  - Install and Manage Software on existing servers
+Infrastructure Orchestration - Terraform, Cloud Formation - Provision the server and infrastructure
+
+Terraform will create a new EC2 instance in AWS
+Each "provider" has "resources" divided into multiple categories
+Resources require certain set of arguments based on the use case
+Note: every region has a different AMI ID. The AMI ID's keeps on changing so make sure you use the latest AMI ID from the AWS console
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 4.0"
+    }
+  }
+}
+
+provider "aws" {
+  region     = "us-west-2"
+  access_key = "xxxxxxxxxxxx"
+  secret_key = "xxxxxxxxxxxx"
+}
+
+resource "aws_instance" "myec2" {
+  ami           = "ami-0c2ab3b8efb09f272"
+  instance_type = "t2.micro"
+
+  tags = {
+    Name = "HelloWorld"
+  }
+}
+
+aws_instance = resource type
+myec2 = local resource name
+
+Terraform supports multiple providers
+terraform init -> Will download appropriate plugins associated with the provider
+Note: Any Providers that are not Hashicorp maintained, explicit source information needs to be fed in under required providers
+
+terraform {
+  required_providers {
+    digitalocean {
+      source = "digitalocean/digitalocean"
+    }
+  }
+
+  provider "digitalocean"{
+    token = "PUT_YOUR_TOKEN_HERE"
+  }
+}
+
+
+
+Resources are the reference to the individual services which the provider has to offer
+Example:
+  resource aws_instance
+  resource aws_alb
+  resource iam_user
+  resource digitalocean_droplet
+
+
+TERRAFORM DESTROY
+terraform destroy -> Allows us to destroy all the resources that are created within the folder
+terraform destroy -target aws_instance:myec2 -> TARGET flag allows us to destroy specific resource
+
+TERRAFORM STATE FILE
+Terraform stores the state of the infrastructure that is being created from the TF files
+This state allows terraform to map real world resource to your existing configuration
+
+DESIRED AND CURRENT STATE
+Terraform's primary function is to create, modify and destroy infrastructure resources to match
+the desired state described WITHIN THE TERRAFORM CONFIGURATION (For example instance type, but not security group as in above example)
+Current state is the actual state of the resource that is currently deployed
+
+Terraform tries to ensure that the deployed infrastructure is based on the desired state
+If there is a difference between the two, the terraform plan presents a description of the
+changes necessary to achieve the desired state
+
+NOTE : It is generally recommended that whenever you go ahead and create a resource like instance, do not just specify minimal things,
+specify all the important things that are necessary including the IAM ROLE, SECURITY GROUPS etc so that it always matches the desired
+state whenever you add under Terraform plan in the future
+
+EXPLICITLY SETTING PROVIDER VERSION
+During Terraform init if version argument is not specified, the most recent provider will be downloaded during initialization
+For production use, you should constrain the acceptable provider versions via configuration, to ensure that new versions with
+breaking changes will not be automatically installed
+
+ARGUMENTS FOR SPECIFYING PROVIDER
+>=1.0
+<=1.0
+~>1.0   -> Any version in 1.x range
+>=1.0,<=2.0 -> Ranging between
+
+DEPENDENCY LOCK FILE
+Terraform dependency lock file allows us to lock to a specific version of the provider
+If a particular provider already has a selection recorded in the lock file, Terraform will always reselect the version for Installation even if
+a newer version has become available
+You can override the behavior by adding the upgrade option when you run terraform init
+
+ATTRIBUTE AND OUTPUT VALUES
+Terraform has the capability to output the attribute of a resource with the help of output values
+An outputted attribute can not only be used for user reference, but it can also act as an INPUT to other resources being created via terraform
+For example, after EIP gets created, its IP address should automatically get whitelisted in the security group
+
+provider "aws" {
+  region     = "us-west-2"
+  access_key = "PUT-YOUR-ACCESS-KEY-HERE"
+  secret_key = "PUT-YOUR-SECRET-KEY-HERE"
+}
+
+resource "aws_eip" "lb" {
+  vpc      = true
+}
+
+output "eip" {
+  value = aws_eip.lb
+}
+
+resource "aws_s3_bucket" "mys3" {
+  bucket = "kplabs-attribute-demo-001"
+}
+
+output "mys3bucket" {
+  value = aws_s3_bucket.mys3
+}
+
+REFERENCING CROSS RESOURCE ATTRIBUTES

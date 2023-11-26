@@ -1,0 +1,841 @@
+https://github.com/in28minutes/master-spring-and-spring-boot
+
+World before Spring Boot
+------------------------
+Dependency Management(pom.xml)
+-------------------------------
+    Manage framework and versions
+        REST API - Spring framework, Spring MVC Framework, JSON Binding Framework
+        Unit Tests - Spring Test, Mockito, Junit
+
+Define Web app Configuration(web.xml)
+-------------------------------------
+    Configure Dispatcher Servlet for Spring MVC
+
+Manage Spring Beans(context.xml)
+--------------------------------
+    Component Scan
+    View Resolver
+
+Implement NFRs
+--------------
+    Logging
+    Error Handling
+    Monitoring
+
+Important Goals of Spring Boot
+------------------------------
+Helps build PRODUCTION-READY apps QUICKLY
+
+QUICKLY
+    Spring Initializr
+    Spring Boot Starter Projects
+    Spring Boot Auto Configuration
+    Spring Boot Dev Tools
+
+PRODUCTION-READY
+    Logging
+    Different configurations for different environments(Profiles, ConfigurationProperties)
+    Monioring(Spring Boot Actuator)
+
+
+SPRING INITIALIZR
+-----------------
+start.spring.io - spring initializr
+Create a Spring Boot Project
+Build a simple REST API using Spring Boot
+
+SPRING BOOT STARTER PROJECTS 
+----------------------------
+Build a REST API - Need Spring, Spring MVC, Tomcat, JSON Conversion etc
+Write Unit Tests - Spring Tests, Junit, Mockito etc
+
+STARTERS make it easy to group them to build applications
+STARTERS - CONVENIENT DEPENDENCY DESCRIPTORS for different features
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+Spring Boot provides a variety of Starter projects 
+Web application and REST API - Spring Boot Starter Web(spring-webmvc, spring-web, spring-boot-starter-tomcat, spring-boot-starter-json)
+Unit Tests - Spring Boot Starter Tests
+Talk to database using JPA - Spring Boot Starter Data JPA
+Talk to database using JDBC - Spring Boot Starter JDBC
+Secure your Web application and REST API  - Spring Boot starter Security
+
+SPRING BOOT AUTO CONFIGURATION 
+------------------------------
+Need lot of configration to build spring app
+- Component Scan, Dispatcher Servlet, Dta Sources, JSON Conversion etc
+
+Auto Configuration simplifies this
+- Automated configuration for your app. Decided based on 
+    - Which frameworks are in the ClassPath
+    - What is the existing configuration(Annotations) etc
+
+Example : Spring Boot Starter Web
+    - Dispatcher Servlet - DispatcherservletAutoConfiguration
+    - Embedded Servlet Container - Tomcat is the default (EmbeddedWebServerFactoryCustomizerAutoConfiguration)
+    - Default Error Pages (ErrorMVCAutoConfiguration)
+    - Bean<->JSON (JacksonHttpMessageConvertersConfiguration)
+
+
+SPRING BOOT DEV TOOLS
+---------------------
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+
+MANAGING APP CONFIGURATION USING PROFILES 
+-----------------------------------------
+Applications have different environments - Dev, QA, Stage, Prod
+Different environments need different configurations - Different databases, different web services
+PROFILES - Provide different configurations for different environments i.e. spring.profiles.active=dev
+
+application.properties 
+    logging.level.org.springframework=DEBUG
+    spring.profiles.active=dev
+application-dev.properties 
+    logging.level.org.springframework=TRACE
+application-prod.properties
+    logging.level.org.springframework=INFO
+
+
+
+Logging Levels : Higher levels will include all levels below it
+    TRACE
+    DEBUG
+    INFO
+    WARNING
+    ERROR
+    OFF
+
+EMBEDDED SERVER 
+---------------
+Embedded Server - Simpler Alternative
+spring-boot-starter-web automatically beings in spring-boot-starter-tomcat 
+Make JAR not WAR
+
+Examples:
+spring-boot-starter-tomcat
+spring-boot-starter-jetty
+spring-boot-starter-undertow
+
+MONITOR APPLICATIONS USING SPRING BOOT ACTUATOR 
+-----------------------------------------------
+Monitor and manage your applications in production
+provides a number of endpoints
+    beans - Complete list of Spring Beans in your app   - http://localhost:8081/actuator/beans
+    health - Application Health Information
+    metrics - Application Metrics
+    mappings - Details around request mappings
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+</dependency>
+
+http://localhost:8081/actuator
+
+{
+  "_links": {
+    "self": {
+      "href": "http://localhost:8081/actuator",
+      "templated": false
+    },
+    "health-path": {
+      "href": "http://localhost:8081/actuator/health/{*path}",
+      "templated": true
+    },
+    "health": {
+      "href": "http://localhost:8081/actuator/health",
+      "templated": false
+    }
+  }
+}
+
+application.properties
+management.endpoints.web.exposure.include=* # for actuator
+management.endpoints.web.exposure.include=health,metrics
+
+http://localhost:8081/actuator/configprops
+http://localhost:8081/actuator/metrics  ->  http://localhost:8081/actuator/metrics/jvm.memory.used
+
+
+SPRING BOOT VS SPRING MVC VS SPRING 
+-----------------------------------
+SPRING FRAMEWORK - Dependency Injection
+    @Component, @Autowired, Component Scan etc
+    Just Dependency Inejction is not sufficient. We need other frameworks to build apps)
+    SPRING MODULES and SPRING PROJECTS extend Spring Ecosystem
+    Provides good integration with other frameworks(Hibernate/JPA and Junit/Mockito)
+
+SPRING MVC (Spring Module) - Simplify building webapps and REST API
+    Building web application with Struts was very complex
+    @Controller, @RestController, @RequestMapping("/courses")
+
+SPRING BOOT(Spring Project) - Build PRODUCTION-READY apps QUICKLY
+    STARTER PROJECTS - Makes it easy to build a variety of applications
+    AUTO CONFIGURATION - Eliminate configuration to setup Spting, Spring MVC and other frameworks
+    ENABLE NFRs
+        ACTUATORS - Enables advanced monitoring of applications
+        EMBEDDED SERVERS - No Need for separate application servers 
+        LOGGING and ERROR HANDLING
+        PROFILES and CONFIGURATION PROPERTIES
+
+
+JPA AND HIBERNATE 
++++++++++++++++++
++++++++++++++++++
+Spring Data JPA 
+JPA 
+Spring JDBC 
+JDBC
+
+Difference between JPA and Hibernate
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jdbc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+H2 URL = jdbc:h2:mem:deffd018-7657-4868-998a-214297f6d42e
+application.properties -> spring.h2.console.enabled=true    [To Enable H2 Console to access the database]
+http://localhost:8080/h2-console    -> JDBC URL should be H2 URL
+
+application.properties -> spring.datasource.url=jdbc:h2:mem:testdb    [Configuring a Static URL]
+
+schema.sql 
+    create table course
+    (
+        id bigint not null,
+        name varchar(255) not null,
+        author varchar(255) not null,
+        primary key (id)
+
+    );
+
+JDBC
+    Write a lot of SQL queries 
+    Write a lot of Java code 
+
+Spring JDBC 
+    Write a lot of SQL queries 
+    Less Java code
+
+    CLASS ANNOTATION -> @Repository [Class that talks to a database - org.springframework.stereotype.Repository]
+    JDBC TEMPLATE -> JdbcTemplate [org.springframework.jdbc.core.JdbcTemplate]
+    
+
+    springJdbcTemplate.update(INSERT_QUERY, 
+                    course.getId(), course.getName(), course.getAuthor());
+
+    springJdbcTemplate.update(DELETE_QUERY,id);
+
+    //ResultSet -> Bean => Row Mapper => 
+    return springJdbcTemplate.queryForObject(SELECT_QUERY,
+            new BeanPropertyRowMapper<>(Course.class), id);
+
+    
+    COMMAND LINE RUNNER -> Runs on startup of a Spring application
+
+    @Component
+    public class CourseCommandLineRunner implements CommandLineRunner{
+
+        @Autowired
+        private CourseJdbcRepository jdbcRepository;
+
+        @Autowired
+        private CourseJpaRepository jpaRepository;
+
+        @Autowired
+        private CourseSpringDataJpaRepository springDataJpaRepository;
+
+        @Override
+        public void run(String... args) throws Exception {
+            jdbcRepository.insert(new Course(1, "Learn AWS JDBC!", "in28minutes"));
+            jdbcRepository.insert(new Course(2, "Learn Azure JDBC!", "in28minutes"));
+            jdbcRepository.insert(new Course(3, "Learn DevOps JDBC!", "in28minutes"));
+            jdbcRepository.deleteById(1);
+            System.out.println(jdbcRepository.findById(2));
+            System.out.println(jdbcRepository.findById(3));
+        }
+    }    
+  
+  SPRING JPA 
+    Dont need to worry about queries
+    Just map Entities to Tables
+    Map your Bean directly to your Table
+    You can do all the operations using EntityManager. Finally what is executed still are SQL queries
+
+    CLASS ANNOTATION -> @Entity [create a mapping between Java bean and table, and use that mapping to insert/retrieve operations on table]
+                                 jakarta.persistence.Entity
+
+    application.properties -> spring.jpa.show-sql=true
+
+    
+    @Entity(name = "Course")
+    public class Course {
+        @Id
+        private long id;
+
+        @Column(name = "name", nullable = false)
+        private String name;
+
+        @Column(name = "author", nullable = false)
+        private String author;
+    }
+
+    EntityManager is used to manage our entities
+    instead of @Autowired, use @PersistenceContext
+    Expresses a dependency on a container managed EntityManager and its associated PersistenceContext   
+    Whenever we want to execute queries with JPA, you need to have a transaction enabled 
+    i.e. you need to add @Transactional annotation 
+
+
+
+    import jakarta.persistence.EntityManager;
+    import jakarta.persistence.PersistenceContext;
+    import jakarta.transaction.Transactional;
+
+    @Repository
+    @Transactional
+    public class CourseJpaRepository {
+
+        @PersistenceContext
+        private EntityManager entityManager;
+
+        public void insert(Course course) {
+            entityManager.merge(course);
+        }
+
+        public Course findById(long id) {
+            return entityManager.find(Course.class, id);
+        }
+
+        public void deleteById(long id) {
+            Course course = entityManager.find(Course.class, id);
+            entityManager.remove(course);
+        }
+
+    }
+
+    jpaRepository.insert(new Course(1, "Learn AWS JDBC!", "in28minutes"));
+    jpaRepository.insert(new Course(2, "Learn Azure JDBC!", "in28minutes"));
+    jpaRepository.insert(new Course(3, "Learn DevOps JDBC!", "in28minutes"));
+    jpaRepository.deleteById(1);
+    System.out.println(jpaRepository.findById(2));
+    System.out.println(jpaRepository.findById(3));    
+
+SPRING DATA JPA 
+Lets make JPA even more simple 
+Takes care of everything
+Just create an interface that extends JpaRepository<Course, Long>
+
+    public interface CourseSpringDataJpaRepository extends JpaRepository<Course, Long> {
+
+        List<Course> findByAuthor(String author);
+        List<Course> findByName(String name);
+
+    }
+
+    springDataJpaRepository.save(new Course(1, "Learn AWS Jpa!", "in28minutes"));
+    springDataJpaRepository.save(new Course(2, "Learn Azure Jpa!", "in28minutes"));
+    springDataJpaRepository.save(new Course(3, "Learn DevOps Jpa!", "in28minutes"));
+
+    springDataJpaRepository.deleteById(1l);
+
+    System.out.println(springDataJpaRepository.findById(2l));
+    System.out.println(springDataJpaRepository.findById(3l));
+
+    System.out.println(springDataJpaRepository.findAll());
+    System.out.println(springDataJpaRepository.count());
+
+    System.out.println(springDataJpaRepository.findByAuthor("in28minutes"));
+    System.out.println(springDataJpaRepository.findByAuthor(""));
+
+    System.out.println(springDataJpaRepository.findByName("Learn AWS Jpa!"));
+    System.out.println(springDataJpaRepository.findByName("Learn DevOps Jpa!"));
+
+HIBERNATE vs JPA 
+
+JPA defines the specification. It is an API 
+    How do you define entities 
+    How do you map attributes
+    Who manages the entities
+
+Hibernate is one of the popular implementations of JPA
+Using Hibernate directly would result in a lock in to Hibernate
+    There are other JPA implementations(Toplink for example)
+
+Jakarta persistence entity and there is also hibernate annotation entity
+If you are making use of hibernate annotations entity, then you are making use of hibernate directly.
+However, we are not making use of hibernate directly, we are making use of JPA
+and by adding hibernate JAR to our class path we are making use of hibernate as the implementation of the JPA.
+
+WEB APPLICATION 
++++++++++++++++
++++++++++++++++
+Webapp concepts (Browser, HTML, CSS, Request, Response, Form, Session, Authentication)
+Spring MVC (Dispatcher Servlet, View Resolvers, Model, View, Controller validations)
+Spring Boot (Starters, Auto Configuration) 
+Frameworks/Tools (JSP, JSTL, JPA, Bootstrap, Spring Security, MySQL, H2)
+
+Browser sends HttpRequest
+Server returns HttpResponse
+
+Spring Web - Build web, including RESTful, applications using Spring MVC. Uses Apache Tomcat as the default embedded container.
+Spring Boot DevTools - Provides fast application restarts, LiveReload, and configurations for enhanced development experience.
+
+ CLASS ANNOTATION -> @Controller [Web UI related component]
+                                    i.e that handles web requests
+                     @ResponseBody [Annotation that indicates a method return value should be bound to the web response body]
+                                    i.e. will return whatever is returned by this message as is to the browser.
+                     @RequestParam  [Annotation which indicates that a method parameter should be bound to a web request parameter]
+JSP
+    Spring MVC makes use of View Resolver
+    Prefix and Suffix will be added to your view name
+
+    VIEW RESOLVER CONFIGURATION 
+        #path of JSP = src/main/resources/META-INF/resources/WEB-INF/jsp/sayHello.jsp 
+        spring.mvc.view.prefix=/WEB-INF/jsp/        Note: Spring MVC already knows this path "src/main/resources/META-INF/resources"
+        spring.mvc.view.suffix=.jsp
+        logging.level.org.springframework=debug
+    
+    POM.XML     -> If you want to run JSPs in Tomcat
+    <dependency>
+        <groupId>org.apache.tomcat.embed</groupId>
+        <artifactId>tomcat-embed-jasper</artifactId>
+        <scope>default</scope>
+    </dependency>
+
+    ModelMap = Using put, we can pass anything from your controller to your JSP
+    EL = Expression Language ${} This name should match whatever you are using in ModelMap
+
+LOGGING 
+    Default Logging Framework used by Sring Boot = Logback with SLF4j
+    spring-boot-starter-web  > spring-boot-starter-logging [Transitive Dependency]
+
+    logging.level.<PACKAGE NAME>
+    logging.level.some.path=debug           -> For example logging.level.org.springframework=debug
+    logging.level.some.other.path=error
+    logging.fie.name=logfile.log
+
+    private Logger logger = LoggerFactory.getLogger(this.getClass())
+    logger.info("PostConstruct")
+    logger.debug("Request Param is {}",name)
+
+DISPATCHER SERVLET, MODEL 1, MODEL 2 and FRONT CONTROLLER 
+
+    Model 1 Architecture (without any controllers)
+        All code in Views(JSPs) - Voew Logic, Flow Logic, Queries to Database
+    
+    Disadvantages
+        Very Complex JSPs
+        Zero separation of concerns
+        Difficult to maintain
+    
+    Model 2 Architecture
+        Separating Concerns
+        Model - Data to generate the view
+        View - Show information to user
+        Controller - Controls the flow
+
+        Advantage : Simpler to maintain
+        Concern : Where to implement common features to all controllers?
+    
+    Model 2 Architecture - Front Controller
+        All requests flow into a central(Front) controller
+        Front controller controls flows to Controllers(Servlet) and Views
+        Common features across all the controllers can be implemented in Front Controllers
+        All the requests from the browser go to just one controller and therefore security etc become easier to implement.
+
+    Spring MVC Front Controller - Dispatcher Servlet
+        Dispatcher Servlet is the Spring MVC implementation of the Model 2 Front Controller
+        -> Receives HTTP Request
+        -> Processes HTTP Request
+            - Identifies correct controller method(based on request URL)
+            - Executes Controller method (returns model and view name)
+            - Identifies correct view (using view resolver)
+            - Executes view
+        -> Returns HTTP response
+
+SESSION vs REQUEST SCOPES
+    All requests from browser are handled by our web application deployed on a server
+    REQUEST Scope - Active for a single request only
+        Whenever you put something in a model BY DEFAULT, it's only available for the scope of that request.
+        Once the response is sent back, the request attributes will be removed from memory 
+        These cannot be used for future requests
+        Recommended for most usecases
+    
+    SESSION Scope - Details stored across multiple requests
+        Be careful about what you store in session(Takes additional memory as all details are stored on server)
+
+ CLASS ANNOTATION -> @SessionAttributes(<AttributeNames>)        
+
+
+ADDING JSTL TO SPRING BOOT PROJECT
+
+    POM.XML
+    <dependency>
+        <groupId>jakarta.servlet.jsp.jstl</groupId>
+        <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>glassfish-jstl</artifactId>
+    </dependency>
+
+    JSTL Core Tags - https://docs.oracle.com/javaee/5/jstl/1.1/docs/tlddocs/c/tld-summary.html
+    Standard Syntax
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+
+BOOTSTRAP
+    NOTE: Effective POM includes version that is automatically added by Spring Boot
+
+    <link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+    <script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+    <script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+
+    POM.XML - DOWNLOAD BOOTSTRAP AS WEB JAR (instead of manually downloading bootstrap, webjars automate the dependency management)
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap</artifactId>
+        <version>5.1.3</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>jquery</artifactId>
+        <version>3.6.0</version>
+    </dependency>
+
+
+    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+    <html>
+        <head>
+            <link href="webjars/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet" >
+        </head>
+        <body>
+            <div class="container">                
+                <table class="table">
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>Description</th>
+						<th>Target Date</th>
+						<th>Is Done?</th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach items="${todos}" var="todo">
+						<tr>
+							<td>${todo.id}</td>
+							<td>${todo.description}</td>
+							<td>${todo.targetDate}</td>
+							<td>${todo.done}</td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+			<a href="add-todo" class="btn btn-primary">Add Todo</a>
+            </div>
+            <script src="webjars/bootstrap/5.1.3/js/bootstrap.min.js"></script>
+            <script src="webjars/jquery/3.6.0/jquery.min.js"></script>
+        </body>
+    </html>
+
+
+
+SPRING BOOT SERVER SIDE VALIDATION  [Validations you implement in HTML and Javascript can easily be overridden by Hackers]
+    SPRING BOOT STARTER VALIDATION
+        pom.xml
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+    COMMAND BEAN(FORM BACKING OBJECT)
+            2 Way binding(todo.jsp and TodoController.java using TodoBean)
+
+            Instead of binding all the fields to the REQUEST PARAMS we can bind all of them directly to the BEAN i.e.TodoBean
+
+
+                @RequestMapping(value="add-todo", method = RequestMethod.POST)
+                public String addNewTodo(ModelMap model, Todo todo) {
+                    String username = (String)model.get("name");
+                    todoService.addTodo(username, todo.getDescription(), 
+                            LocalDate.now().plusYears(1), false);
+                    return "redirect:list-todos";
+                }
+
+
+            https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/view.html
+            Use SPRING FORM TAG LIBRARIES to configure a FORM BACKING OBJECT in your JSP
+
+                <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+                <form:form method="post" modelAttribute="todo">
+                    Description: <form:input type="text" path="description" 
+                                    required="required"/>
+                    <form:input type="hidden" path="id"/>
+                    <form:input type="hidden" path="done"/>
+                </form:form>
+
+    ADD VALIDATIONS TO BEAN
+            Todo.java
+
+            USING ANNOTATIONS
+                IN BEAN @Size
+                @Size(min = 5, message = "minimum of 5 characters required")
+                private String description;
+
+                IN CONTROLLER @Valid
+                public String addNewTodo(ModelMap model, @Valid Todo todo) {
+
+            WHEN VALIDATION FAILS
+            There was an unexpected error (type=Bad Request, status=400).
+            Validation failed for object='todo'. Error count: 1
+            org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [1] in public java.lang.String 
+            com.example.learnspringboot.myfirstwebapp.todo.TodoController.addNewTodo(org.springframework.ui.ModelMap,
+            com.example.learnspringboot.myfirstwebapp.todo.Todo): [Field error in object 'todo' on field 'description': rejected value [cg]; 
+            codes [Size.todo.description,Size.description,Size.java.lang.String,Size]; 
+            arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [todo.description,description]; 
+            arguments []; default message [description],2147483647,5]; default message [minimum of 5 characters required]]             
+
+            USE BINDING RESULT IN CONTROLLER
+            public String addNewTodo(ModelMap model, @Valid Todo todo, BindingResult result) {
+                if (result.hasErrors()) {
+                    return "addTodo";
+                }
+                ...
+            
+
+    DISPLAY VALIDATION ERRORS IN THE VIEW
+            todo.jsp  
+
+            USE FORM:ERRORS IN JSP
+            <form:errors path="description" cssClass="text-warning"/>
+
+DELETE TODO
+            todo.jsp
+            <a href="delete-todo?id=${todo.id}" class="btn btn-danger">Delete Todo ${todo.id}</a>
+
+
+            @RequestMapping(value = "delete-todo", method = RequestMethod.GET)
+            public String deleteTodo(@RequestParam int id) {
+                todoService.deleteTodo(id);
+                return "redirect:list-todos";
+            }
++++++++++++++++++++++
+DATE PICKER 
+    POM
+    <dependency>
+        <groupId>org.webjars</groupId>
+        <artifactId>bootstrap-datepicker</artifactId>
+        <version>1.9.0</version>
+    </dependency>
+
+    APPLICATION.PROPERTIES
+    spring.mvc.format.date=yyyy-MM-dd
+
+    HTML    
+    <link href="webjars/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.standalone.min.css" rel="stylesheet" >
+    
+    <fieldset class="mb-3">				
+        <form:label path="description">Description</form:label>
+        <form:input type="text" path="description" required="required"/>
+        <form:errors path="description" cssClass="text-warning"/>
+    </fieldset>
+    <fieldset class="mb-3">				
+        <form:label path="targetDate">Target Date</form:label>
+        <form:input type="text" path="targetDate" required="required"/>
+        <form:errors path="targetDate" cssClass="text-warning"/>
+    </fieldset>
+            
+    <script src="webjars/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript">
+        $('#targetDate').datepicker({
+            format: 'yyyy-mm-dd'
+        });
+    </script>
+++++++++++++++++++++++++++
+NAVBAR - Navigation Bar
+    <nav class="navbar navbar-expand-md navbar-light bg-light mb-3 p-1">
+        <a class="navbar-brand m-1" href="https://courses.in28minutes.com">in28Minutes</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="/list-todos">Todos</a></li>
+            </ul>
+        </div>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+        </ul>	
+    </nav>
+++++++++++++++++++++++++++
+SPRING SECURITY 
+
+    POM.XML
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+    WHEN RUNNING THE APPLICATION (Everytime when we restart there will be different password)
+        Using generated security password: 21f86179-5492-4a39-94db-d337e0cb0328
+        This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+        CREDENTIALS - user 21f86179-5492-4a39-94db-d337e0cb0328
+
+
+    @Configuration
+    public class SpringSecurityConfiguration {
+
+        @Bean
+        public InMemoryUserDetailsManager createUserDetailsManager() {
+            UserDetails userDetails1 = getUserDetails("vijay", "dummy");
+            UserDetails userDetails2 = getUserDetails("anand", "dummy");
+            return new InMemoryUserDetailsManager(userDetails1,userDetails2);
+        }
+
+        private UserDetails getUserDetails(String username, String password) {
+            Function<String, String> passwordEncoder = input -> passwordEncoder().encode(input);
+            UserDetails userDetails = User.builder().passwordEncoder(passwordEncoder).username(username).password(password).roles("USER","ADMIN").build();
+            return userDetails;
+        }
+
+        @Bean
+        public PasswordEncoder passwordEncoder(){
+            return new BCryptPasswordEncoder();
+        }
+    }
+
+    private String getLoggedinUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+++++++++++++++++++++++++++
+SPRING BOOT STARTER JPA / H2 DATABASE 
+
+    POM.XML
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+2023-10-23T13:32:54.512+05:30  INFO 36248 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2023-10-23T13:32:54.601+05:30  INFO 36248 --- [  restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:e178d6a8-90bb-4477-bbba-f81ff68463b9 user=SA
+2023-10-23T13:32:54.602+05:30  INFO 36248 --- [  restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2023-10-23T13:32:54.608+05:30  INFO 36248 --- [  restartedMain] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:e178d6a8-90bb-4477-bbba-f81ff68463b9'
+2023-10-23T13:32:54.675+05:30  INFO 36248 --- [  restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2023-10-23T13:32:54.697+05:30  INFO 36248 --- [  restartedMain] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.2.7.Final
+2023-10-23T13:32:54.698+05:30  INFO 36248 --- [  restartedMain] org.hibernate.cfg.Environment            : HHH000406: Using bytecode reflection optimizer
+2023-10-23T13:32:54.752+05:30  INFO 36248 --- [  restartedMain] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-10-23T13:32:54.805+05:30  INFO 36248 --- [  restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2023-10-23T13:32:54.863+05:30  INFO 36248 --- [  restartedMain] o.h.b.i.BytecodeProviderInitiator        : HHH000021: Bytecode provider name : bytebuddy
+2023-10-23T13:32:54.960+05:30  INFO 36248 --- [  restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2023-10-23T13:32:54.962+05:30  INFO 36248 --- [  restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2023-10-23T13:32:55.158+05:30  WARN 36248 --- [  restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+
+    application.properties 
+    spring.datasource.url=jdbc:h2:mem:testdb
+
+    All URLs are protected
+    A Login form is shown for unauthorized requests
+    CSRF Disable 
+    Frames 
+        X-Frame-Options enabled => Frames cannot be used
+        h2-console uses Frames => Disable X-Frame-Options header  
+    
+    SecurityFilterChain - Defines a filter chain matched against every request
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+        http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
+        http.formLogin(Customizer.withDefaults());
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.headers().frameOptions(frameOptions -> frameOptions.disable());
+        return http.build();
+    }
+
+   
+++++++++++++++++++++++++++
+JSP FRAGMENTS
+
+<%@ include file="common/navigatiom.jspf"  %>
+
+common 
+    header.jspf
+    footer.jspf
+    navigatiom.jspf
+
+MYSQL WITH DOCKER
++++++++++++++++++
+Launch MySQL using Docker
+docker run --detach --env MYSQL_ROOT_PASSWORD=dummypassword --env MYSQL_USER=todos-user --env MYSQL_PASSWORD=dummytodos --env MYSQL_DATABASE=todos --name mysql --publish 3306:3306 mysql:8-oracle
+
+
+application.properties 
+#spring.datasource.url=jdbc:h2:mem:testdb
+ 
+spring.jpa.hibernate.ddl-auto=update
+spring.datasource.url=jdbc:mysql://localhost:3306/todos
+spring.datasource.username=todos-user
+spring.datasource.password=dummytodos
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
+ 
+#todos-user@localhost:3306
+
+
+mysqlsh commands
+mysqlsh
+\connect todos-user@localhost:3306
+\sql
+use todos
+select * from todo;
+\quit
+
+<!-- Use this for Spring Boot 3.1 and higher -->
+<dependency>
+	<groupId>com.mysql</groupId>
+	<artifactId>mysql-connector-j</artifactId>
+</dependency> 
+ 
+<!-- Use this if you are using Spring Boot 3.0 or lower
+	<dependency>
+		<groupId>mysql</groupId>
+		<artifactId>mysql-connector-java</artifactId>
+	</dependency> 
+--> 
+

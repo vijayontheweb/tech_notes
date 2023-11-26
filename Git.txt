@@ -56,3 +56,104 @@ GIT REVERT EXAMPLE
   465  git status
   466  git log --oneline
   467  git commit -m "reverted the log4j fixes"
+
+CONFIGURING GIT
+https://git-scm.com/docs/git-config
+
+git config --global user.name "your-username"
+git config --global user.email "your-email"
+
+CREATE GIT REPOSITORY
+git init - initialise empty git repository
+
+WORKING WITH COMMITS(CODE SNAPSHOTS)
+U - UNSTAGED
+M - MODIFIED
+HEAD pointer generally points to the latest commit
+
+CREATING COMMIT
+git add <file(s)> - Stage changes for next commit. For all files -> git add .
+git commit - Create a commit that includes all the staged changes
+git status
+git log - Git log by default always logs all commits that are OLDER than the commit we currently checked out.
+
+MOVING BETWEEN COMMITS
+git checkout <COMMIT ID> - Temporarily move to another commit. You can move the HEAD to point to different commit ids to see the code at that point of commit
+  NOTE: The HEAD Will no longer attached to the branch. i.e. It is DETACHED
+git checkout main - Now HEAD pointer points to the latest commit in the main branch again  
+
+UNDO COMMITS
+git revert <COMMIT ID> - Revert changes of commit by creating a new commit
+git reset --hard <COMMIT ID> - Undo changes by deleting all the commits since <COMMIT ID>
+
+.gitignore
+  .vscode
+  .DS_Store
+
+BRANCHES - Containers that contain commits
+
+LIST ALL BRANCHES
+git branch
+
+CREATE A NEW BRANCH 
+git branch <branchname> - By default, this command takes the latest commit, which is currently targeted by head,
+    and it builds a new branch with this commit as the starting point.
+And then switch to that branch using - git checkout <branchname>
+
+git checkout -b <branchname> - Does both creating a new branch + switch over to the new branch in one step
+
+DELETING A BRANCH
+git branch -D <branchname>
+
+SWITCH TO THE BRANCH
+git checkout <branchname>
+
+MERGE BRANCH
+git merge <branchname> - Merge is technically a brand new commit. We get an additional commit that performed the merge
+  We get a default commit message "merge branch <branchname>"
+  Automerging <filenames>
+  Merge made by the 'ort' strategy
+
+Code and Repoitory Management - Automate code reviews, issue management etc 
+
+CONNECTING TO LOCAL REPOSITORY
+
+git remote add origin <GIT REPO URL> - Connect to local repository. Origin is just a local identifer
+NOTE: You could add connections to multiple remote repositories by simply using different idenifiers
+
+git push --set-upstream origin main  -> To Push the current branch and to set remote as upstream
+
+git push - Local commits are uploaded
+
+README.md - Mark Down
+Search for Github Markdown
+
+git pull - Downloading the latest version of the code from remote repository into our local
+
+git config --global user.name ".."
+git config --global user.email ".."
+git clone <remote repo urk> <foldername>
+
+git remote = list of all connected remote repositories
+    origin
+git remote get-url origin = List the remote repository URL
+    https://github.com/XYZ/ABC.git
+
+Owner will get to see the "Settings" tab
+Owner - Settings > Collaborators -> To provide other github account which should have write access to your repository
+    add a <collaborator username> to <github repository>
+    Collaborator receives an email and once they accept the invitation, "you now have push access to <repository name>"
+Owner - Settings > Branches > Branch Protection Rule - select 'main' branch - Require a pll request before merging
+
+Collabortor - git remote set-url origin https://<collaboratorname>@github.com/<ownername>/<repositoryname>.git
+
+MARKDOWN FOR CSS
+```css
+h1{
+    color: #efa82e
+}
+```
+
+NOTE: You can refer to ISSUES in PULL REQUESTS using #<num> of that issue
+
+FORKING A REPOSITORY

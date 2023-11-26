@@ -1,0 +1,595 @@
+UNDERSTAND CLARITY OF CODE(UNIT TESTS)
+FOCUS ON 4 PRINCIPLES OF SIMPLE DESIGN
+GET STARTED WITH REFACTORING
+UNDERSTAND TDD
+
+Update the code in such a way that there is no need for comment at all 
+A comment should only explain why you are doing(instead of what you are doing)
+How easy it is for somebody to understand your code
+
+//setup
+
+//invoke
+
+//verify
+
+
+1)Look at the values and how they are changing and establish the relationship between values
+For example, 15 and 14 -> DEFAULT_QUALITY and DEFAULT_QUALITY-1
+
+BEFORE
+------
+
+	@Test
+	public void testUpdateQualityDefault1() {
+		Item item = new Item("DEFAULT_ITEM", 15, 3);
+		Item[] items = new Item[] { item };
+		GildedRose app = new GildedRose(items);
+		app.updateQuality();
+		assertEquals("DEFAULT_ITEM", app.items[0].name);
+		assertEquals(14, app.items[0].sellIn);
+		assertEquals(2, app.items[0].quality);
+	}
+
+AFTER 
+-----
+	private static final int NOT_EXPIRED_SELLIN = 16;
+	private static final String DEFAULT_ITEM = "DEFAULT_ITEM";
+	private static final int DEFAULT_QUALITY = 4;
+
+
+    @Test
+	public void unexpiredDefaultItem_qualityDecreasesBy1() {		
+		GildedRose app = createGildedRoseWithOneItem(DEFAULT_ITEM, 
+						NOT_EXPIRED_SELLIN, DEFAULT_QUALITY);
+		app.updateQuality();
+		Item expected = new Item(DEFAULT_ITEM, 
+						NOT_EXPIRED_SELLIN - 1,DEFAULT_QUALITY - 1);
+		assertItem(expected, app.items[0]);
+	}
+
+    private void assertItem(Item expected, Item actual) {
+		assertEquals(expected.name, actual.name);
+		assertEquals(expected.sellIn, actual.sellIn);
+		assertEquals(expected.quality, actual.quality);
+	}
+
+	private GildedRose createGildedRoseWithOneItem(String itemType, int sellin, int quality) {
+		Item item = new Item(itemType, sellin, quality);
+		Item[] items = new Item[] { item };
+		GildedRose app = new GildedRose(items);
+		return app;
+	}
+
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 PRINCIPLES OF SIMPLE DESIGN
+    - RUNS ALL TESTS 
+        - Code Should work
+        - (Recommended) Have Automated Tests
+        - Design Evolves (Not created in one day)
+            - Without Automation Tests Developers are reluctant to make changes
+        - (Recommended) TDD leads to better tests and better design     
+    - MINIMIZE DUPLICATION 
+        - Duplication leads to 
+            - More Bugs 
+            - More Maintenance
+    - MAXIMIZE CLARITY 
+        - Code we write today will be maintained by someone else later
+        - Good Starting Point - Focus on Naming - Methods, Variables, Classes etc
+    - KEEP IT SMALL 
+        - Effort involved in making something perfect is High
+            - Effort to improve design : 90 to 99 greater than 60 to 90
+        - Does that effort give you significant returns?
+            - Extra Layer - Additional Complexity
+            - Extra Code - More code to maintain
+        - Keep things simple and small
+
+ KEEP YOUR DESIGN SIMPLE
+ 
+ 
+ Agile and Extreme Programming
+    Focus on today's requirements. Do them well
+    Change is expected
+    No Big Design Upfront
+Good Goals for starting programmers
+Design vs Architecture
+    Architecture - Difficult to change
+    Design - Easier to change
+
+Simplest Possible Testable Approach while 
+    - Maximizing Clarity and 
+    - Reduce Duplication
+
+
+	/*
+	* You get a grade B if marks are between 51 and 80 (both inclusive). Except for Maths where the upper limit is increased by 10.
+	*/
+	public boolean isGradeB(int marks, boolean isMaths) {
+		return isMaths ? marks>=51 && marks<=90 : marks>=51 && marks<=80; 
+	}
+
+    //Refactored
+	private static final int EXTRA_FOR_MATHS = 10;
+	private static final int GRADE_B_UPPER_LIMIT = 80;
+	private static final int GRADE_B_LOWER_LIMIT = 51;
+
+   	public boolean isGradeB(int marks, boolean isMaths) {		
+		int extraLimit = isMaths ? EXTRA_FOR_MATHS : 0;		
+		int upperLimit = GRADE_B_UPPER_LIMIT + extraLimit;		
+		return  marks>=GRADE_B_LOWER_LIMIT && marks<=upperLimit; 
+	}
+
+   	/*
+	You are awarded a grade based on your marks.
+	Grade A = 91 to 100, Grade B = 51 to 90, Otherwise Grade C
+	Except for Maths where marks to get a Grade are 5 higher than required for other subjects.
+	*/
+	public String getGrade(int mark, boolean isMaths) {
+		String grade = "C";
+		if (isGradeA(mark, isMaths))
+			grade = "A";
+		else if (isBGrade(mark, isMaths)) {
+			grade = "B";
+		}
+		return grade;
+	}
+
+	private boolean isGradeA(int mark, boolean isMaths) {
+		int lowerLimitForAGrade = isMaths ? 95
+				: 90;
+		return mark > lowerLimitForAGrade;
+	}
+
+	private boolean isBGrade(int mark, boolean isMaths) {
+		int lowerLimitGradeB = isMaths ? 55
+				: 50;
+		return mark > lowerLimitGradeB && mark < 90;
+	}
+
+	//Refactored
+    public String getGrade(int mark, boolean isMaths) {		
+		int extraLimit = isMaths? 5 : 0;		
+		if (mark >= 91 + extraLimit)
+			return "A";		
+		if (mark >= 51 + extraLimit)
+			return "B";
+		return "C";
+	}
+
+
+    /*  PROBLEM 3
+     * You and your Friend are planning to enter a Subject Quiz.
+     * However, there is a marks requirement that you should attain to qualify.
+     * 
+     * Return value can be YES, NO or MAYBE.
+     * 
+     * YES If either of you are very good at the subject(has 80 or more marks)
+     * However, there is an exception that if either of you is not good in the subject(20 or less marks), it is NO.
+     * In all other conditions, return MAYBE.
+     * 
+     * However, the definition for good and not good are 5 marks higher if the subject is Mathematics.
+     * 
+     * marks1 - your marks
+     * marks2 - your friends marks
+    */
+        
+    public String willQualifyForQuiz(int marks1, int marks2, boolean isMaths) {
+        if ((isMaths ? marks1 <= 25 : marks1 <= 20)
+                || (isMaths ? marks2 <= 25 : marks2 <= 20)) return "NO";
+        if ((isMaths ? marks1 >= 85 : marks1 >= 80)
+                || (isMaths ? marks2 >= 85 : marks2 >= 80)) return "YES";
+        return "MAYBE";
+    }
+
+    //REFACTORED
+    public String willQualifyForQuiz(int marks1, int marks2, boolean isMaths) {
+        
+    	if (isNotGood(marks1, isMaths) || isNotGood(marks2, isMaths)) 
+        	return "NO";
+        
+    	if (isGood(marks1, isMaths) || isGood(marks2, isMaths))
+    		return "YES";
+        
+    	return "MAYBE";
+    }
+
+	private boolean isGood(int marks, boolean isMaths) {
+		int extraLimit = isMaths ? 5 : 0; 
+		return marks >= 80 + extraLimit;
+	}
+
+	private boolean isNotGood(int marks, boolean isMaths) {
+		int extraLimit = isMaths ? 5 : 0;
+		return marks <= 20 + extraLimit;
+	}
+
+Most Difficult Challenge in Programming - NAMING 
+Creating Good Names is hard
+Make names as long as necessary
+Length of variable name is inversely propotional to scope 
+Follow Conventions:
+    Packages, Classes, Interfaces, Methods, Variables, Constants 
+    Project Specific(get vs retrieve vs ..)
+
+COMMENTS
+Different Types 
+Type 1 : API Comments
+Type 2 : Comments to help other programmers understand your code
+Type 3 : TODO, FIXME
+
+Use Type 1 and Type 3 liberally
+Type 2 should focus on WHY but not WHAT?    Example: Sorting, Performance Optimizations
+
+
+//PROBLEM 
+	@Test
+	public void testCustomerProductSum_TwoProductsSameCurrencies()
+			throws DifferentCurrenciesException {
+
+		List<Product> products = new ArrayList<Product>();
+
+		products.add(
+				new ProductImpl(100, "Product 15", ProductType.BANK_GUARANTEE,
+						new AmountImpl(new BigDecimal("5.0"), Currency.EURO)));
+
+		products.add(
+				new ProductImpl(120, "Product 20", ProductType.BANK_GUARANTEE,
+						new AmountImpl(new BigDecimal("6.0"), Currency.EURO)));
+
+		Amount temp = customerBO.getCustomerProductsSum(products);
+
+		assertEquals(Currency.EURO, temp.getCurrency());
+		assertEquals(new BigDecimal("11.0"), temp.getValue());
+	}
+
+    //REFACTORED 
+	@Test
+	public void testCustomerProductSum_TwoProductsSameCurrencies()
+			throws DifferentCurrenciesException {
+		Amount[] amounts = {
+				new AmountImpl(new BigDecimal("5.0"), Currency.EURO), 
+				new AmountImpl(new BigDecimal("6.0"), Currency.EURO) };
+		Amount expected = 
+				new AmountImpl(new BigDecimal("11.0"), Currency.EURO);
+		List<Product> products = createProductsWithAmounts(amounts);
+		assertAmount(expected, customerBO.getCustomerProductsSum(products));
+	}
+
+    private List<Product> createProductsWithAmounts(Amount[] amounts) {
+        return Arrays.stream(amounts)
+                .map(amount -> 
+                    new ProductImpl(100, "Product 15", ProductType.BANK_GUARANTEE,
+                            amount))
+                .collect(Collectors.toList());
+    }
+
+
+    //PROBLEM 
+    @Test
+	public void testCustomerProductSum1() {
+		List<Product> products = new ArrayList<Product>();
+		products.add(new ProductImpl(100, "Product 15",
+				ProductType.BANK_GUARANTEE,
+				new AmountImpl(new BigDecimal("5.0"), Currency.INDIAN_RUPEE)));
+		products.add(
+				new ProductImpl(120, "Product 20", ProductType.BANK_GUARANTEE,
+						new AmountImpl(new BigDecimal("6.0"), Currency.EURO)));
+		@SuppressWarnings("unused")
+		Amount temp = null;
+		try {
+			temp = customerBO.getCustomerProductsSum(products);
+			fail("DifferentCurrenciesException is expected");
+		} catch (DifferentCurrenciesException e) {
+		}
+	}
+
+    //REFACTORED
+    @Test
+	public void testCustomerProductSum_TwoProductsDifferentCurrencies()
+			throws DifferentCurrenciesException {
+		Amount[] amounts = {
+				new AmountImpl(new BigDecimal("5.0"), Currency.EURO), 
+				new AmountImpl(new BigDecimal("6.0"), Currency.INDIAN_RUPEE) };
+		List<Product> products = createProductsWithAmounts(amounts);
+		Assertions.assertThrows(DifferentCurrenciesException.class, ()->{
+			customerBO.getCustomerProductsSum(products);
+		});
+	}
+
+    //PROBLEM
+    @Test
+	public void testCustomerProductSum2() {
+		List<Product> products = new ArrayList<Product>();
+		Amount temp = null;
+		try {
+			temp = customerBO.getCustomerProductsSum(products);
+		} catch (DifferentCurrenciesException e) {
+		}
+		assertEquals(Currency.EURO, temp.getCurrency());
+		assertEquals(BigDecimal.ZERO, temp.getValue());
+	}
+
+    //REFACTORED
+    @Test
+	public void testCustomerProductSum_EmptyProducts() throws DifferentCurrenciesException {
+		Amount actual = customerBO.getCustomerProductsSum(
+				new ArrayList<Product>());
+		Amount expected = new AmountImpl(BigDecimal.ZERO, Currency.EURO);
+		assertAmount(expected, actual);
+	}
+
+ UNIT TESTING ORGANIZATION / ATTITUDE
+ More Important than Code
+    Lead to better design due to continuous refactoring
+Best written before code(TDD)
+    TDD improves design and code quality
+Separated from Production Code
+Find defects early
+    Continuous Integration    
+
+UNIT TESTING PRINCIPLES 
+Easy to understand
+    Test should take no longer than 15 seconds to read 
+Test should fail only when there is a problem with production code 
+Tests should find all problems with production code 
+Tests should have as minimum duplication as possible
+Should run quickly
+
+PRINCIPLE 1 : EASY TO UNDERSTAND
+Name of the Unit Test 
+    Should indicate the condition being tested and (if needed) the result 
+        testClientProductSum_AllProductsSameCurrency    vs  testClientProductSum
+        testClientProductSum_DifferentCurrencies_ThrowsException    vs testClientProductSum1
+Highlight values important to the test
+One condition per test
+No Exception Handling in a test method
+
+PRINCIPLE 2 : FAIL ONLY WHEN THERE IS A DEFECT IN CODE UNDER TEST(CUT)
+No dependencies between test conditions
+    Dont assume the order in which tests would run
+Avoid External Dependencies 
+    Avoid depending on (db, external interface, network connection, container)
+    Use STUBS/MOCKS
+Avoid depending on System Date and Random
+    Avoid hard coding of paths  ("C:\\TestData\dataset1.dat")   //Runs well on my machine
+
+PRINCIPLE 3 : TESTS SHOULD FIND ALL DEFECTS IN CODE
+Test everything that could possibly break
+    Test Exceptions 
+    Test Boundary Conditions
+
+Use Strong Assertions
+    Do not write tests for coverage
+
+Favorite Maxim from JUNIT FAQ
+    Test until fear turns to boredom
+
+PRINCIPLE 4 : MINIMUM DUPLICATION 
+
+PRINCIPLE 5 : Tests should run quickly 
+(FACT) Long running tests are not run often
+    Avoid reading from file system or network
+A temporary solution might be to "Collect long running tests into a separate test suite" and run it less often
+
+RESULT : TESTS AS DOCUMENTATION
+Well written tests act as great documentation
+Examples:   testClientProductSum_AllProductsSameCurrency, testClientProductSum_DifferentCurrencies_ThrowsException
+
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ GETTING STARTED WITH REFACTORING
+
+REFACTORING 
+Altering struture of code without affecting "behavior"
+Toughest part of refactoring is the order or sequencing of steps
+Continuous refactoring aided by tests will lead to "clean code" 
+
+REFACTORING BEST PRACTICES
+Have Unit tests 
+Take small steps 
+Run tests at each step
+
+CustomerBOImpl
+--------------
+public class CustomerBOImpl implements CustomerBO {
+	public Amount getCustomerProductsSum(List<Product> products)
+			throws DifferentCurrenciesException {
+		BigDecimal temp = BigDecimal.ZERO;
+
+		if (products.size() == 0)
+			return new AmountImpl(temp, Currency.EURO);
+
+		// Throw Exception If Any of the product has a currency different from
+		// the first product
+		Currency firstProductCurrency = products.get(0).getAmount()
+				.getCurrency();
+
+		for (Product product : products) {
+			boolean currencySameAsFirstProduct = product.getAmount()
+					.getCurrency().equals(firstProductCurrency);
+			if (!currencySameAsFirstProduct) {
+				throw new DifferentCurrenciesException();
+			}
+		}
+
+		// Calculate Sum of Products
+		for (Product product : products) {
+			temp = temp.add(product.getAmount().getValue());
+		}
+		
+		// Create new product
+		return new AmountImpl(temp, firstProductCurrency);
+	}
+}
+
+CustomerBOImplRefactored
+------------------------
+public class CustomerBOImplRefactored implements CustomerBO {
+
+	@Override
+	public Amount getCustomerProductsSum(List<Product> products)
+			throws DifferentCurrenciesException {
+
+		if (products.size() == 0)
+			return new AmountImpl(BigDecimal.ZERO, Currency.EURO);
+
+		if(!doAllProductsHaveSameCurrency(products)) {
+			throw new DifferentCurrenciesException();
+		}
+
+		return calculateSumOfProducts(products);
+	}
+
+	private Amount calculateSumOfProducts(List<Product> products) {
+		
+		Currency firstProductCurrency = products.get(0).getAmount()
+				.getCurrency();
+
+		BigDecimal sum = products.stream()
+			.map(product -> product.getAmount().getValue())
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		return new AmountImpl(sum, firstProductCurrency);
+	}
+
+	private boolean doAllProductsHaveSameCurrency(List<Product> products) throws DifferentCurrenciesException {
+
+		Currency firstProductCurrency = products.get(0).getAmount()
+				.getCurrency();
+
+		return products.stream()
+				.map(product -> product.getAmount().getCurrency())
+				.allMatch(currency -> currency.equals(firstProductCurrency));
+			
+	}
+
+Movie
+-----
+    /*Axx or By
+    Where x represents any digit between 0 and 9, and y represents 
+    any digit between 1 and 4*/
+    public boolean isValidRating() {
+        if (this.getRating() != null) {
+            if (this.getRating().substring(0, 1).equalsIgnoreCase("B")
+                    && this.getRating().length() == 2) {
+                if (StringUtils.isNumeric(this.getRating().substring(1, 2))
+                        && Integer.parseInt(this.getRating().substring(1, 2)) > 0
+                        && Integer.parseInt(this.getRating().substring(1, 2)) < 5)
+                    return true;
+
+            } else if (this.getRating().substring(0, 1).equalsIgnoreCase("A")
+                    && this.getRating().length() == 3
+                    && StringUtils.isNumeric(this.getRating().substring(1, 3)))
+                return true;
+
+        }
+        return false;
+    }
+
+MovieRefactored
+---------------
+ 	private static final List<String> VALID_B_RATINGS_LIST 
+    						= Arrays.asList("B1","B2","B3","B4");
+
+
+    /*Axx or By
+    Where x represents any digit between 0 and 9, and y represents 
+    any digit between 1 and 4*/
+    public boolean isValidRating() {
+    	
+    	if (rating == null) {
+    		return false;
+    	}
+    	    	
+        if (isValidARating())
+            return true;
+
+        if (isValidBRating())
+        	return true;
+
+        return false;
+    }
+
+	private boolean isValidARating() {
+		String firstChar = rating.substring(0, 1);
+		
+		return firstChar.equalsIgnoreCase("A")
+                && rating.length() == 3
+                && StringUtils.isNumeric(rating.substring(1, 3));
+	}
+
+	private boolean isValidBRating() {
+		return VALID_B_RATINGS_LIST.contains(rating);		
+	}
+
+MenuAccess
+----------
+
+	public void setAuthorizationsInEachMenus(
+            List<MenuItem> menuItemsList, Role[] roles) {
+        for (int i = 0; i < menuItemsList.size(); i++) {
+            MenuItem menuItem = menuItemsList.get(i);
+            if (roles != null) {
+                for (int j = 0; j < roles.length; j++) {
+                    if (roles[j].getName().equals(menuItem
+                            .getReadAccessRole())
+                            && !Constants.WRITE.equals(
+                                    menuItem
+                                            .getAccess())) {
+                        menuItem.setAccess(Constants.READ);
+                        menuItem.setVisible(true);
+                    } else if (roles[j].getName().equals(
+                            menuItem
+                                    .getWriteAccessRole())) {
+                        menuItem.setAccess(Constants.WRITE);
+                        menuItem.setVisible(true);
+                    }
+                }
+
+            }
+
+        }
+
+MenuAccessRefactored
+--------------------
+
+	public void setAuthorizationsInEachMenus(
+            List<MenuItem> menuItems, Role[] roles) {
+    	if(roles == null)
+        	return;
+    	
+    	menuItems.stream().forEach(
+    			menuItem -> setAccessForMenuItem(menuItem, roles));
+    }
+
+	private void setAccessForMenuItem(MenuItem menuItem, Role[] roles) {
+		if (doesUserHaveTheRole(roles, menuItem.getReadAccessRole())) {
+		    menuItem.setAccess(Constants.READ);
+		    menuItem.setVisible(true);
+		}
+		
+		if(doesUserHaveTheRole(roles, menuItem.getWriteAccessRole())) {
+		    menuItem.setAccess(Constants.WRITE);
+		    menuItem.setVisible(true);
+		}
+	}
+
+	private boolean doesUserHaveTheRole(Role[] roles, String roleToCheckFor) {
+		return Arrays.stream(roles)
+			  .anyMatch(role -> role.getName().equals(roleToCheckFor));
+	}
+
+10 TIPS FOR GOOD PROGRAMMER
+----------------------------
+PAIR PROGRAMMING
+BOY SCOUT RULE 
+CONTINUOUS LEARNING 
+LEARN TOUCH TYPING 
+USE KEYBOARD 
+ASK WHY?
+WORK WITH SMART PEOPLE 
+UNDERSTAND ALL TOOLS - IDE, JSHELL, MAVEN, GRADLE 
+PLAY WITH OTHER LANGUAGES AND FRAMEWORKS 
+UNDERSTAND DIFFERENT PROGRAMMING APPROACHES - OBJECT ORIENTED, FUNCTIONAL, STRUCTURED
+
+TEST DRIVEN DEVELOPMENT - DO THE OPPOSITE
+-----------------------------------------

@@ -1,0 +1,346 @@
+042923
+Tight Coupling
+Loose Coupling
+Dependency Injection
+Spring Beans
+Application Context
+IOC Container
+Auto Wiring 
+Component Scan
+
+Arrays.stream(context.getBeanDefinitionNames()).forEach(System.out::println)
+@Component - An instance of class will be managed by Spring framework i.e A Spring Bean will be created
+Dependency - Class Car has a dependency for class Tyre
+@Component Scan("com.some.package") - How does Spring framework find component classes? It scans packages
+Dependency Injection - Identify beans, their dependencies and wire them together(Provides IOC - Inversion of control)
+    Spring Bean - An object managed by spring framework
+    IOC Container - Manages the lifecycle of beans and their dependencies
+        Types - ApplicationContext(complex) and Bean Factory(simpler features - rarely used)
+    Autowiring - Process of wiring in dependencies for a spring bean
+
+
+
+Spring Container/Spring Context/Application Container/Application Context
+Spring is managing objects and performing autowiring
+List all the beans managed by Spring framework
+What if muliple matching beans are available?
+    PRIMARY ()
+    Make one of them as primary(default) to indicate which of them is most important i.e. @Primary
+    Indicates that a bean should be given preference when multiple candidates are qualified to 
+    autowire a single-valued dependency. If exactly one primary bean exists among the candidates,
+    it will be the autowired value.
+    QUALIFIER
+    org.springframework.beans.factory.annotation.Qualifier
+    Use @Qualifier if you dont want to use the default one
+    This annotation may be used on a field or parameter as a qualifier for candidate beans when autowiring
+    It may also be used to annotate other custom annotations that can in turn be used as qualifiers
+    NOTE:
+        @Qualifier has higher priority than @Primary
+Spring is managing objects and performing autowiring. It will also helo to create object for us    
+    Based on the @Component annotation and using the @ComponentScan annotation
+    Spring is able to scan the right packages, find the components, create instances, autowire them
+    for us and get the entire application up and running.    
+
+Spring Initializer - start.spring.io
+Group Id - Package Name 
+Artifact Id - Class Name
+
+Coupling is a measure of how much work is involved in changing something
+Step 1 - Loose Coupling using interfaces
+            Object Creation
+            Wiring(injection) of dependencies
+Step 2 -  We want spring framework to create the objects for us and wire the dependencies
+          Inside JVM, we want to create a Spring context, and we want spring framework to manage the bean
+
+          A - Launch a Spring Context with the @Configuration class
+                Create a new instance of AnnotationConfigApplicationContext using @Configuration file - Use this to create a spring context
+
+
+          B - Configure the things that we want Spring to manage using @Configuration class 
+                Configuration indicates that a class declares one or more bean methods and may be processed by the 
+                Spring container to generate bean definitions and service requests for the beans at runtime   
+                @Bean - Indicates that a method produces a Bean to be managed by the spring container
+
+          C - Retrieving Beans managed by Spring
+                System.out.println(context.getBean("name"));      
+                Once Spring starts managing the bean, you could either use the name of the bean or the type of the bean
+
+Note: RECORD - Released in JDK 16
+        Eliminate verbosity in creating java beans
+        Public accessor methods, constructor, equals, hashcode and tostring are automatically created   
+
+Spring Container - Manages Spring Beans and their lifecycle
+Also called IOC Container - Once you create the java classes and configuration, the IOC container creates the runtime for us
+    i.e. INPUTS(POJO, Configuration) -> IOC CONTAINER -> OUTPUT(Ready System)
+
+
+2 Popular types of IOC container
+++++++++++++++++++++++++++++++++ 
+-> Bean Factory(Basic Spring Container)
+-> Application Context: Advanced Spring Container with enterprise specific features
+        Easy to use in web Applications
+        Easy internationalization
+        Easy integration with Spring AOP
+(RECOMMENDED) Most enterprise applications use Application Context. Recommended for Web Services/Web apps/REST APIs/Microservices 
+
+Java Bean vs POJO vs Spring Bean 
+++++++++++++++++++++++++++++++++
+Java Bean - Classes adhering to 3 constraints
+    -> Have public default no-arg constructors
+    -> Allow access to their properties using getter and setter methods
+    -> Implement jav.io.serializable
+POJO - No constraints. Any java object is a POJO
+Spring Bean - Any Java object that is managed by Spring
+    -> Spring uses IOC container(Bean Factory or Application Context) to manage these objects     
+
+
+@Component  -   import org.springframework.stereotype.Component
+----------
+Indicates that the annotated class is a Component
+
+Classes having @Component are considered as candidates for auto-detection when using 
+annotation based configuration and classpath scanning
+
+i.e. An instance of this class will be created by the spring framework for you
+
+@ComponentScan("com.some.package")
+Using COMPONENT SCAN, we need to tell Spring which package to search for components
+
+Spring will now be able to successfully invoke the component by creating an instance of the component
+and also able to autowire it to the calling bean method
+
+
+PRIMARY VS QUALIFIER
+---------------------
+@Component @Primary
+class QuickSort implements SortingAlgorithm {}
+
+@Component 
+class BubbleSort implements SortingAlgorithm {}
+
+@Component @Qualifier("RadixSortQualifier")
+class RadixSort implements SortingAlgorithm {}
+
+@Component
+class ComplexAlgorithm{
+    @Autowired
+    private SortingAlgorithm algorithm;
+}
+
+@Component
+class AnotherComplexAlgorithm{
+    @Autowired @Qualifier("RadixSortQualifier")
+    private SortingAlgorithm iwanttouseradixsortonly;
+}
+
+@Primary - A Bean should be given preference when multiple candidates are qualified
+@Qualifier - A Specific Bean should be auto-wired(name of the bean can be used as qualifier)
+Note: Always think from the perspective of the class using the SortingAlgorithm
+1 -> Just @Autowired : Give me (preferred) Sorting Algorithm 
+2 -> @Autowired + @Qualifier : I want to use specific Sorting Algorithm
+@Qualifier has higher priority than @Primary
+
+DEPENDENCY INJECTION TYPES
+--------------------------
+Constructor Based [preferred] -> Dependencies are set by creating the bean using its constructor
+
+Setter Based -> Dependencies are set by calling setter method on your beans
+
+Field Based -> No setter or constructor. Dependency is injected using reflectionz
+
+NOTE: Spring team recommends Constructor based injection as dependencies are automatically set when an object is created
+Even @Autowired annotation is not required
+
+@Component VS @Bean 
+-------------------
+@Component - CLASSES - Field, Setter or Constructor injection - Spring framework creates beans - Instantiating Beans for your own application code
+@Bean - METHODS - Method Call or Method Parameters - You write bean creation code - custom business logic, Instantiating beans for third party libraries @Bean
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+SPRING FRAMEWORK ADVANCED
+++++++++++++++++++++++++++
+LAZY INITIALIZATION
+BEAN SCOPES
+POST CONSTRUCT AND PRE-DESTROY
+JAKARTA EE
+CONTEXT AND DEPENDENCY INJECTION
+XML CONFIGURATION
+ALTERNATIVES @Component
+SPRING BIG PICTURE
+SPRING MODULES AND PROJECTS
+WHY IS SPRING POPULAR?
+
+@Lazy
+Default initialization of Spring Beans is Eager. Each Spring Bean is initialized eagerly at startup
+Eager initialization is always recommended. Since Errors during initialization will prevent application from starting up
+@Lazy Annotation on any class that uses @Component or @Bean. Not recommended and not frequently used
+Lazy resolution proxy will be injected instead of actual dependency
+After the initialization of context is completed, the bean is loaded. i.e. The bean is loaded just before it is made use of
+
+SINGLETON(Stateless Beans) vs PROTOTYPE(Stateful Beans)
+By default all the beans created in Spring framework are Singletons. Whenever you ask for a bean, the same instance would be returned back
+Prototype will create a new instance every time you ask for a bean, whereas the default one is Singleton   
+Single - One object instance per IOC container  => @Scope(value=ConfigurableBeanFactory.SCOPE_SINGLETON) or Default
+Prototype - Possibly many object instances per IOC container => @Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE) 
+
+Web-aware Scope
+    Request - One object instance per single HTTP Request
+    Session - One object instance per user HTTP Session
+    Application - One object instance per web application runtime
+    Websocket - One object instance per web socket instance
+
+@PostConstruct
+Used on a method that needs to be executed after dependency injection is done to perform any initialization. 
+This method must be invoked before the class is put into service
+
+@PreDestroy
+Used on a method as a callback notification to signal that the instance is in the process of being removed by the container
+Typically used to release resources that it has been holding
+
+JAKARTA EE
+++++++++++
+J2EE - 1.2, 1.3, 1.4
+Java EE - 5 to 8
+Jakarta EE - Onwards
+
+Spring 5 - Java EE  i.e. javax.* packages
+Spring 6+ adn Spring Boot 3+ - Jakarta EE   i.e. jakarta.* packages
+
+Jakarta Context and Dependency Injection(CDI) is a Specification(Interface)
+Spring Framework implements CDI
+Inject API Annotations
+    Inject(~Autowired in Spring)    -> import jakarta.inject.Inject
+    Named(~Component in Spring)     -> import jakarta.inject.Named
+    Qualifier
+    Scope
+    Singleton
+
+@Autowired and @Component are Spring annotations. 
+Important CDI annotations are @Inject (~Autowired in Spring), @Named (~Component in Spring).
+
+groupId - jakarta.inject
+artifactId - jakarta.inject-api
+version - 2.0.1
+
+XML CONFIGURATION
+++++++++++++++++++
+
+contextConfiguration.xml
+------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"> <!-- bean definitions here -->
+	
+    <bean id="name" class="java.lang.String">
+        <constructor-arg value="Vijay">
+    </bean>
+
+    <bean id="age" class="java.lang.Integer">
+        <constructor-arg value="41">
+    </bean>
+
+    <context:component-scan base-package="com.some.package.name"/>
+ 	
+
+    <bean id="someClass" class="com.some.package.name.SomeClassName">
+    </bean>
+
+    <bean id="enclosingClass" class="com.some.package.name.EnclosingClassName">
+        <constructor-arg ref="someClass">
+    </bean>
+</beans>
+
+var context = new AnnotationConfigApplicationContext(HelloWorldConfiguration.class);
+var context = new ClassPathXmlApplicationContext("contextConfiguration.xml");
+
+Arrays.stream(context.getBeanDefinitionNames()).forEach(System.out::println)
+System.out.println(context.getBean("name"));   
+System.out.println(context.getBean("age"));   
+
+context.getBean(EnclosingClassName.class).someMethod();
+
+SPRING STEREOTYPE ANNOTATIONS - @Component and more 
++++++++++++++++++++++++++++++++++++++++++++++++++++
+@Component - Generic Annotation applicable for any class. Base for all Spring Stereotype Annotations
+
+Specializations of @Component:
+    @Service - Indicates that an annotated class has business logic
+    @Controller - Indicates that an annotated class is a "controller" i.e. web controller 
+                    Used to define controllers in your web applications and REST API 
+    @Repository - Indicates that an annotated class is used to retrieve and/or manipulate data in a database
+
+What should you use?
+Recommendation - Use the most specific annotation possible
+Why? By using a specific annotation, you are giving more information to the framework about your intentions
+You can use AOP at a later point to add additional behavior
+    Example: For @Repository, Spring automatically wires JDBC Exception translation features   
+
+SPRING ANNOTATIONS SUMMARY
+++++++++++++++++++++++++++
+@Configuration - Indicates that a class declares one or more @Bean methods and may be processed by the spring container to generate bean definitions 
+@ComponentScan - Defines specific packages to scan for components. 
+    If specific packages are not defined, scanning will occur from the package of the class that declares this annotation
+@Bean - Indicates that a method produces a bean to be managed by the Spring container
+@Component - Indicates that an annotated class is a component.If the annotated component is part of component scan, spring beans will be created
+@Service -
+@Controller -
+@Repository -
+@Primary - Indicates that a bean should be given preference when multiple candidates are qualified to autowire a single valued dependency 
+@Qualifier - Used on a field or parameter as a qualifier for candidate beans when autowiring 
+@Lazy - Indicates that a bean has to be lazily initialized. Absence of @Lazy initialization will lead to eager initialization
+@Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE) - Defines a bean to be a Prototype - a new instance will be created everytime you refer to the bean
+    Default scope is Singleton - One instance per IOC container 
+@PostConstruct - Identifies the method that will be executed after dependency injection is done to perform any initialization 
+@PreDestroy - Identifies the method that will receive the callback notification to signal that the instance is in the process of being removed by the container
+    Typically used to release resources that it has been holding 
+@Named - Jakarta Context and Dependency Injection(CDI) Annotation similar to Component
+@Inject - Jakarta Context and Dependency Injection(CDI) Annotation similar to Autowired
+
+SPRING CONCEPTS SUMMARY
++++++++++++++++++++++++
+Dependency Injection - Identifies beans, their dependencies and wire them together(Provides IOC - Inversion Of Control) 
+Constructor Injection - Dependencies are set by creating the bean using its constructor 
+Setter Injection - Dependencies are set by calling setter methods on your beans 
+Field Injection - No setter or constructor. Dependency is injected using reflection 
+IOC Container - Spring IOC Context that manages Spring beans and their lifecycle
+Bean Factory - Basic Spring IOC Container 
+Application Context - Advanced Spring IOC Container with enterprise specific features - Easy to use in web applications with internationalization features
+    and good integration with Spring AOP
+Spring Beans - Objects managed by Spring
+Autowiring - Process of wiring in dependencies for a Spring Bean 
+
+SPRING BIG PICTURE - FRAMEWORK, MODULES, PROJECTS 
++++++++++++++++++++++++++++++++++++++++++++++++++
+SPRING PROJECTS
+    - SPRING FRAMEWORK  (contains multiple spring modules)
+        - CORE (fundamental features - IOC CONTAINER, DEPENDENCY INJECTION, AUTOWIRING)
+        - TEST (Mock Objects, Spring MVC Test)
+        - WEB - Spring MVC (Web application, REST API)
+        - JDBC (Data Access - JDBC, JPA etc)
+        - INTEGRATION (JMS) - Address challenges with integration with other applications
+        - WEB REACTIVE (Spring Webflux)
+    - SPRING BOOT - Popular framework to build microservices
+    - SPRING CLOUD - Build cloud native applications
+    - SPRING DATA - Integrate the same way with different types of databases. NoSQL and Relational
+    - SPRING SECURITY - Secure your web application/REST API/Microservice
+
+Each application can choose modules they wanted to make use of
+Application Architectures evolve continuously - Web > REST API > Microservices > Cloud
+
+Why is Spring Ecosystem popular?
+Loose Coupling - Spring manages creation and wiring of beans and dependencies
+    Makes it easy to build loosely coupled applications
+    Makes writing unit tests easy (Spring Unit Testing)
+
+Reduce Boilerplate Code - Focus on business Logic
+    Example : No need for exception handling in each method 
+        All Checked Exceptions are converted to runtime or unchecked Exceptions
+
+Architectural Flexibility - Spring Modules and Projects 
+    You can pick and choose which ones to use(Need not use all of them)
+
+Evolution with time - Microservices and Cloud
+    Spring Boot, Spring Cloud etc.

@@ -1,0 +1,151 @@
+GITHUB
+Cloud git repository and services provider - Stores and manages git repositories
+
+Cloud git repository storage - Push and Pull
+    Backup, work across machines and work in teams
+    public and private, team management and more
+
+Code Management and collaborative development
+    Via "issues", "projects", "pull requests" and more
+
+Automation and CI/CD
+    via Github Actions, Github Apps and more.
+
+
+Workflow Automation Service by Github
+Automates all kind of repository related processes and actions
+Code Deployment(CI/CD) - Automate code testing, building and deployment
+    CI - Continuous Integration - Code changes are automatically built, tested and merged with existing code
+    CD - Continuous Delivery - After integration, new app or package versions are published automatically 
+
+WORKFLOWS - Belong to a given github repository 
+    Attached to a git repository
+    Contain one or more jobs
+    Triggered upon events
+
+JOBS - Workflow comprise of number of jobs
+    Define a RUNNER or EXECUTION ENVIRONMENT
+    Contain one or more steps
+    Run in parallel(default) or sequential
+    Can be conditional
+
+STEPS - Job comprise of number of steps
+    Execute a SHELL SCRIPT or an ACTION
+    Can use custom or third party actions
+    Steps are executed in order
+    Can be conditional
+
+The exact quotas and payment details depend on your GitHub plan, a detailed summary can be found here: 
+https://docs.github.com/en/billing/managing-billing-for-github-actions/about-billing-for-github-actions
+
+If you can't find an "Actions" tab in your GitHub repository, you can should enable them as described here: 
+https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository
+
+Github Action Runners
+https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+
+
+first-action.yml
+----------------
+name: First Workflow    -> Name of the workflow
+on: workflow_dispatch   -> The event that should trigger this workflow. Dispatch and trigger the workflow manually
+jobs:                   -> The work that should be done
+  first-job:            -> job name identifier of our choice(check above Github Action Runners)
+    runs-on: ubuntu-latest  -> Runner environment that we want to use
+    steps:                  -> List of steps that should be executed
+      - name: Print greeting    -> Name of the step
+        run: echo "Hello World!"    -> Script/Command that should be executed in the Shell or Predefined Actions
+      - name: Print goodbye
+        run: echo "Done - bye!"
+
+Details of the workflow execuion (Logs)
+--------------------------------
+Set up job
+    Current runner version: '2.311.0'
+    Operating System
+    Runner Image
+    Runner Image Provisioner
+    GITHUB_TOKEN Permissions
+    Secret source: Actions
+    Prepare workflow directory
+    Prepare all required actions
+    Complete job name: first-job
+Print greeting
+    Run echo "Hello World!"
+    Hello World!
+Print goodbye
+    Run echo "Done - bye!"
+    Done - bye!
+Complete job
+    Cleaning up orphan processes
+
+
+Running Multi-Line Shell Commands
+---------------------------------
+adding the pipe symbol (|) as a value after the run: key
+
+run: |
+    echo "First output"
+    echo "Second output"
+
+EVENTS (WORKFLOW TRIGGERS)
+--------------------------
+Guthub Actions Events - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+
+REPOSITORY RELEATED
+    push - Pushing a commit
+        By default, push request, has no permission to create workflows. 
+        ! [remote rejected] main -> main (refusing to allow a Personal Access Token to create or update workflow `.github/workflows/test.yml` without `workflow` scope)
+        under developer settings down here and personal access token,permission to update GitHub action workflows.
+    fork - Repository was forked
+    watch - Repository was starred
+    pull_request - pul request action (Open, Closed..)
+    issues - An issue was opened, deleted..
+    discussion - Discussion action created, deleted..
+    create - A branch or tag was created
+    issue_comment - Issue or pull request comment action
+
+OTHER
+    workflow_dispatch - Manually trigger workflow
+    repository_dispatch - REST API request triggers workflow(which would allow us to send REST API request
+                                                    to a specific GitHub REST API to trigger a workflow,)
+    schedule - Workflow is scheduled
+    workflow_call - Can be called by other workflows
+
+
+ACTIONS - A (Custom) application that performs a (typically complex) frequently repeated task
+    for example,fetching the code from a GitHub Repository, and downloading it onto such a runner machine.
+    You can build your own actions, but you can also use official or community actions
+
+RUN - We simply execute typically simple shell commands on that runner machine,
+
+GITHUB ACTIONS CHECKOUT
+https://github.com/actions/checkout
+
+MARKETPLACE - Central place where you can browse different actions
+https://github.com/marketplace/actions/checkout
+
+GITHUB ACTIONS SETUP-NODE
+https://github.com/actions/setup-node
+
+
+
+
+test-action.yml
+----------------
+name : My Test Project
+on: push
+jobs:
+  mytest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v4
+      - name: Install NodeJS
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install Dependencies
+        run:  npm ci
+      - name: Run Tests
+        run:  npm test
